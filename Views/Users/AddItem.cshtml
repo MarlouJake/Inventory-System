@@ -58,9 +58,6 @@
 <h5 class="text-break"><strong>Add new item</strong></h5>
 <hr />
 <form asp-action="AddItem" method="post" class="forms" asp-route-id="@Model.ItemId" onsubmit="return jQueryAjaxPost(this);">
-
-    <!--div asp-validation-summary="ModelOnly"  class="text-danger needs-validation" novalidate></!--div-->
-
     <div class="form-group">
         <label asp-for="ItemCode" for="itemCode" class="control-label"></label>
         <input asp-for="ItemCode" id="itemCode" type="text" class="form-control user-input"
