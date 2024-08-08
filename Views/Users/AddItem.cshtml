@@ -62,8 +62,8 @@
     <!--div asp-validation-summary="ModelOnly"  class="text-danger needs-validation" novalidate></!--div-->
 
     <div class="form-group">
-        <label asp-for="ItemCode" class="control-label"></label>
-        <input asp-for="ItemCode" type="text" class="form-control user-input"
+        <label asp-for="ItemCode" for="itemCode" class="control-label"></label>
+        <input asp-for="ItemCode" id="itemCode" type="text" class="form-control user-input"
                    autocomplete="off"
                    required
                    placeholder="Item Code"
@@ -76,8 +76,8 @@
         <span asp-validation-for="ItemCode" class="text-danger"></span>
     </div>
     <div class="form-group mt-2">
-        <label asp-for="ItemName" class="control-label"></label>
-        <input asp-for="ItemName" class="form-control user-input"
+        <label asp-for="ItemName" for="itemName" class="control-label"></label>
+        <input asp-for="ItemName" id="itemName" class="form-control user-input"
                    autocomplete="off"
                    required
                    placeholder="Item Name"
@@ -88,15 +88,15 @@
     </div>
 
     <div class="form-group mt-2">
-        <label asp-for="ItemDescription" class="control-label"></label>
-        <textarea asp-for="ItemDescription" type="text" class="form-control user-input"
+        <label asp-for="ItemDescription" for="itemDescription" class="control-label"></label>
+        <textarea asp-for="ItemDescription" id="itemDescription" type="text" class="form-control user-input"
                autocomplete="off"
                    placeholder="Description"></textarea>
         <span asp-validation-for="ItemDescription" class="text-danger"></span>
     </div>
 
     <div class="form-group mt-2">
-        <label asp-for="Status" class="control-label"></label>
+        <label asp-for="Status" for="statusDropdown" class="control-label"></label>
         <select asp-for="Status" id="statusDropdown" class="form-control" required>
             <option value="" class="text-muted">--Select Status--</option>
         </select>      
@@ -110,8 +110,8 @@
 
 
       <div class="form-group mt-2">
-        <label asp-for="AdditionalInfo" class="control-label"></label>
-        <textarea asp-for="AdditionalInfo" class="form-control user-input"
+        <label asp-for="AdditionalInfo" for="item-info" class="control-label"></label>
+        <textarea asp-for="AdditionalInfo" id="item-info" class="form-control user-input"
                autocomplete="off"
                placeholder="Additional inforamtion"></textarea>
         <span asp-validation-for="AdditionalInfo" class="text-danger"></span>
@@ -119,7 +119,7 @@
 
 
     <div class="form-group mt-2">
-        <label asp-for="FirmwareUpdated" class="control-label"></label>
+        <label asp-for="FirmwareUpdated" for="updateDropdown" class="control-label"></label>
         <select asp-for="FirmwareUpdated" id="updateDropdown" class="form-control" required>
             <option value="" class="text-muted">--Select Option--</option>
         </select>
