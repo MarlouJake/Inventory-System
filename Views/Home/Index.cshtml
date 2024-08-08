@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewData["Title"] = "Login";   
+}
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+<div class="row d-grid d-lg-flex" id="login-page">
+    <div class="col-12 col-lg-6 mt-3 mt-lg-0">    
+        @await Html.PartialAsync("LoginPage", new LoginModel())
+    </div>
+</div>
+
+<!--Swap order of div in small screen-->
+<!--div class="row d-grid d-lg-flex">
+    <div class="col-12 col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0">
+        await Html.PartialAsync("Privacy")
+    </div>
+    <div class="col-12 col-lg-6 order-1 order-lg-2 mt-3 mt-lg-0">
+        await Html.PartialAsync("LoginPage")
+    </div>
+</!--div-->
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    
+}

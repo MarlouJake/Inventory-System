@@ -1,0 +1,148 @@
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins/Poppins-Regular.ttf') format('truetype'), url('/fonts/poppins/Poppins-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins/Poppins-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 60px;
+}
+
+
+
+@media screen and (min-width: 577px) {
+    .btn-crud {
+        display:block;
+        width: 6rem;
+        height: 2.3rem;
+    }
+
+    .btn-hidden {
+        display: none;
+    }
+
+}
+
+
+@media screen and (max-width: 576px){
+    .user-table th{
+        font-size: 0.8rem;
+    }
+
+
+    .modal-dialog {
+        max-width: 91%;
+        
+    }
+
+   
+    .btn-crud {
+        display: none;
+    }
+
+    .btn-hidden {
+        display: block;
+        width: 2rem;
+        height: 2rem;
+    }
+}
+
+#success-message {
+    display: none; /* Initially hidden */
+    position: fixed; /* Fixed position to stay in place when scrolling */
+    top: 10px; /* Distance from the top */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Offset by half its width to center */
+    padding: 10px;
+    background-color: #008000; /* Green background */
+    color: white; /* White text color */
+    border-radius: 5px; /* Rounded corners */
+    z-index: 9999; /* High z-index to ensure it appears above other elements */
+}
+
+#error-message {
+    display: none; /* Initially hidden */
+    position: fixed; /* Fixed position to stay in place when scrolling */
+    top: 10px; /* Distance from the top */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Offset by half its width to center */
+    padding: 10px;
+    background-color: #FF5252; /* Green background */
+    color: white; /* White text color */
+    border-radius: 5px; /* Rounded corners */
+    z-index: 9999; /* High z-index to ensure it appears above other elements */
+}
+
+#loading-animation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.modal-content {
+    border: none;
+    border-radius: 10px;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.4em;
+}
+
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 14px;
+    z-index: 9999;
+}
+.notification.success {
+    background-color: #28a745;
+}
+
+.notification.error {
+    background-color: #dc3545;
+}
+
+.invalid-input {
+    border: 2px solid red;
+}

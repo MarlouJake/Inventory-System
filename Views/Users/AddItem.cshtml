@@ -1,0 +1,87 @@
+﻿@model InventorySystem.Models.Item
+
+@{
+    ViewData["Title"] = "Add new item";
+    Layout = null;   
+}
+
+
+<h5 class="text-break"><strong>Add new item</strong></h5>
+<hr />
+<form asp-action="AddItem" method="post" class="forms" asp-route-id="@Model.ItemId" onsubmit="return jQueryAjaxPost(this);">
+
+    <!--div asp-validation-summary="ModelOnly"  class="text-danger needs-validation" novalidate></!--div-->
+
+    <div class="form-group">
+        <label asp-for="ItemCode" class="control-label"></label>
+        <input asp-for="ItemCode" type="text" class="form-control user-input"
+                   autocomplete="off"
+                   required
+                   placeholder="Item Code"
+                   data-val = "true"
+                   data-val-required="Item code is required!"
+                   data-val-minlength="Item code must be at least 3 characters long."
+                   data-val-minlength-min="3"
+                   pattern="\S+" />
+
+        <span asp-validation-for="ItemCode" class="text-danger"></span>
+    </div>
+    <div class="form-group mt-2">
+        <label asp-for="ItemName" class="control-label"></label>
+        <input asp-for="ItemName" class="form-control user-input"
+                   autocomplete="off"
+                   required
+                   placeholder="Item Name"
+                   data-val="true"
+                   data-val-required="Item name is required!"
+                   data-val-minlength="Item name must be at least 3 characters long." />
+        <span asp-validation-for="ItemName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="ItemDescription" class="control-label"></label>
+        <textarea asp-for="ItemDescription" type="text" class="form-control user-input"
+               autocomplete="off"
+                   placeholder="Description"></textarea>
+        <span asp-validation-for="ItemDescription" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="Status" class="control-label"></label>
+        <select asp-for="Status" class="form-control" required>
+            <option value="--Select Status--" class="text-muted">--Select Status--</option>
+            <option value="Complete" class="text-success">Complete</option>
+            <option value="Incomplete(Usable)" class="text-primary">Incomplete(Usable)</option>
+            <option value="Incomplete(Unusable)" class="text-danger">Incomplete(Unusable)</option>
+        </select>      
+                 
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+  
+
+
+
+
+
+      <div class="form-group mt-2">
+        <label asp-for="AdditionalInfo" class="control-label"></label>
+        <textarea asp-for="AdditionalInfo" class="form-control user-input"
+               autocomplete="off"
+               placeholder="Additional inforamtion"></textarea>
+        <span asp-validation-for="AdditionalInfo" class="text-danger"></span>
+    </div>
+
+    <hr class="mt-4"/>
+    <div class="form-group mt-4">
+        <input type="submit" value="Add Item" class="btn btn-success form-control"/>
+        <input type="button" value="Cancel" class="btn btn-outline-secondary form-control mt-3"  data-bs-dismiss="modal" />
+    </div>
+</form>
+
+
+
+
+@section Scripts {
+     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+  
+}

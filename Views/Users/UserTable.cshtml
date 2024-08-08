@@ -1,0 +1,158 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "User Table";
+    //bool isCreationContext = ViewData["IsCreationContext"] is bool value && value;
+    //var isCreationContext = ViewData["IsCreationContext"] != null && (bool)ViewData["IsCreationContext"];
+    Layout = null;
+
+    /*
+    // Ensure Model.Users is not null and has elements
+    var users = Model.Users ?? Enumerable.Empty<InventorySystem.Models.User>();
+    var updateUsers = Model.UpdateModels ?? Enumerable.Empty<InventorySystem.Models.UpdateModel>();
+    var hasUsers = users.Any();
+    var userIdHeader = hasUsers ? users.FirstOrDefault()?.UserId.ToString() ?? "UserId" : "UserId";
+    var usernameHeader = hasUsers ? users.FirstOrDefault()?.Username?.ToString() ?? "Username" : "Username";
+    var emailHeader = hasUsers ? users.FirstOrDefault()?.Username?.ToString() ?? "Username" : "Username";
+    var passwordHeader = hasUsers ? users.FirstOrDefault()?.Username?.ToString() ?? "Username" : "Username";
+    var dateCreatedHeader = hasUsers ? users.FirstOrDefault()?.Username?.ToString() ?? "Username" : "Username";
+    var users = Model.Users ?? Enumerable.Empty<InventorySystem.Models.User>();
+    var updateModels = Model.UpdateModels ?? Enumerable.Empty<InventorySystem.Models.UpdateModel>();*/
+
+}
+
+
+@model IEnumerable<InventorySystem.Models.Item>
+
+<section>
+
+    <table class="table table-striped table-hover user-table text-start text-break">
+        <thead class="table-dark">
+            <tr class="col" style="font-size:12px;">
+                <th>
+                    ID
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().ItemCode)
+                </th>
+
+                <th>
+                    @Html.DisplayNameFor(model => model.First().ItemName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().ItemDescription)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().Status)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().AdditionalInfo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().ItemDateUpdated)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().ItemDateAdded)
+                </th>
+               
+                <th class="text-center">
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="9" class="text-center">NO DATA</td>
+                </tr>
+
+            }
+
+            else
+            {
+
+                @foreach (var item in Model)
+                {
+                    // Assuming DecryptId is not needed here as item.UserId is directly used
+                    //var hashedId = item.UserId.ToString(); // Convert UserId to string
+
+                    <tr class="">
+                        <td style="width:3%;">
+                            @Html.DisplayFor(modelItem => item.ItemId)
+                        </td>
+                        <td style="width:8%;">
+                            @Html.DisplayFor(modelItem => item.ItemCode)
+                        </td>
+                        <td style="width:8%;">
+                            @Html.DisplayFor(modelItem => item.ItemName)
+                        </td>
+                        <td style="width:26%;">
+                            @Html.DisplayFor(modelItem => item.ItemDescription)
+                        </td>
+                        <td style="width:9.5%;" class="status-container">                     
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                        <td style="width:25%;">
+                            @Html.DisplayFor(modelItem => item.AdditionalInfo)
+                        </td>
+                        <td style="width:10%;">
+                            @Html.DisplayFor(modelItem => item.ItemDateUpdated)
+                        </td>
+                        <td style="width:10%;">
+                            @Html.DisplayFor(modelItem => item.ItemDateAdded)
+                        </td>
+                        <td class="col-sm-1">
+                            <a onclick="ShowPopUp('@Url.Action("Update", "Users",  new{id = item.UserId}, Context.Request.Scheme)','Update User')" class="btn  btn-crud  m-1 p-2 text-light" style="font-size:12px; background-color:rgb(0, 201, 195);">
+                                <svg class="feather feather-edit" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 3 28 24" width="12" height="12" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                </svg>Update
+                            </a>
+                            <a onclick="ShowPopUp('@Url.Action("ViewDetails", "Users",  new{id = item.UserId}, Context.Request.Scheme)','User Details')" class="btn btn-primary m-1 p-2 btn-crud" style="font-size:12px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 2 30 25" width="16" height="16">
+                                    <path d="M13 7.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-3 3.75a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v4.25h.75a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1 0-1.5h.75V12h-.75a.75.75 0 0 1-.75-.75Z" fill="white"></path>
+                                    <path d="M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1ZM2.5 12a9.5 9.5 0 0 0 9.5 9.5 9.5 9.5 0 0 0 9.5-9.5A9.5 9.5 0 0 0 12 2.5 9.5 9.5 0 0 0 2.5 12Z" fill="white"></path>
+                                </svg>View
+                            </a>
+                            <a onclick="ShowPopUp('@Url.Action("Delete", "Users",  new{id = item.ItemId}, Context.Request.Scheme)')" class="btn btn-danger m-1 p-2 btn-crud" style="font-size:12px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="15" height="15">
+                                    <path d="M16 1.75V3h5.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H8V1.75C8 .784 8.784 0 9.75 0h4.5C15.216 0 16 .784 16 1.75Zm-6.5 0V3h5V1.75a.25.25 0 0 0-.25-.25h-4.5a.25.25 0 0 0-.25.25ZM4.997 6.178a.75.75 0 1 0-1.493.144L4.916 20.92a1.75 1.75 0 0 0 1.742 1.58h10.684a1.75 1.75 0 0 0 1.742-1.581l1.413-14.597a.75.75 0 0 0-1.494-.144l-1.412 14.596a.25.25 0 0 1-.249.226H6.658a.25.25 0 0 1-.249-.226L4.997 6.178Z" fill="white"></path>
+                                    <path d="M9.206 7.501a.75.75 0 0 1 .793.705l.5 8.5A.75.75 0 1 1 9 16.794l-.5-8.5a.75.75 0 0 1 .705-.793Zm6.293.793A.75.75 0 1 0 14 8.206l-.5 8.5a.75.75 0 0 0 1.498.088l.5-8.5Z" fill="white"></path>
+                                </svg>Delete
+                            </a>
+
+
+                            <a onclick="ShowPopUp('@Url.Action("Update", "Users",  new{id = item.UserId}, Context.Request.Scheme)')" title="Update" class="btn  btn-hidden  m-1 p-2 text-light" style="font-size:12px; background-color:rgb(0, 201, 195);">
+                                <svg class="feather feather-edit" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="-3 0 28 24" width="12" height="12" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                </svg>
+                            </a>
+                            <a onclick="ShowPopUp('@Url.Action("ViewDetails", "Users", new { id = item.UserId }, Context.Request.Scheme)')" class="btn btn-primary m-1 p-2 btn-hidden" title="View Details" style="font-size:12px; ">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 3 30 25" width="16" height="16">
+                                    <path d="M13 7.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-3 3.75a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v4.25h.75a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1 0-1.5h.75V12h-.75a.75.75 0 0 1-.75-.75Z" fill="white"></path>
+                                    <path d="M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1ZM2.5 12a9.5 9.5 0 0 0 9.5 9.5 9.5 9.5 0 0 0 9.5-9.5A9.5 9.5 0 0 0 12 2.5 9.5 9.5 0 0 0 2.5 12Z" fill="white"></path>
+                                </svg>
+                            </a>
+                            <a onclick="ShowPopUp('@Url.Action("Delete", "Users", new { id = item.ItemId }, Context.Request.Scheme)')" class="btn btn-danger m-1 p-2 btn-hidden" title="Delete" style="font-size:12px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -1 30 30" width="15" height="15">
+                                    <path d="M16 1.75V3h5.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H8V1.75C8 .784 8.784 0 9.75 0h4.5C15.216 0 16 .784 16 1.75Zm-6.5 0V3h5V1.75a.25.25 0 0 0-.25-.25h-4.5a.25.25 0 0 0-.25.25ZM4.997 6.178a.75.75 0 1 0-1.493.144L4.916 20.92a1.75 1.75 0 0 0 1.742 1.58h10.684a1.75 1.75 0 0 0 1.742-1.581l1.413-14.597a.75.75 0 0 0-1.494-.144l-1.412 14.596a.25.25 0 0 1-.249.226H6.658a.25.25 0 0 1-.249-.226L4.997 6.178Z" fill="white"></path>
+                                    <path d="M9.206 7.501a.75.75 0 0 1 .793.705l.5 8.5A.75.75 0 1 1 9 16.794l-.5-8.5a.75.75 0 0 1 .705-.793Zm6.293.793A.75.75 0 1 0 14 8.206l-.5 8.5a.75.75 0 0 0 1.498.088l.5-8.5Z" fill="white"></path>
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                }
+
+            }
+        </tbody>
+    </table>
+</section>
+
+@section Scripts {
+    <!--script src="https://code.jquery.com/jquery-3.6.0.min.js"></!--script-->
+}
+
