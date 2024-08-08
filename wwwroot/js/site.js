@@ -82,6 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
         successMessage.fadeIn().delay(1500).fadeOut(); // Show for 1.5 seconds
     }
     */
+
+
  
     NewItemAdded();
 
@@ -112,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function NewItemAdded() {
     const statusDisplays = document.getElementsByClassName('status-container');
+    const firmwareUpdateDisplay = document.getElementsByClassName('firmware-update');
 
     Array.from(statusDisplays).forEach(statusDisplay => {
         if (statusDisplay.textContent.trim() === "Complete") {
@@ -120,6 +123,16 @@ function NewItemAdded() {
             statusDisplay.style.color = 'blue';
         } else if (statusDisplay.textContent.trim() === "Incomplete(Unusable)") {
             statusDisplay.style.color = 'red';
+        }
+    });
+
+    Array.from(firmwareUpdateDisplay).forEach(firmwareUpdateDisplay => {
+        if (firmwareUpdateDisplay.textContent.trim() === "YES") {
+            firmwareUpdateDisplay.style.color = 'green';
+        } else if (firmwareUpdateDisplay.textContent.trim() === "N/A") {
+            firmwareUpdateDisplay.style.color = 'gray';
+        } else if (firmwareUpdateDisplay.textContent.trim() === "NO") {
+            firmwareUpdateDisplay.style.color = 'red';
         }
     });
 }
@@ -289,7 +302,6 @@ jQueryAjaxLoginPost = form => {
     //prevent default form submit event
     return false;
 }
-
 
 
 

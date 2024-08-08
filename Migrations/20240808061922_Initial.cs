@@ -40,7 +40,8 @@ namespace InventorySystem.Migrations
                     AdditionalInfo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ItemDateAdded = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ItemDateUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    FirmwareUpdated = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {

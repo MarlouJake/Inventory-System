@@ -57,77 +57,118 @@ namespace InventorySystem.Controllers
             /*addItemModel.Users = await _context.Users.ToListAsync()
             addItemModel.Items_ = await _context.Items.ToListAsync();*/
 
-            var items = new Item();
-            /*var model = new StatusDropdownValues
-            {
-                Item = new Item(),
-                Statuses = GetStatusDropdownItems()
-            };*/
+            var model = new Item();
 
-
-            return PartialView(items);
+            return PartialView(model);
 
 
         }
 
+        [HttpGet]
+        public JsonResult GetStatuses()
+        {
+            var statuses = new List<SelectListItem>
+            {
+                //new() {Value = "--Select Status--", Text = "--Select Status--"},
+                new () { Value = "Complete", Text = "Complete" },
+                new() { Value = "Incomplete(Usable)", Text = "Incomplete(Usable)" },
+                new () { Value = "Incomplete(Unusable)", Text = "Incomplete(Unusable)" }
+            };
+
+            return Json(statuses);
+        }
 
 
 
+        [HttpGet]
+        public JsonResult GetOptions()
+        {
+            var options = new List<SelectListItem>
+            {
+                //new() {Value = "--Select Status--", Text = "--Select Status--"},
+                 new () { Value = "N/A", Text = "N/A" },
+                new () { Value = "YES", Text = "YES" },
+                new() { Value = "NO", Text = "NO" }
+
+            };
+
+            return Json(options);
+        }
+
+        private static string[] ConsoleOutputs(Item model)
+        {
+            // Define a string array with each element being a formatted output string
+            string[] arr =
+            [
+                $"Item code: {model.ItemCode}",
+                $"Item name: {model.ItemName}",
+                $"Item description: {model.ItemDescription}",
+                $"Item status: {model.Status}",
+                $"Item additional info: {model.AdditionalInfo}",
+                $"Item firmware updated: {model.FirmwareUpdated}",
+                $"Item date added: {model.ItemDateAdded}",
+                $"Item date updated: {model.ItemDateUpdated}",
+                $"Item user id: {model.UserId}"
+            ];
+
+            // Print each element of the string array
+            foreach (var output in arr)
+            {
+                Console.WriteLine(output);
+            }
+
+            // Return the string array
+            return arr;
+        }
 
         // POST: Users/Create/id
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddItem([Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,AdditionalInfo,ItemDateAdded,ItemDateUpdated,UserId")] Item model)
+        public async Task<IActionResult> AddItem([Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,AdditionalInfo,ItemDateAdded,ItemDateUpdated,FirmwareUpdated,UserId")] Item model)
         {
-            /*var model = new StatusDropdownValues
-            {
-                Item = items,  // Use the bound item data
-                Statuses = GetStatusDropdownItems()
-            };*/
-
-
-
             if (model == null)
             {
-                ModelState.AddModelError("", "Item data is null.");
+                ModelState.AddModelError("", "Item data is null");
                 return Json(new
                 {
                     isValid = false,
                     html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                    failedMessage = "Item data is null!"
+                    failedMessage = "Item data is null"
                 });
             }
 
-            Console.WriteLine($"Item code: {model.ItemCode}");
-            Console.WriteLine($"Item name: {model.ItemName}");
-            Console.WriteLine($"Item description: {model.ItemDescription}");
-            Console.WriteLine($"Item status: {model.Status}");
-            Console.WriteLine($"Item additional info: {model.AdditionalInfo}");
-            Console.WriteLine($"Item date added: {model.ItemDateAdded}");
-            Console.WriteLine($"Item date updated: {model.ItemDateUpdated}");
-            Console.WriteLine($"Item user id: {model.UserId}");
+            ConsoleOutputs(model);
 
             if (string.IsNullOrWhiteSpace(model.ItemCode) || model.ItemCode.Contains(' '))
             {
-                ModelState.AddModelError("", "Item code cannot contain spaces.");
+                ModelState.AddModelError("", "Item code cannot contain spaces");
                 return Json(new
                 {
                     isValid = false,
                     html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                    failedMessage = "Item code cannot contain spaces!"
+                    failedMessage = "Item code cannot contain spaces"
                 });
             }
-
-            if (string.IsNullOrWhiteSpace(model.Status) || model.Status.Contains("--Select Status--"))
+            if (string.IsNullOrWhiteSpace(model.FirmwareUpdated) || model.FirmwareUpdated.Contains(' '))
             {
-                ModelState.AddModelError("", "Select status first.");
+                ModelState.AddModelError("", "Selecet firmware update option first");
                 return Json(new
                 {
                     isValid = false,
                     html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                    failedMessage = "Select status first."
+                    failedMessage = "Selecet firmware update option first"
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.Status) || model.Status.Contains("--Select Status--"))
+            {
+                ModelState.AddModelError("", "Select status first");
+                return Json(new
+                {
+                    isValid = false,
+                    html = Helper.RenderRazorViewToString(this, "AddItem", model),
+                    failedMessage = "Select status first"
                 });
             }
 
@@ -160,16 +201,9 @@ namespace InventorySystem.Controllers
                         successMessage = "Successfully added!"
                     });
                 }
-                catch
+                catch (Exception ex)
                 {
-                    TempData["ErrorMessage"] = "An error occurred while saving changes.";
-
-                    return Json(new
-                    {
-                        isValid = false,
-                        html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                        failedMessage = "An error occurred while saving changes!"
-                    });
+                    return StatusCode(500, new { success = false, message = ex.Message });
                 }
             }
 
@@ -193,35 +227,22 @@ namespace InventorySystem.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(int? id)
         {
-            //ViewData["IsCreationContext"] = false;
-            /*
+
             if (id == null)
             {
                 return NotFound();
             }
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            var item = await _context.Items.FindAsync(id); // logic to get the user data
 
-            return PartialView(user);*/
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.Users.FindAsync(id); // logic to get the user data
-
-            if (user == null)
+            if (item == null)
 
             {
                 return NotFound();
             }
 
 
-            return PartialView(user);
+            return PartialView(item);
         }
 
         #endregion
@@ -235,56 +256,32 @@ namespace InventorySystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(int id, [Bind("UserId,Username,Email,Password,DateCreated")] User model)
+        public async Task<IActionResult> Update(int id, [Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,AdditionalInfo,ItemDateUpdated,FirmwareUpdated")] Item model)
         {
             //ViewData["IsCreationContext"] = false;
             // Retrieve the success message from TempData if it exists
 
 
-            if (id != model.UserId)
+            if (id != model.ItemId)
             {
                 return NotFound();
             }
 
             //var existingUser = await _context.Users.FindAsync(id);
-            var existingUser = await _context.Users.FindAsync(id);
-            if (existingUser == null)
+            var existingItem = await _context.Items.FindAsync(id);
+            if (existingItem == null)
             {
                 return NotFound();
             }
-            model.Username = model.Username?.Trim();
-            model.Email = model.Email?.Trim();
-            model.Password = model.Password?.Trim();
+
 
 
             if (ModelState.IsValid)
             {
 
-                // Ensure no whitespaces are in Username, Email, and Password
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                if (model.Username.Contains(' ') || model.Email.Contains(' ') || model.Password.Contains(' '))
-                {
-                    ModelState.AddModelError("", "Fields cannot contain spaces.");
-                    return Json(new
-                    {
-                        isValid = false,
-                        html = Helper.RenderRazorViewToString(this, "Update", model),
-                        failedMessage = "Fields cannot contain spaces!"
-                    });
-                }
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-
-
-
                 //_context.Entry(existingUser).CurrentValues.SetValues(user);
-                existingUser.Username = model.Username;
-                existingUser.Email = model.Email;
+                existingItem.ItemCode = model.ItemCode;
 
-
-                if (!string.IsNullOrWhiteSpace(model.Password))
-                {
-                    existingUser.Password = HashHelper.HashPassword(model.Password).ToString();
-                }
 
                 //_context.Update(user);
 
@@ -294,7 +291,7 @@ namespace InventorySystem.Controllers
                 return Json(new
                 {
                     isValid = true,
-                    html = Helper.RenderRazorViewToString(this, "UserTable", await _context.Users.ToListAsync()),
+                    html = Helper.RenderRazorViewToString(this, "UserTable", await _context.Items.ToListAsync()),
                     successMessage = "Update successful!"
 
                 });
@@ -379,17 +376,7 @@ namespace InventorySystem.Controllers
             return _context.Users.Any(e => e.UserId == id);
         }
 
-        // Method to get status dropdown items
-        private static List<SelectListItem> GetStatusDropdownItems()
-        {
-            return
-            [
-                new() { Value = "--Select Status--", Text = "--Select Status--"},
-                new() { Value = "Complete", Text = "Complete" },
-                new() { Value = "Incomplete(Usable)", Text = "Incomplete(Usable)" },
-                new() { Value = "Incomplete(Not usable)", Text = "Incomplete(Not usable)" }
-            ];
-        }
+
     }
 }
 

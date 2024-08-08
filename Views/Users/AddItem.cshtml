@@ -1,9 +1,58 @@
 ﻿@model InventorySystem.Models.Item
-
 @{
     ViewData["Title"] = "Add new item";
     Layout = null;   
 }
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '@Url.Action("GetStatuses")',
+            type: 'GET',
+            success: function (data) {
+                var $statusDropdown = $('#statusDropdown');
+                $.each(data, function (index, item) {
+                    var $option = $('<option></option>').val(item.value).text(item.text);
+                    if (item.value === "Complete") {
+                        $option.css('color', 'green');
+                    } else if (item.value === "Incomplete") {
+                        $option.css('color', 'red');
+                    }
+                    $statusDropdown.append($option);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.log('Error fetching statuses: ' + error);
+            }
+        });
+
+
+        $.ajax({
+            url: '@Url.Action("GetOptions")',
+            type: 'GET',
+            success: function (data) {
+                var $statusDropdown = $('#updateDropdown');
+                $.each(data, function (index, item) {
+                    var $option = $('<option></option>').val(item.value).text(item.text);
+
+                    if (item.value === "N/A") {
+                        $option.addClass('text-secondary'); // Apply gray color
+                    }
+                    else if (item.value.startsWith("YES")) {
+                        $option.addClass('text-success'); // Apply green color
+                    }
+                    else if (item.value.startsWith("NO")) {
+                        $option.addClass('text-danger'); // Apply red color
+                    }
+
+                    $statusDropdown.append($option);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.log('Error fetching statuses: ' + error);
+            }
+        });
+    });
+</script>
 
 
 <h5 class="text-break"><strong>Add new item</strong></h5>
@@ -48,11 +97,8 @@
 
     <div class="form-group mt-2">
         <label asp-for="Status" class="control-label"></label>
-        <select asp-for="Status" class="form-control" required>
-            <option value="--Select Status--" class="text-muted">--Select Status--</option>
-            <option value="Complete" class="text-success">Complete</option>
-            <option value="Incomplete(Usable)" class="text-primary">Incomplete(Usable)</option>
-            <option value="Incomplete(Unusable)" class="text-danger">Incomplete(Unusable)</option>
+        <select asp-for="Status" id="statusDropdown" class="form-control" required>
+            <option value="" class="text-muted">--Select Status--</option>
         </select>      
                  
         <span asp-validation-for="Status" class="text-danger"></span>
@@ -71,6 +117,15 @@
         <span asp-validation-for="AdditionalInfo" class="text-danger"></span>
     </div>
 
+
+    <div class="form-group mt-2">
+        <label asp-for="FirmwareUpdated" class="control-label"></label>
+        <select asp-for="FirmwareUpdated" id="updateDropdown" class="form-control" required>
+            <option value="" class="text-muted">--Select Option--</option>
+        </select>
+
+        <span asp-validation-for="FirmwareUpdated" class="text-danger"></span>
+    </div>
     <hr class="mt-4"/>
     <div class="form-group mt-4">
         <input type="submit" value="Add Item" class="btn btn-success form-control"/>

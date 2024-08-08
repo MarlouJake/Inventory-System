@@ -7,9 +7,65 @@
     Layout = null;
 }
 
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '@Url.Action("GetStatuses")',
+            type: 'GET',
+            success: function (data) {
+                var $statusDropdown = $('#statusDropdown');
+                $.each(data, function (index, item) {
+                    var $option = $('<option></option>').val(item.value).text(item.text);
+
+                    if (item.value === "Complete") {
+                        $option.addClass('text-success'); // Apply green color
+                    }
+                    else if (item.value.startsWith("Incomplete(Usable)")) {
+                        $option.addClass('text-primary'); // Apply blue color
+                    }
+                    else if (item.value.startsWith("Incomplete(Unusable)")) {
+                        $option.addClass('text-danger'); // Apply red color
+                    }
+
+                    $statusDropdown.append($option);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.log('Error fetching statuses: ' + error);
+            }
+        });
+
+        $.ajax({
+            url: '@Url.Action("GetOptions")',
+            type: 'GET',
+            success: function (data) {
+                var $statusDropdown = $('#updateDropdown');
+                $.each(data, function (index, item) {
+                    var $option = $('<option></option>').val(item.value).text(item.text);
+
+                    if (item.value === "N/A") {
+                        $option.addClass('text-secondary'); // Apply gray color
+                    }
+                    else if (item.value.startsWith("YES")) {
+                        $option.addClass('text-success'); // Apply green color
+                    }
+                    else if (item.value.startsWith("NO")) {
+                        $option.addClass('text-danger'); // Apply red color
+                    }
+
+                    $statusDropdown.append($option);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.log('Error fetching statuses: ' + error);
+            }
+        });
+    });
+</script>
+
 <h5><strong>Edit</strong></h5>
 <hr />
-<form asp-action="update" class="forms" asp-route-id="@Model.UserId" onsubmit="return jQueryAjaxPost(this);">
+<form asp-action="update" class="forms" asp-route-id="@Model.ItemId" onsubmit="return jQueryAjaxPost(this);">
     <!--div asp-validation-summary="ModelOnly" class="text-danger"></!--div-->
     <input type="hidden" asp-for="ItemId" />
     <div class="form-group">
@@ -17,15 +73,43 @@
         <input asp-for="ItemCode" type="text" class="form-control user-input" autocomplete="off" pattern="\S+" />
         <span asp-validation-for="ItemCode" class="text-danger"></span>
     </div>
+
     <div class="form-group mt-2">
         <label asp-for="ItemName" class="control-label"></label>
-        <input asp-for="ItemName" type="text" class="form-control user-input" autocomplete="off" pattern="\S+" />
+        <input asp-for="ItemName" type="text" class="form-control user-input" autocomplete="off"/>
         <span asp-validation-for="ItemName" class="text-danger"></span>
     </div>
+
     <div class="form-group mt-2">
         <label asp-for="ItemDescription" class="control-label"></label>
-        <input asp-for="ItemDescription" type="password" class="form-control user-input" autocomplete="off" pattern="\S+" />
+        <input asp-for="ItemDescription" type="text" class="form-control user-input" autocomplete="off"/>
         <span asp-validation-for="ItemDescription" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="Status" class="control-label"></label>
+        <select asp-for="Status" id="statusDropdown" class="form-control" required>
+            <option value="" class="text-muted">--Select Status--</option>
+        </select>
+
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="AdditionalInfo" class="control-label"></label>
+        <textarea asp-for="AdditionalInfo" class="form-control user-input"
+                  autocomplete="off"
+                  placeholder="Additional inforamtion"></textarea>
+        <span asp-validation-for="AdditionalInfo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="FirmwareUpdated" class="control-label"></label>
+        <select asp-for="FirmwareUpdated" id="updateDropdown" class="form-control" required>
+            <option value="" class="text-muted">--Select Option--</option>
+        </select>
+
+        <span asp-validation-for="FirmwareUpdated" class="text-danger"></span>
     </div>
 
     <div class="form-group mt-3">
