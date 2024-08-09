@@ -13,7 +13,7 @@ namespace InventorySystem.Controllers
 
         public async Task<IActionResult> AdminViewer()
         {
-            var admin = await _context.Admins.ToListAsync();
+            var admin = await _context.Users.ToListAsync();
             return View(admin);
         }
 
@@ -22,20 +22,71 @@ namespace InventorySystem.Controllers
             return View();
         }
 
-        public IActionResult AdminDelete()
+        // GET: Admin/Delete/id?
+        #region --Previous Delete Method--
+        [HttpGet]
+        public async Task<IActionResult> AdminDelete(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var item = await _context.Users
+                .FirstOrDefaultAsync(m => m.UserId == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            /*
+            return Json(new
+            {
+                isValid = true,
+                html = Helper.RenderRazorViewToString(this, "Delete", await _context.Users.ToListAsync())
+            }); */
+
+            return PartialView(item);
         }
+
+        #endregion
+
+
+        #region --Previous DeleteConfirmed Method--
+
+        // POST: Admin/Delete/id?
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AdminDelete(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                isValid = true,
+                html = Helper.RenderRazorViewToString(this, "UserTable", await _context.Users.ToListAsync()),
+                successMessage = "Deletion successful!"
+            });
+        }
+
+        #endregion
 
         public IActionResult ViewUsers()
         {
-            return View();
+            return PartialView();
         }
 
         [HttpGet]
         public IActionResult AdminCreate()
         {
-            var admin = new Admin();
+            var admin = new User();
             return PartialView(admin);
         }
 
@@ -43,7 +94,7 @@ namespace InventorySystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AdminCreate([Bind("AdminId, Username, Email, Password, DateCreated")] Admin adminModel)
+        public async Task<IActionResult> AdminCreate([Bind("UserId, Username, Email, Password, DateCreated")] User adminModel)
         {
 
 
@@ -54,8 +105,8 @@ namespace InventorySystem.Controllers
             if (ModelState.IsValid)
             {
 
-                var usernameExist = await _context.Admins.AnyAsync(u => u.Username == adminModel.Username);
-                var emailExist = await _context.Admins.AnyAsync(u => u.Email == adminModel.Email);
+                var usernameExist = await _context.Users.AnyAsync(u => u.Username == adminModel.Username);
+                var emailExist = await _context.Users.AnyAsync(u => u.Email == adminModel.Email);
                 if (usernameExist)
                 {
                     return Json(new
@@ -92,14 +143,14 @@ namespace InventorySystem.Controllers
                 try
                 {
                     adminModel.Password = adminModel.Password != null ? HashHelper.HashPassword(adminModel.Password) : string.Empty;
-                    _context.Admins.Add(adminModel);
+                    _context.Users.Add(adminModel);
                     await _context.SaveChangesAsync();
 
 
                     return Json(new
                     {
                         isValid = true,
-                        html = Helper.RenderRazorViewToString(this, "AdminCreate", adminModel),
+                        html = Helper.RenderRazorViewToString(this, "AdminCreate", await _context.Users.ToListAsync()),
                         successMessage = "Successfuly created!"
                     });
                     //return RedirectToAction(nameof(Admin));

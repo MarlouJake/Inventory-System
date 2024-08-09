@@ -3,8 +3,11 @@
     ViewData["Title"] = "Add new item";
     Layout = null;   
 }
+
+
 <script>
     $(document).ready(function () {
+        
         $.ajax({
             url: '@Url.Action("GetStatuses")',
             type: 'GET',
@@ -13,9 +16,11 @@
                 $.each(data, function (index, item) {
                     var $option = $('<option></option>').val(item.value).text(item.text);
                     if (item.value === "Complete") {
-                        $option.css('color', 'green');
-                    } else if (item.value === "Incomplete") {
-                        $option.css('color', 'red');
+                        $option.addClass('text-success'); // Set color attribute
+                    } else if (item.value === "Incomplete(Usable)") {
+                        $option.addClass('text-primary');
+                    } else if (item.value === "Incomplete(Unusable)") {
+                        $option.addClass('text-danger');
                     }
                     $statusDropdown.append($option);
                 });
@@ -24,7 +29,8 @@
                 console.log('Error fetching statuses: ' + error);
             }
         });
-
+        
+  
 
         $.ajax({
             url: '@Url.Action("GetOptions")',
@@ -48,7 +54,7 @@
                 });
             },
             error: function (xhr, status, error) {
-                console.log('Error fetching statuses: ' + error);
+                console.log('Error fetching options: ' + error);
             }
         });
     });

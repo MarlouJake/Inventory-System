@@ -35,14 +35,14 @@ namespace InventorySystem.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (user == null)
+            var item = await _context.Items
+                .FirstOrDefaultAsync(m => m.ItemId == id);
+            if (item == null)
             {
                 return NotFound();
             }
             //user.Password = user.Password != null ? HashHelper.HashPassword(user.Password) : string.Empty;
-            return View(user);
+            return View(item);
         }
 
         #endregion
@@ -281,7 +281,7 @@ namespace InventorySystem.Controllers
 
                 //_context.Entry(existingUser).CurrentValues.SetValues(user);
                 existingItem.ItemCode = model.ItemCode;
-
+                existingItem.ItemDateUpdated = DateTime.Now;
 
                 //_context.Update(user);
 

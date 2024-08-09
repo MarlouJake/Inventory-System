@@ -11,7 +11,7 @@ namespace InventorySystem.Models
         [MinLength(3, ErrorMessage = "Username must be at least 3 characters long.")]
         [Required(ErrorMessage = "Username or Email is required!")]
         [DisplayName("Username")]
-        public string? UserName { get; set; }
+        public string? Username { get; set; }
 
         /*
         [EmailAddress(ErrorMessage = "Invalid Email Address.")]

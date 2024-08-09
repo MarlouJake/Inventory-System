@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         successMessage.fadeIn().delay(1500).fadeOut(); // Show for 1.5 seconds
     }
     */
-
+    
 
  
     NewItemAdded();
@@ -105,10 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function trimInput(element) {
         element.value = element.value.trim();
     }
-
-    //userInput.addEventListener('blur', () => trimInput(userInput));
-
-    
+   
 });
 
 
@@ -116,25 +113,28 @@ function NewItemAdded() {
     const statusDisplays = document.getElementsByClassName('status-container');
     const firmwareUpdateDisplay = document.getElementsByClassName('firmware-update');
 
+
     Array.from(statusDisplays).forEach(statusDisplay => {
         if (statusDisplay.textContent.trim() === "Complete") {
-            statusDisplay.style.color = 'green';
+            statusDisplay.classList.add('text-success');
         } else if (statusDisplay.textContent.trim() === "Incomplete(Usable)") {
-            statusDisplay.style.color = 'blue';
+            statusDisplay.classList.add('text-primary');
         } else if (statusDisplay.textContent.trim() === "Incomplete(Unusable)") {
-            statusDisplay.style.color = 'red';
+            statusDisplay.classList.add('text-danger');
         }
     });
 
     Array.from(firmwareUpdateDisplay).forEach(firmwareUpdateDisplay => {
         if (firmwareUpdateDisplay.textContent.trim() === "YES") {
-            firmwareUpdateDisplay.style.color = 'green';
+            firmwareUpdateDisplay.classList.add('text-success');
         } else if (firmwareUpdateDisplay.textContent.trim() === "N/A") {
-            firmwareUpdateDisplay.style.color = 'gray';
+            firmwareUpdateDisplay.classList.add('text-muted');
         } else if (firmwareUpdateDisplay.textContent.trim() === "NO") {
-            firmwareUpdateDisplay.style.color = 'red';
+            firmwareUpdateDisplay.classList.add('text-danger');
         }
     });
+
+   
 }
 
 
@@ -276,7 +276,7 @@ jQueryAjaxLoginPost = form => {
                 else {
                     // Hide loading modal
                     setTimeout(() => $('#loading-modal').modal('hide'),500); // Ensure modal hides after error message fades out
-                    $("#error-message").text(res.failedMessage).fadeIn().delay(500).fadeOut();
+                    $("#error-message").text(res.failedMessage).fadeIn().delay(500).fadeOut();;
                     console.log("Error login:" + res.failedMessage);
                     //$('#error-message').removeClass('alert-success').addClass('alert-danger').text(response.errorMessage).show();
                 }

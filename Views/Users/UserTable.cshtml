@@ -29,10 +29,10 @@
 
     <table class="table table-striped table-hover user-table text-start text-break">
         <thead class="table-dark">
-            <tr class="col" style="font-size:12px;">
-                <th>
+            <tr class="col rounded" style="font-size:12px;">
+                <!--th>
                     ID
-                </th>
+                </!--th-->
                 <th>
                     @Html.DisplayNameFor(model => model.First().ItemCode)
                 </th>
@@ -79,29 +79,29 @@
                     // Assuming DecryptId is not needed here as item.UserId is directly used
                     //var hashedId = item.UserId.ToString(); // Convert UserId to string
 
-                    <tr class="">
-                        <td style="width:3%;">
-                            @Html.DisplayFor(modelItem => item.ItemId)
-                        </td>
-                        <td style="width:8%;">
+                    <tr class="rounded">
+                        <!--td style="width:3%;">
+                            Html.DisplayFor(modelItem => item.ItemId)
+                        </!--td-->
+                        <td class="w-auto">
                             @Html.DisplayFor(modelItem => item.ItemCode)
                         </td>
-                        <td style="width:8%;">
+                        <td class="w-auto">
                             @Html.DisplayFor(modelItem => item.ItemName)
                         </td>
-                        <td style="width:26%;">
+                        <td class="w-auto">
                             @Html.DisplayFor(modelItem => item.ItemDescription)
                         </td>
-                        <td style="width:9.5%;" class="status-container">                     
+                        <td class="status-container w-auto">                     
                             @Html.DisplayFor(modelItem => item.Status)
                         </td>
-                        <td style="width:25%;">
+                        <td class="w-auto">
                             @Html.DisplayFor(modelItem => item.AdditionalInfo)
                         </td>
-                        <td style="width:10%;" class="firmware-update">
+                        <td class="firmware-update w-auto">
                             @Html.DisplayFor(modelItem => item.FirmwareUpdated)
                         </td>
-                        <td style="width:10%;">
+                        <td class="w-auto">
                             @Html.DisplayFor(modelItem => item.ItemDateUpdated)
                         </td>
                         <td class="col-sm-1">
@@ -111,7 +111,7 @@
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                 </svg>Update
                             </a>
-                            <a onclick="ShowPopUp('@Url.Action("ViewDetails", "Users",  new{id = item.ItemId}, Context.Request.Scheme)','User Details')" class="btn btn-primary m-1 p-2 btn-crud" style="font-size:12px;">
+                            <a onclick="ShowPopUp('@Url.Action("ViewDetails", "Users",  new{id = item.ItemId}, Context.Request.Scheme)')" class="btn btn-primary m-1 p-2 btn-crud" style="font-size:12px;">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 2 30 25" width="16" height="16">
                                     <path d="M13 7.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-3 3.75a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v4.25h.75a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1 0-1.5h.75V12h-.75a.75.75 0 0 1-.75-.75Z" fill="white"></path>
                                     <path d="M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1ZM2.5 12a9.5 9.5 0 0 0 9.5 9.5 9.5 9.5 0 0 0 9.5-9.5A9.5 9.5 0 0 0 12 2.5 9.5 9.5 0 0 0 2.5 12Z" fill="white"></path>
@@ -126,13 +126,13 @@
 
 
                             <a onclick="ShowPopUp('@Url.Action("Update", "Users",  new{id = item.ItemId}, Context.Request.Scheme)')" title="Update" class="btn  btn-hidden  m-1 p-2 text-light" style="font-size:12px; background-color:rgb(0, 201, 195);">
-                                <svg class="feather feather-edit" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="-3 0 28 24" width="12" height="12" xmlns="http://www.w3.org/2000/svg">
+                                <svg class="feather feather-edit" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="-2 4 30 30" width="14" height="14" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                 </svg>
                             </a>
                             <a onclick="ShowPopUp('@Url.Action("ViewDetails", "Users", new { id = item.ItemId }, Context.Request.Scheme)')" class="btn btn-primary m-1 p-2 btn-hidden" title="View Details" style="font-size:12px; ">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 3 30 25" width="16" height="16">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 1 30 25" width="16" height="16">
                                     <path d="M13 7.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-3 3.75a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v4.25h.75a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1 0-1.5h.75V12h-.75a.75.75 0 0 1-.75-.75Z" fill="white"></path>
                                     <path d="M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1ZM2.5 12a9.5 9.5 0 0 0 9.5 9.5 9.5 9.5 0 0 0 9.5-9.5A9.5 9.5 0 0 0 12 2.5 9.5 9.5 0 0 0 2.5 12Z" fill="white"></path>
                                 </svg>

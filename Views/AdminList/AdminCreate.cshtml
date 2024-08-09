@@ -1,4 +1,4 @@
-﻿@model InventorySystem.Models.Admin
+﻿@model InventorySystem.Models.User
 
 @{
     ViewData["Title"] = "Create User";
@@ -6,9 +6,9 @@
 }
 
 
-<h5 class="text-break"><strong>Create new admin</strong></h5>
+<h5 class="text-break"><strong>Add new user</strong></h5>
 <hr />
-<form asp-action="AdminCreate" method="post" class="forms" asp-route-id="@Model.AdminId" onsubmit="return jQueryAjaxPost(this);">
+<form asp-action="AdminCreate" method="post" class="forms" asp-route-id="@Model.UserId" onsubmit="return jQueryAjaxPost(this);">
 
     <!--div asp-validation-summary="ModelOnly"  class="text-danger needs-validation" novalidate></!--div-->
 
@@ -100,7 +100,7 @@
     </div>
     <hr class="mt-4" />
     <div class="form-group mt-4">
-        <input type="submit" value="Create User" class="btn btn-success form-control" />
+        <input type="submit" value="Add User" class="btn btn-success form-control" />
         <input type="button" value="Cancel" class="btn btn-outline-secondary form-control mt-3" data-bs-dismiss="modal" />
     </div>
 </form>

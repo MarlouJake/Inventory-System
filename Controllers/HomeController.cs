@@ -22,43 +22,57 @@ namespace InventorySystem.Controllers
         [HttpGet]
         public IActionResult LoginPage()
         {
-            return PartialView(new LoginModel());
+            var user = new LoginModel();
+            return PartialView(user);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginPage(LoginModel model)
         {
-            var errorRender = PartialView("Index", model);
             if (ModelState.IsValid)
             {
                 if (string.IsNullOrEmpty(model.Password))
                 {
-                    Console.WriteLine("Password empty");
-                    TempData["ErrorMessage"] = "Password cannot be empty!";
                     return Json(new
                     {
                         isValid = false,
-                        errorRender,
+                        html = Helper.RenderRazorViewToString(this, "LoginPage", model),
                         failedMessage = "Password cannot be empty!"
                     });
                 }
-
                 var user = await _context.Users
-                    .FirstOrDefaultAsync(u => (u.Username == model.UserName || u.Email == model.UserName) && u.Password == HashHelper.HashPassword(model.Password));
+                   .FirstOrDefaultAsync(u => (u.Username == model.Username || u.Email == model.Username) && u.Password == HashHelper.HashPassword(model.Password));
 
                 if (user != null)
                 {
-                    // Set authentication cookie or session here
-                    Console.WriteLine("Admin Page");
-                    TempData["SuccessMessage"] = "Login Successful!";
-                    return RedirectToAction("Admin", "Users");
+                    return Json(new
+                    {
+                        isValid = true,
+                        redirectUrl = Url.Action("UserDashboard", "Users"),
+                        successMessage = "Login Successful!"
+                    });
+
                 }
+
+                else
+                {
+                    return Json(new
+                    {
+                        isValid = false,
+                        html = Helper.RenderRazorViewToString(this, "LoginPage", model),
+                        failedMessage = "User not found!"
+                    });
+                }
+
             }
 
-            Console.WriteLine("Returned to index");
-            TempData["ErrorMessage"] = "Username or Password is incorrect!";
-            return RedirectToAction("Admin", "Users");
+            return Json(new
+            {
+                isValid = false,
+                html = Helper.RenderRazorViewToString(this, "LoginPage", model),
+                failedMessage = "Attempt failed, try again!"
+            });
         }
 
 
@@ -118,13 +132,13 @@ namespace InventorySystem.Controllers
         [HttpGet]
         public IActionResult AdminLogin()
         {
-            var admin = new AdminModel();
+            var admin = new LoginModel();
             return View(admin);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AdminLogin(AdminModel model)
+        public IActionResult AdminLogin(LoginModel model)
         {
             if (ModelState.IsValid)
             {
@@ -137,9 +151,20 @@ namespace InventorySystem.Controllers
                         failedMessage = "Password cannot be empty!"
                     });
                 }
+                /*
                 var user = await _context.Admins
                    .FirstOrDefaultAsync(u => (u.Username == model.Username || u.Email == model.Username) && u.Password == HashHelper.HashPassword(model.Password));
-
+                */
+                if ((model.Username == "admin" || model.Username == "admin@admin.admin") && model.Password == "admin1234")
+                {
+                    return Json(new
+                    {
+                        isValid = true,
+                        redirectUrl = Url.Action("AdminViewer", "AdminList"),
+                        successMessage = "Login Successful!"
+                    });
+                }
+                /*
                 if (user != null)
                 {
                     return Json(new
@@ -150,7 +175,7 @@ namespace InventorySystem.Controllers
                     });
 
                 }
-
+                */
                 else
                 {
                     return Json(new
@@ -170,107 +195,6 @@ namespace InventorySystem.Controllers
                 failedMessage = "Attempt failed, try again!"
             });
         }
-
-
-
-
-        [HttpGet]
-        public IActionResult AdminCreate()
-        {
-            var admin = new Admin();
-            return PartialView(admin);
-        }
-
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AdminCreate([Bind("AdminId, Username, Email, Password, DateCreated")] Admin adminModel)
-        {
-
-
-            adminModel.Username = adminModel.Username?.Trim();
-            adminModel.Email = adminModel.Email?.Trim();
-            adminModel.Password = adminModel.Password?.Trim();
-
-            if (ModelState.IsValid)
-            {
-
-                var usernameExist = await _context.Admins.AnyAsync(u => u.Username == adminModel.Username);
-                var emailExist = await _context.Admins.AnyAsync(u => u.Email == adminModel.Email);
-                if (usernameExist)
-                {
-                    return Json(new
-                    {
-                        isValid = false,
-                        html = Helper.RenderRazorViewToString(this, "AdminCreate", adminModel),
-                        failedMessage = "Username already exists!"
-                    });
-                }
-
-                if (emailExist)
-                {
-                    return Json(new
-                    {
-                        isValid = false,
-                        html = Helper.RenderRazorViewToString(this, "AdminCreate", adminModel),
-                        failedMessage = "Email already exists!"
-                    });
-                }
-
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                if (adminModel.Username.Contains(' ') || adminModel.Email.Contains(' ') || adminModel.Password.Contains(' '))
-                {
-                    ModelState.AddModelError("", "Input cannot contain spaces.");
-                    return Json(new
-                    {
-                        isValid = false,
-                        html = Helper.RenderRazorViewToString(this, "AdminCreate", adminModel),
-                        failedMessage = "Input cannot contain spaces!"
-                    });
-                }
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-
-                try
-                {
-                    adminModel.Password = adminModel.Password != null ? HashHelper.HashPassword(adminModel.Password) : string.Empty;
-                    _context.Admins.Add(adminModel);
-                    await _context.SaveChangesAsync();
-
-
-                    return Json(new
-                    {
-                        isValid = true,
-                        html = Helper.RenderRazorViewToString(this, "AdminCreate", adminModel),
-                        successMessage = "Successfuly created!"
-                    });
-                    //return RedirectToAction(nameof(Admin));
-                    //return Json(new(ModelState.IsValid = true, html = "")); 
-                }
-                catch (Exception ex)
-                {
-                    return Json(new
-                    {
-                        isValid = false,
-                        html = Helper.RenderRazorViewToString(this, "AdminCreate", adminModel),
-                        failedMessage = $"An error occured while saving: {ex.Message}"
-                    });
-                }
-
-            }
-
-
-
-            var admin = await _context.SaveChangesAsync();
-
-            return Json(new
-            {
-                isValid = false,
-                html = Helper.RenderRazorViewToString(this, "AdminCreate", adminModel),
-                failedMessage = "Failed to create user!"
-            });
-        }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
