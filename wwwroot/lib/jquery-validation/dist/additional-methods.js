@@ -170,7 +170,7 @@ $.validator.addMethod( "bankorgiroaccountNL", function( value, element ) {
  * - Last 3 characters - branch code, optional (shall not start with 'X' except in case of 'XXX' for primary office) (letters and digits)
  */
 $.validator.addMethod( "bic", function( value, element ) {
-    return this.optional( element ) || /^([A-Z]{6}[A-Z2-9][A-NP-Z1-9])(X{3}|[A-WY-Z0-9][A-Z0-9]{2})?$/.test( value.toUpperCase() );
+	return this.optional( element ) || /^([A-Z]{6}[A-Z2-9][A-NP-Z1-9])(X{3}|[A-WY-Z0-9][A-Z0-9]{2})?$/.test( value.toUpperCase() );
 }, "Please specify a valid BIC code." );
 
 /*
@@ -299,7 +299,7 @@ $.validator.addMethod( "cnhBR", function( value ) {
 
   // Checking value to have 11 digits only
   if ( value.length !== 11 ) {
-    return false;
+	return false;
   }
 
   var sum = 0, dsc = 0, firstChar,
@@ -308,30 +308,30 @@ $.validator.addMethod( "cnhBR", function( value ) {
   firstChar = value.charAt( 0 );
 
   if ( new Array( 12 ).join( firstChar ) === value ) {
-    return false;
+	return false;
   }
 
   // Step 1 - using first Check Number:
   for ( i = 0, j = 9, v = 0; i < 9; ++i, --j ) {
-    sum += +( value.charAt( i ) * j );
+	sum += +( value.charAt( i ) * j );
   }
 
   firstCN = sum % 11;
   if ( firstCN >= 10 ) {
-    firstCN = 0;
-    dsc = 2;
+	firstCN = 0;
+	dsc = 2;
   }
 
   sum = 0;
   for ( i = 0, j = 1, v = 0; i < 9; ++i, ++j ) {
-    sum += +( value.charAt( i ) * j );
+	sum += +( value.charAt( i ) * j );
   }
 
   secondCN = sum % 11;
   if ( secondCN >= 10 ) {
-    secondCN = 0;
+	secondCN = 0;
   } else {
-    secondCN = secondCN - dsc;
+	secondCN = secondCN - dsc;
   }
 
   return ( String( firstCN ).concat( secondCN ) === value.substr( -2 ) );
@@ -619,16 +619,16 @@ $.validator.addMethod( "creditcardtypes", function( value, element, param ) {
  *  }
  */
 $.validator.addMethod( "currency", function( value, element, param ) {
-    var isParamString = typeof param === "string",
-        symbol = isParamString ? param : param[ 0 ],
-        soft = isParamString ? true : param[ 1 ],
-        regex;
+	var isParamString = typeof param === "string",
+		symbol = isParamString ? param : param[ 0 ],
+		soft = isParamString ? true : param[ 1 ],
+		regex;
 
-    symbol = symbol.replace( /,/g, "" );
-    symbol = soft ? symbol + "]" : symbol + "]?";
-    regex = "^[" + symbol + "([1-9]{1}[0-9]{0,2}(\\,[0-9]{3})*(\\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\\.[0-9]{0,2})?|0(\\.[0-9]{0,2})?|(\\.[0-9]{1,2})?)$";
-    regex = new RegExp( regex );
-    return this.optional( element ) || regex.test( value );
+	symbol = symbol.replace( /,/g, "" );
+	symbol = soft ? symbol + "]" : symbol + "]?";
+	regex = "^[" + symbol + "([1-9]{1}[0-9]{0,2}(\\,[0-9]{3})*(\\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\\.[0-9]{0,2})?|0(\\.[0-9]{0,2})?|(\\.[0-9]{1,2})?)$";
+	regex = new RegExp( regex );
+	return this.optional( element ) || regex.test( value );
 
 }, "Please specify a valid currency." );
 
@@ -694,27 +694,27 @@ $.validator.addMethod( "giroaccountNL", function( value, element ) {
 }, "Please specify a valid giro account number." );
 
 $.validator.addMethod( "greaterThan", function( value, element, param ) {
-    var target = $( param );
+	var target = $( param );
 
-    if ( this.settings.onfocusout && target.not( ".validate-greaterThan-blur" ).length ) {
-        target.addClass( "validate-greaterThan-blur" ).on( "blur.validate-greaterThan", function() {
-            $( element ).valid();
-        } );
-    }
+	if ( this.settings.onfocusout && target.not( ".validate-greaterThan-blur" ).length ) {
+		target.addClass( "validate-greaterThan-blur" ).on( "blur.validate-greaterThan", function() {
+			$( element ).valid();
+		} );
+	}
 
-    return value > target.val();
+	return value > target.val();
 }, "Please enter a greater value." );
 
 $.validator.addMethod( "greaterThanEqual", function( value, element, param ) {
-    var target = $( param );
+	var target = $( param );
 
-    if ( this.settings.onfocusout && target.not( ".validate-greaterThanEqual-blur" ).length ) {
-        target.addClass( "validate-greaterThanEqual-blur" ).on( "blur.validate-greaterThanEqual", function() {
-            $( element ).valid();
-        } );
-    }
+	if ( this.settings.onfocusout && target.not( ".validate-greaterThanEqual-blur" ).length ) {
+		target.addClass( "validate-greaterThanEqual-blur" ).on( "blur.validate-greaterThanEqual", function() {
+			$( element ).valid();
+		} );
+	}
 
-    return value >= target.val();
+	return value >= target.val();
 }, "Please enter a greater value." );
 
 /**
@@ -867,27 +867,27 @@ $.validator.addMethod( "ipv6", function( value, element ) {
 }, "Please enter a valid IP v6 address." );
 
 $.validator.addMethod( "lessThan", function( value, element, param ) {
-    var target = $( param );
+	var target = $( param );
 
-    if ( this.settings.onfocusout && target.not( ".validate-lessThan-blur" ).length ) {
-        target.addClass( "validate-lessThan-blur" ).on( "blur.validate-lessThan", function() {
-            $( element ).valid();
-        } );
-    }
+	if ( this.settings.onfocusout && target.not( ".validate-lessThan-blur" ).length ) {
+		target.addClass( "validate-lessThan-blur" ).on( "blur.validate-lessThan", function() {
+			$( element ).valid();
+		} );
+	}
 
-    return value < target.val();
+	return value < target.val();
 }, "Please enter a lesser value." );
 
 $.validator.addMethod( "lessThanEqual", function( value, element, param ) {
-    var target = $( param );
+	var target = $( param );
 
-    if ( this.settings.onfocusout && target.not( ".validate-lessThanEqual-blur" ).length ) {
-        target.addClass( "validate-lessThanEqual-blur" ).on( "blur.validate-lessThanEqual", function() {
-            $( element ).valid();
-        } );
-    }
+	if ( this.settings.onfocusout && target.not( ".validate-lessThanEqual-blur" ).length ) {
+		target.addClass( "validate-lessThanEqual-blur" ).on( "blur.validate-lessThanEqual", function() {
+			$( element ).valid();
+		} );
+	}
 
-    return value <= target.val();
+	return value <= target.val();
 }, "Please enter a lesser value." );
 
 $.validator.addMethod( "lettersonly", function( value, element ) {
@@ -979,7 +979,7 @@ $.validator.addMethod( "mobileUK", function( phone_number, element ) {
 }, "Please specify a valid mobile number." );
 
 $.validator.addMethod( "netmask", function( value, element ) {
-    return this.optional( element ) || /^(254|252|248|240|224|192|128)\.0\.0\.0|255\.(254|252|248|240|224|192|128|0)\.0\.0|255\.255\.(254|252|248|240|224|192|128|0)\.0|255\.255\.255\.(254|252|248|240|224|192|128|0)/i.test( value );
+	return this.optional( element ) || /^(254|252|248|240|224|192|128)\.0\.0\.0|255\.(254|252|248|240|224|192|128|0)\.0\.0|255\.255\.(254|252|248|240|224|192|128|0)\.0|255\.255\.255\.(254|252|248|240|224|192|128|0)/i.test( value );
 }, "Please enter a valid netmask." );
 
 /*

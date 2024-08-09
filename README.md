@@ -1,5 +1,15 @@
-# InventorySystem
+# Inventory System
 
 Practice Project
 
-Basic CRUD Operations
+With Basic CRUD Operations
+
+TECH's Used:
+C#
+ASP.NET MVC
+HTML
+CSS
+JAVASCRIPT
+JQUERY
+BOOTSTRAP
+
