@@ -1,11 +1,14 @@
 ﻿using InventorySystem.Data;
 using InventorySystem.Models;
 using InventorySystem.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventorySystem.Controllers
 {
+    [Authorize]
+    [Route("AdminList/[action]")]
     public class AdminListController(ApplicationDbContext context) : Controller
     {
 

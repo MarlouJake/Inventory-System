@@ -1,11 +1,18 @@
 using InventorySystem.Data;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Access configuration from the builder
+var configuration = builder.Configuration;
+
 // Add services to the container.
+builder.Services.AddHttpClient();
 builder.Services.AddControllersWithViews();
+
+
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -19,22 +26,29 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("RequireAdministratorRole", policy => policy.RequireRole("Administrator"));
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddRoles<IdentityRole>()
-    .AddDefaultTokenProviders();
-
-builder.Services.ConfigureApplicationCookie(options =>
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Home/AdminLogin"; // Path to the login page
+        options.AccessDeniedPath = "/Home/AccessDenied"; // Path for access denied
+        options.Cookie.Expiration = TimeSpan.FromMinutes(1); // Adjust as needed
+        options.Cookie.SameSite = SameSiteMode.Strict; // Adjust based on your needs
+    });
+builder.Services.AddSession(options =>
 {
-    options.LoginPath = "/Home/Index";
-    options.AccessDeniedPath = "/Users/AdminView/Admin";
+    options.IdleTimeout = TimeSpan.FromMinutes(1); // Set session timeout duration
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build());
+
 
 var app = builder.Build();
 
@@ -46,71 +60,34 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-// Apply CORS policy
-app.UseCors("AllowAllOrigins");
-
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
+app.UseCors("AllowAllOrigins");
 
-// Define routes
-app.MapControllerRoute(
-    name: "userdashboard",
-    pattern: "dashboard/user/{id?}",
-    defaults: new { controller = "Users", action = "UserDashboard" });
+// Configure status code pages
+app.UseStatusCodePages(async context =>
+{
+    var response = context.HttpContext.Response;
+    if (response.StatusCode == StatusCodes.Status403Forbidden)
+    {
+        response.ContentType = "text/html";
+        await response.WriteAsync("<html><body><h1>Access Denied</h1><p>You do not have permission to access this resource.</p></body></html>");
+    }
+    // You can add other status codes if needed
+});
 
-app.MapControllerRoute(
-    name: "additem",
-    pattern: "/dashboard/add-item/{id?}",
-    defaults: new { controller = "Users", action = "AddItem" });
-
-app.MapControllerRoute(
-    name: "delete",
-    pattern: "dashboard/delete-item/{id?}",
-    defaults: new { controller = "Users", action = "Delete" });
-
-app.MapControllerRoute(
-    name: "update",
-    pattern: "dashboard/update-item/{id?}",
-    defaults: new { controller = "Users", action = "Update" });
-
-app.MapControllerRoute(
-    name: "viewdetails",
-    pattern: "dashboard/view-item-details/{id?}",
-    defaults: new { controller = "Users", action = "ViewDetails" });
-
-
-app.MapControllerRoute(
-    name: "adminviewer",
-    pattern: "admin/dashboard/admins",
-    defaults: new { controller = "AdminViewer", action = "AdminList" });
-
-app.MapControllerRoute(
-    name: "adminlist",
-    pattern: "admin/dashboard/admin-list",
-    defaults: new { controller = "AdminListView", action = "AdminList" });
-
-app.MapControllerRoute(
-    name: "index",
-    pattern: "home/login/user",
-    defaults: new { controller = "Home", action = "Index" });
-
-app.MapControllerRoute(
-    name: "loginpage",
-    pattern: "home/login/user",
-    defaults: new { controller = "Home", action = "LoginPage" });
-
-app.MapControllerRoute(
-    name: "adminlogin",
-    pattern: "home/login/admin",
-    defaults: new { controller = "Home", action = "AdminLogin" });
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Users}/{action=UserDashboard}/{id?}");
+app.UseEndpoints(endpoints =>
+{
+    _ = endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+});
 
 app.Run();

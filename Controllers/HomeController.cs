@@ -1,9 +1,12 @@
 using InventorySystem.Data;
 using InventorySystem.Models;
 using InventorySystem.Utilities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Security.Claims;
 
 
 namespace InventorySystem.Controllers
@@ -138,8 +141,9 @@ namespace InventorySystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AdminLogin(LoginModel model)
+        public async Task<IActionResult> AdminLogin(LoginModel model)
         {
+
             if (ModelState.IsValid)
             {
                 if (string.IsNullOrEmpty(model.Password))
@@ -157,25 +161,26 @@ namespace InventorySystem.Controllers
                 */
                 if ((model.Username == "admin" || model.Username == "admin@admin.admin") && model.Password == "admin1234")
                 {
-                    return Json(new
-                    {
-                        isValid = true,
-                        redirectUrl = Url.Action("AdminViewer", "AdminList"),
-                        successMessage = "Login Successful!"
-                    });
-                }
-                /*
-                if (user != null)
-                {
-                    return Json(new
-                    {
-                        isValid = true,
-                        redirectUrl = Url.Action("AdminViewer", "AdminList"),
-                        successMessage = "Login Successful!"
-                    });
 
+                    var claims = new List<Claim>
+                    {
+                        new(ClaimTypes.Name, model.Username),
+                        // Add additional claims if needed
+                    };
+
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var principal = new ClaimsPrincipal(identity);
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+                    return Json(new
+                    {
+                        isValid = true,
+                        redirectUrl = Url.Action("AdminViewer", "AdminList"),
+                        successMessage = "Login Successful!"
+                    });
                 }
-                */
+
                 else
                 {
                     return Json(new
@@ -196,7 +201,21 @@ namespace InventorySystem.Controllers
             });
         }
 
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("AdminLogin");
+        }
+
+
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
