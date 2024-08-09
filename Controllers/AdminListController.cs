@@ -19,6 +19,11 @@ namespace InventorySystem.Controllers
             var admin = await _context.Users.ToListAsync();
             return View(admin);
         }
+        public async Task<IActionResult> AdminListView()
+        {
+            var admin = await _context.Users.ToListAsync();
+            return PartialView(admin);
+        }
 
         public IActionResult AdminModify()
         {
@@ -148,12 +153,11 @@ namespace InventorySystem.Controllers
                     adminModel.Password = adminModel.Password != null ? HashHelper.HashPassword(adminModel.Password) : string.Empty;
                     _context.Users.Add(adminModel);
                     await _context.SaveChangesAsync();
-
-
+                    Console.WriteLine("Submitted");
                     return Json(new
                     {
                         isValid = true,
-                        html = Helper.RenderRazorViewToString(this, "AdminCreate", await _context.Users.ToListAsync()),
+                        html = Helper.RenderRazorViewToString(this, "AdminListView", await _context.Users.ToListAsync()),
                         successMessage = "Successfuly created!"
                     });
                     //return RedirectToAction(nameof(Admin));
@@ -161,6 +165,7 @@ namespace InventorySystem.Controllers
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message.ToString());
                     return Json(new
                     {
                         isValid = false,
@@ -172,8 +177,8 @@ namespace InventorySystem.Controllers
             }
 
 
+            Console.WriteLine("Failed to submit");
 
-            var admin = await _context.SaveChangesAsync();
 
             return Json(new
             {

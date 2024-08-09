@@ -283,7 +283,7 @@ jQueryAjaxLoginPost = form => {
                     // Redirect to the admin page
                     setTimeout(() => {
                         window.location.href = res.redirectUrl;
-                    }, 10000); // Ensure redirect happens after the success message fades out
+                    }, 1000); // Ensure redirect happens after the success message fades out
                     // Show success message
                     $("#success-message").text(res.successMessage).fadeIn().delay(3000).fadeOut(); // Show for 2 seconds
 
@@ -343,7 +343,7 @@ function logout() {
             // Redirect to the admin login
             setTimeout(() => {
                 window.location.href = '/Home/AdminLogin'; // Redirect to login page after successful logout
-            }, 10000); // Ensure redirect happens after the success message fades out
+            }, 1000); // Ensure redirect happens after the success message fades out
            
         },
         error: function (err) {

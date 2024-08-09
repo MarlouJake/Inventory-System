@@ -8,14 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Security.Claims;
 
-
 namespace InventorySystem.Controllers
 {
-    public class HomeController(ILogger<HomeController> logger, ApplicationDbContext context) : Controller
+    public class HomeController(/*ILogger<HomeController> logger,*/ ApplicationDbContext context) : Controller
     {
-        private readonly ILogger<HomeController> _logger = logger;
+        //private readonly ILogger<HomeController> _logger = logger;
         private readonly ApplicationDbContext _context = context;
-        public ILogger<HomeController> Logger => _logger;
 
         public IActionResult Index()
         {
@@ -44,20 +42,40 @@ namespace InventorySystem.Controllers
                         failedMessage = "Password cannot be empty!"
                     });
                 }
+
                 var user = await _context.Users
                    .FirstOrDefaultAsync(u => (u.Username == model.Username || u.Email == model.Username) && u.Password == HashHelper.HashPassword(model.Password));
 
                 if (user != null)
                 {
+                    if (user.Username == null)
+                    {
+                        return Json(new
+                        {
+                            isValid = false,
+                            html = Helper.RenderRazorViewToString(this, "LoginPage", model),
+                            failedMessage = "Username is missing!"
+                        });
+                    }
+                    // Set authentication cookie
+                    var claims = new List<Claim>
+                    {
+                        new(ClaimTypes.Name, user.Username),
+
+                    };
+
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var principal = new ClaimsPrincipal(identity);
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
                     return Json(new
                     {
                         isValid = true,
                         redirectUrl = Url.Action("UserDashboard", "Users"),
                         successMessage = "Login Successful!"
                     });
-
                 }
-
                 else
                 {
                     return Json(new
@@ -67,7 +85,6 @@ namespace InventorySystem.Controllers
                         failedMessage = "User not found!"
                     });
                 }
-
             }
 
             return Json(new
@@ -77,55 +94,6 @@ namespace InventorySystem.Controllers
                 failedMessage = "Attempt failed, try again!"
             });
         }
-
-
-        /*
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LoginPage(LoginModel model)
-        {
-            var errorRender = PartialView("Index", model);
-            if (ModelState.IsValid)
-            {
-                var user = await _context.Users
-                    .FirstOrDefaultAsync(u => (u.Username == model.UserName || u.Email == model.UserName) && u.Password == HashHelper.HashPassword(model.Password));
-
-                if (user != null)
-                {
-                    // Set authentication cookie or session here
-
-                    Console.WriteLine("Admin Page");
-
-
-                    return Json(new
-                    {
-                        isValid = true,
-                        redirectUrl = Url.Action("Admin", "Users"), // Redirect to the admin page                       
-                        successMessage = "Login Successful!"
-                    });
-                }
-                else
-                {
-                    Console.WriteLine("User not found");
-                    return Json(new
-                    {
-                        isValid = false,
-                        errorMessage = "Username or Password is incorrect!"
-                    });
-                }
-
-            }
-
-            // Return the view with the model to show validation errors
-
-            Console.WriteLine("Return Index");
-            return Json(new
-            {
-                isValid = false,
-                errorRender,
-                errorMessage = "Username or Password is incorrect!"
-            });
-        }*/
 
         public IActionResult Info()
         {
@@ -143,7 +111,6 @@ namespace InventorySystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AdminLogin(LoginModel model)
         {
-
             if (ModelState.IsValid)
             {
                 if (string.IsNullOrEmpty(model.Password))
@@ -155,13 +122,9 @@ namespace InventorySystem.Controllers
                         failedMessage = "Password cannot be empty!"
                     });
                 }
-                /*
-                var user = await _context.Admins
-                   .FirstOrDefaultAsync(u => (u.Username == model.Username || u.Email == model.Username) && u.Password == HashHelper.HashPassword(model.Password));
-                */
+
                 if ((model.Username == "admin" || model.Username == "admin@admin.admin") && model.Password == "admin1234")
                 {
-
                     var claims = new List<Claim>
                     {
                         new(ClaimTypes.Name, model.Username),
@@ -180,7 +143,6 @@ namespace InventorySystem.Controllers
                         successMessage = "Login Successful!"
                     });
                 }
-
                 else
                 {
                     return Json(new
@@ -190,7 +152,6 @@ namespace InventorySystem.Controllers
                         failedMessage = "User not found!"
                     });
                 }
-
             }
 
             return Json(new
@@ -207,14 +168,12 @@ namespace InventorySystem.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("AdminLogin");
         }
-
 
         public IActionResult Error()
         {
