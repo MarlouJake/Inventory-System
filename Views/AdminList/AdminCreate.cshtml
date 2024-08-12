@@ -8,7 +8,7 @@
 
 <h5 class="text-break"><strong>Add new user</strong></h5>
 <hr />
-<form asp-action="AdminCreate" method="post" class="forms" asp-route-id="@Model.UserId" onsubmit="return jQueryAjaxPost(this);">
+<form asp-action="AdminCreate" method="post" class="forms" asp-route-id="@Model.UserId" onsubmit="return jQueryAjaxAdminPost(this);">
     @Html.AntiForgeryToken()
     <!--div asp-validation-summary="ModelOnly"  class="text-danger needs-validation" novalidate></!--div-->
 

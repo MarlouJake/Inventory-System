@@ -14,77 +14,20 @@ namespace InventorySystem.Controllers
 
         private readonly ApplicationDbContext _context = context;
 
+
         public async Task<IActionResult> AdminViewer()
         {
             var admin = await _context.Users.ToListAsync();
             return View(admin);
         }
-        public async Task<IActionResult> AdminListView()
-        {
-            var admin = await _context.Users.ToListAsync();
-            return PartialView(admin);
-        }
+
 
         public IActionResult AdminModify()
         {
             return View();
         }
 
-        // GET: Admin/Delete/id?
-        #region --Previous Delete Method--
-        [HttpGet]
-        public async Task<IActionResult> AdminDelete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var item = await _context.Users
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-            /*
-            return Json(new
-            {
-                isValid = true,
-                html = Helper.RenderRazorViewToString(this, "Delete", await _context.Users.ToListAsync())
-            }); */
-
-            return PartialView(item);
-        }
-
-        #endregion
-
-
-        #region --Previous DeleteConfirmed Method--
-
-        // POST: Admin/Delete/id?
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AdminDelete(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return Json(new
-            {
-                isValid = true,
-                html = Helper.RenderRazorViewToString(this, "UserTable", await _context.Users.ToListAsync()),
-                successMessage = "Deletion successful!"
-            });
-        }
-
-        #endregion
 
         public IActionResult ViewUsers()
         {
@@ -187,5 +130,57 @@ namespace InventorySystem.Controllers
                 failedMessage = "Failed to create user!"
             });
         }
+
+        // GET: Admin/Delete/id?
+        #region --Previous Delete Method--
+        [HttpGet]
+        public async Task<IActionResult> AdminDelete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+
+            return PartialView(user);
+        }
+
+        #endregion
+
+
+        #region --Previous DeleteConfirmed Method--
+
+        // POST: Admin/Delete/id?
+        [HttpPost, ActionName("AdminDelete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AdminDelete(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                isValid = true,
+                html = Helper.RenderRazorViewToString(this, "AdminListView", await _context.Users.ToListAsync()),
+                successMessage = "Deletion successful!"
+            });
+
+
+        }
+
+        #endregion
     }
 }

@@ -216,6 +216,7 @@ jQueryAjaxPost = form => {
                 'RequestVerificationToken' : token
             },
             success: function (res) {
+                console.log("AJAX Success Response:", res);
                 if (res.isValid) {
                     $("#view-all").html(res.html);
                     $("#view-myModal .modal-body").html('');
@@ -227,6 +228,7 @@ jQueryAjaxPost = form => {
 
                 }
                 else {
+                    console.log("AJAX Fail Response:", res);
                     $("#view-myModal .modal-body").html(res.html);
                     $("#error-message").text(res.failedMessage).fadeIn().delay(500).fadeOut(); 
                     console.error('Attempt failed: "', res.failedMessage + ' "');
@@ -245,6 +247,55 @@ jQueryAjaxPost = form => {
     //prevent default form submit event
     return false;
 }
+
+
+jQueryAjaxAdminPost = form => {
+
+    try {
+        //const token = $('input[name="__RequestVerificationToken"]').val();
+        $.ajax({
+            type: 'POST',
+            url: form.action,
+            data: new FormData(form),
+            contentType: false,
+            processData: false,
+            /*headers: {
+                'RequestVerificationToken': token
+            },*/
+            success: function (res) {
+                console.log("AJAX Success Response:", res);
+                if (res.isValid) {
+                    $("#admin-view").html(res.html);
+                    $("#view-myModal .modal-body").html('');
+                    $("#view-myModal").modal('hide');
+                    NewItemAdded();
+                    // Show success message
+                    $("#success-message").text(res.successMessage).fadeIn().delay(500).fadeOut();
+
+
+                }
+                else {
+                    console.log("AJAX Fail Response:", res);
+                    $("#view-myModal .modal-body").html(res.html);
+                    $("#error-message").text(res.failedMessage).fadeIn().delay(500).fadeOut();
+                    console.error('Attempt failed: "', res.failedMessage + ' "');
+                }
+            },
+            error: function (err) {
+                console.error('AJAX Error: ', err.responseText);
+            }
+
+        })
+    }
+    catch (ex) {
+        console.log("Exception caught: ", ex);
+    }
+
+    //prevent default form submit event
+    return false;
+}
+
+
 
 jQueryAjaxLoginPost = form => {
 
