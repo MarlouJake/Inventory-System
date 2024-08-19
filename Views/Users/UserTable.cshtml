@@ -30,9 +30,6 @@
     <table class="table table-striped table-hover user-table text-start text-break">
         <thead class="table-dark">
             <tr class="col rounded" style="font-size:12px;">
-                <!--th>
-                    ID
-                </!--th-->
                 <th>
                     @Html.DisplayNameFor(model => model.First().ItemCode)
                 </th>
@@ -80,9 +77,6 @@
                     //var hashedId = item.UserId.ToString(); // Convert UserId to string
 
                     <tr class="rounded">
-                        <!--td style="width:3%;">
-                            Html.DisplayFor(modelItem => item.ItemId)
-                        </!--td-->
                         <td class="w-auto">
                             @Html.DisplayFor(modelItem => item.ItemCode)
                         </td>
@@ -101,7 +95,7 @@
                         <td class="firmware-update w-auto">
                             @Html.DisplayFor(modelItem => item.FirmwareUpdated)
                         </td>
-                        <td class="w-auto">
+                        <td class="w-25">
                             @Html.DisplayFor(modelItem => item.ItemDateUpdated)
                         </td>
                         <td class="col-sm-1">

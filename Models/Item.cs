@@ -41,8 +41,8 @@ namespace InventorySystem.Models
         [DisplayName("Date Modified")]
         public DateTime ItemDateUpdated { get; set; }
 
-        [DisplayName("Firmware Updated")]
         [Required(ErrorMessage = "Firmware Update is required")]
+        [DisplayName("Firmware Updated")]
         public string? FirmwareUpdated { get; set; }
 
         [DisplayName("User ID")]

@@ -4,6 +4,7 @@ using InventorySystem.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace InventorySystem.Controllers
 {
@@ -16,15 +17,43 @@ namespace InventorySystem.Controllers
         public async Task<IActionResult> UserDashboard()
         {
 
-            //var user = await _context.Users.ToListAsync();
-            var items = await _context.Items.ToListAsync();
 
-            // Retrieve the success message from TempData if it exists
-            ViewBag.SuccessMessage = TempData["SuccessMessage"] as string;
+            //var items = await _context.Items.ToListAsync();
+            // Get the UserID from the session
+            //var UserIdString = HttpContext.Session.GetString("UserID");
+            // Get the User ID from the claims
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine($"User ID Claim: {userIdClaim}");
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+            {
+                // Handle the case where the UserID is not available or invalid
+                return RedirectToAction("AccessDenied");
+            }
+
+            // Retrieve items associated with the logged-in user
+            var items = await _context.Items
+                .Where(i => i.UserId == userId)
+                .ToListAsync();
 
             return View(items);
         }
 
+        public async Task<IActionResult> UserTable()
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine($"User ID Claim: {userIdClaim}");
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+            {
+                // Handle the case where the UserID is not available or invalid
+                return RedirectToAction("AccessDenied");
+            }
+
+            // Retrieve items associated with the logged-in user
+            var items = await _context.Items
+                .Where(i => i.UserId == userId)
+                .ToListAsync();
+            return PartialView(items);
+        }
 
         // GET: Admin/Details/id?
         #region --Previous ViewDetails Method--
@@ -153,12 +182,12 @@ namespace InventorySystem.Controllers
             }
             if (string.IsNullOrWhiteSpace(model.FirmwareUpdated) || model.FirmwareUpdated.Contains(' '))
             {
-                ModelState.AddModelError("", "Selecet firmware update option first");
+                ModelState.AddModelError("", "Select firmware update option first");
                 return Json(new
                 {
                     isValid = false,
                     html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                    failedMessage = "Selecet firmware update option first"
+                    failedMessage = "Select firmware update option first"
                 });
             }
             if (string.IsNullOrWhiteSpace(model.Status) || model.Status.Contains("--Select Status--"))
@@ -187,23 +216,42 @@ namespace InventorySystem.Controllers
                     });
                 }
 
-                try
-                {
-                    model.UserId = 0;
-                    _context.Items.Add(model);
-                    await _context.SaveChangesAsync();
+                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                Console.WriteLine($"User ID Claim: {userIdClaim}");
 
-                    TempData["SuccessMessage"] = "Item added successfully.";
+                if (userIdClaim != null && int.TryParse(userIdClaim, out var userId))
+                {
+                    model.UserId = userId;
+
+                    try
+                    {
+                        _context.Items.Add(model);
+                        await _context.SaveChangesAsync();
+                        var items = await _context.Items
+                            .Where(i => i.UserId == userId)
+                            .ToListAsync();
+                        TempData["SuccessMessage"] = "Item added successfully.";
+                        return Json(new
+                        {
+                            isValid = true,
+                            html = Helper.RenderRazorViewToString(this, "UserTable", items),
+                            successMessage = "Successfully added!"
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        return StatusCode(500, new { success = false, message = ex.Message });
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Invalid User ID.");
                     return Json(new
                     {
-                        isValid = true,
-                        html = Helper.RenderRazorViewToString(this, "UserTable", await _context.Items.ToListAsync()),
-                        successMessage = "Successfully added!"
+                        isValid = false,
+                        html = Helper.RenderRazorViewToString(this, "AddItem", model),
+                        failedMessage = "Invalid User ID."
                     });
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, new { success = false, message = ex.Message });
                 }
             }
 
@@ -216,6 +264,7 @@ namespace InventorySystem.Controllers
                 failedMessage = "Failed to add item!"
             });
         }
+
 
 
 
@@ -278,24 +327,44 @@ namespace InventorySystem.Controllers
 
             if (ModelState.IsValid)
             {
+                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                Console.WriteLine($"User ID Claim: {userIdClaim}");
 
-                //_context.Entry(existingUser).CurrentValues.SetValues(user);
-                existingItem.ItemCode = model.ItemCode;
-                existingItem.ItemDateUpdated = DateTime.Now;
-
-                //_context.Update(user);
-
-                await _context.SaveChangesAsync();
-                //return RedirectToAction(nameof("UserTable"));
-                TempData["SuccessMessage"] = "Update Successful!";
-                return Json(new
+                if (userIdClaim != null && int.TryParse(userIdClaim, out var userId))
                 {
-                    isValid = true,
-                    html = Helper.RenderRazorViewToString(this, "UserTable", await _context.Items.ToListAsync()),
-                    successMessage = "Update successful!"
 
-                });
+                    try
+                    {
+                        //_context.Entry(existingUser).CurrentValues.SetValues(user);
+                        existingItem.ItemCode = model.ItemCode;
+                        existingItem.ItemDateUpdated = DateTime.Now;
+
+                        //_context.Update(user);
+
+                        await _context.SaveChangesAsync();
+                        //return RedirectToAction(nameof("UserTable"));
+                        TempData["SuccessMessage"] = "Update Successful!";
+
+                        var items = await _context.Items
+                            .Where(i => i.UserId == userId)
+                            .ToListAsync();
+
+                        return Json(new
+                        {
+                            isValid = true,
+                            html = Helper.RenderRazorViewToString(this, "UserTable", items),
+                            successMessage = "Update successful!"
+
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        return StatusCode(500, new { success = false, message = ex.Message });
+                    }
+                }
+
             }
+
 
             //return PartialView(user);     
             return Json(new
@@ -354,15 +423,42 @@ namespace InventorySystem.Controllers
                 return NotFound();
             }
 
-            _context.Items.Remove(item);
-            await _context.SaveChangesAsync();
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine($"User ID Claim: {userIdClaim}");
 
-            return Json(new
+            if (userIdClaim != null && int.TryParse(userIdClaim, out var userId))
             {
-                isValid = true,
-                html = Helper.RenderRazorViewToString(this, "UserTable", await _context.Items.ToListAsync()),
-                successMessage = "Deletion successful!"
-            });
+                try
+                {
+
+
+                    _context.Items.Remove(item);
+                    await _context.SaveChangesAsync();
+                    var items = await _context.Items
+                            .Where(i => i.UserId == userId)
+                            .ToListAsync();
+                    return Json(new
+                    {
+                        isValid = true,
+                        html = Helper.RenderRazorViewToString(this, "UserTable", items),
+                        successMessage = "Deletion successful!"
+                    });
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, new { success = false, message = ex.Message });
+                }
+            }
+            else
+            {
+                return Json(new
+                {
+                    isValid = true,
+                    html = Helper.RenderRazorViewToString(this, "UserTable", await _context.Items.ToListAsync()),
+                    successMessage = "Deletion successful!"
+                });
+            }
+
         }
 
         #endregion
@@ -370,7 +466,9 @@ namespace InventorySystem.Controllers
 
 
 
+#pragma warning disable IDE0051 // Remove unused private members
         private bool UserExists(int id)
+#pragma warning restore IDE0051 // Remove unused private members
 
         {
             return _context.Users.Any(e => e.UserId == id);

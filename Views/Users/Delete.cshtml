@@ -29,7 +29,7 @@
     <hr class="mt-0"/>
     <form asp-action="delete" method="post" class="mt-4" id="delete-form" onsubmit="return jQueryAjaxPost(this);">
         <input type="hidden"  asp-route-id="@Model.ItemId"/>
-        <input type="submit" value="Delete User" class="btn btn-danger form-control" />
+        <input type="submit" value="Delete Item" class="btn btn-danger form-control" />
         <input type="button" value="Cancel" class="btn btn-outline-secondary form-control mt-3 close-modalBtn" data-bs-dismiss="modal" />
     </form>
 </div>

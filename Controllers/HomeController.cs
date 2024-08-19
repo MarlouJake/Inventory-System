@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace InventorySystem.Controllers
 {
-    public class HomeController(/*ILogger<HomeController> logger,*/ ApplicationDbContext context) : Controller
+    public class HomeController(ApplicationDbContext context) : Controller
     {
         //private readonly ILogger<HomeController> _logger = logger;
         private readonly ApplicationDbContext _context = context;
@@ -61,6 +61,7 @@ namespace InventorySystem.Controllers
                     var claims = new List<Claim>
                     {
                         new(ClaimTypes.Name, user.Username),
+                        new(ClaimTypes.NameIdentifier, user.UserId.ToString())
 
                     };
 
@@ -103,63 +104,67 @@ namespace InventorySystem.Controllers
         [HttpGet]
         public IActionResult AdminLogin()
         {
-            var admin = new LoginModel();
+            var admin = new AdminModel();
             return View(admin);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AdminLogin(LoginModel model)
+        public async Task<IActionResult> AdminLogin(AdminModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid || string.IsNullOrEmpty(model.Password))
             {
-                if (string.IsNullOrEmpty(model.Password))
+                var failedMessage = string.IsNullOrEmpty(model.Password) ? "Make sure to enter valid credentials!" : "Attempt failed, try again!";
+                return Json(new
                 {
-                    return Json(new
-                    {
-                        isValid = false,
-                        html = Helper.RenderRazorViewToString(this, "AdminLogin", model),
-                        failedMessage = "Password cannot be empty!"
-                    });
-                }
+                    isValid = false,
+                    html = Helper.RenderRazorViewToString(this, "AdminLogin", model),
+                    failedMessage
+                });
 
-                if ((model.Username == "admin" || model.Username == "admin@admin.admin") && model.Password == "admin1234")
-                {
-                    var claims = new List<Claim>
-                    {
-                        new(ClaimTypes.Name, model.Username),
-                        // Add additional claims if needed
-                    };
-
-                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    var principal = new ClaimsPrincipal(identity);
-
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-                    return Json(new
-                    {
-                        isValid = true,
-                        redirectUrl = Url.Action("AdminViewer", "AdminList"),
-                        successMessage = "Login Successful!"
-                    });
-                }
-                else
-                {
-                    return Json(new
-                    {
-                        isValid = false,
-                        html = Helper.RenderRazorViewToString(this, "AdminLogin", model),
-                        failedMessage = "User not found!"
-                    });
-                }
             }
 
-            return Json(new
+            var admin = await _context.Admins
+                .FirstOrDefaultAsync(a => (a.Username == model.Username || a.Email == model.Username) && a.Password == HashHelper.HashPassword(model.Password));
+            if (admin != null)
             {
-                isValid = false,
-                html = Helper.RenderRazorViewToString(this, "AdminLogin", model),
-                failedMessage = "Attempt failed, try again!"
-            });
+                if (admin.Username == null)
+                {
+                    return Json(new
+                    {
+                        isValid = false,
+                        html = Helper.RenderRazorViewToString(this, "LoginPage", model),
+                        failedMessage = "Username is missing!"
+                    });
+                }
+                var claims = new List<Claim>
+                    {
+                        new(ClaimTypes.Name, admin.Username)
+                    };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+                return Json(new
+                {
+                    isValid = true,
+                    redirectUrl = Url.Action("AdminViewer", "AdminList"),
+                    successMessage = "Login Successful!"
+                });
+            }
+            else
+            {
+                return Json(new
+                {
+                    isValid = false,
+                    html = Helper.RenderRazorViewToString(this, "AdminLogin", model),
+                    failedMessage = "Username or Password incorrect!"
+                });
+            }
+
+
         }
 
         public IActionResult AccessDenied()
