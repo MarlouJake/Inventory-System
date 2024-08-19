@@ -8,8 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Security.Claims;
 
+
 namespace InventorySystem.Controllers
 {
+
     public class HomeController(ApplicationDbContext context) : Controller
     {
         //private readonly ILogger<HomeController> _logger = logger;
@@ -31,6 +33,7 @@ namespace InventorySystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginPage(LoginModel model)
         {
+
             if (ModelState.IsValid)
             {
                 if (string.IsNullOrEmpty(model.Password))
@@ -39,24 +42,31 @@ namespace InventorySystem.Controllers
                     {
                         isValid = false,
                         html = Helper.RenderRazorViewToString(this, "LoginPage", model),
-                        failedMessage = "Password cannot be empty!"
+                        failedMessage = "Password cannot be empty"
                     });
                 }
 
                 var user = await _context.Users
                    .FirstOrDefaultAsync(u => (u.Username == model.Username || u.Email == model.Username) && u.Password == HashHelper.HashPassword(model.Password));
 
+
+
                 if (user != null)
                 {
+
+
                     if (user.Username == null)
                     {
                         return Json(new
                         {
                             isValid = false,
                             html = Helper.RenderRazorViewToString(this, "LoginPage", model),
-                            failedMessage = "Username is missing!"
+                            failedMessage = "Username not found!"
                         });
                     }
+
+
+
                     // Set authentication cookie
                     var claims = new List<Claim>
                     {
@@ -70,29 +80,23 @@ namespace InventorySystem.Controllers
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
+                    TempData["WelcomeMessage"] = $"Welcome, {user.Username}!";
+
                     return Json(new
                     {
                         isValid = true,
-                        redirectUrl = Url.Action("UserDashboard", "Users"),
-                        successMessage = "Login Successful!"
+                        redirectUrl = Url.Action("UserDashboard", "Users", new { username = identity.Name }),
+                        successMessage = "Wait for a moment..."
                     });
                 }
-                else
-                {
-                    return Json(new
-                    {
-                        isValid = false,
-                        html = Helper.RenderRazorViewToString(this, "LoginPage", model),
-                        failedMessage = "User not found!"
-                    });
-                }
+
             }
 
             return Json(new
             {
                 isValid = false,
                 html = Helper.RenderRazorViewToString(this, "LoginPage", model),
-                failedMessage = "Attempt failed, try again!"
+                failedMessage = "Username or Password incorrect"
             });
         }
 
@@ -126,6 +130,7 @@ namespace InventorySystem.Controllers
 
             var admin = await _context.Admins
                 .FirstOrDefaultAsync(a => (a.Username == model.Username || a.Email == model.Username) && a.Password == HashHelper.HashPassword(model.Password));
+
             if (admin != null)
             {
                 if (admin.Username == null)
@@ -134,12 +139,13 @@ namespace InventorySystem.Controllers
                     {
                         isValid = false,
                         html = Helper.RenderRazorViewToString(this, "LoginPage", model),
-                        failedMessage = "Username is missing!"
+                        failedMessage = "Username not found!"
                     });
                 }
                 var claims = new List<Claim>
                     {
-                        new(ClaimTypes.Name, admin.Username)
+                        new(ClaimTypes.Name, admin.Username),
+                        new(ClaimTypes.NameIdentifier, admin.AdminId.ToString())
                     };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -169,6 +175,7 @@ namespace InventorySystem.Controllers
 
         public IActionResult AccessDenied()
         {
+            //return new HttpStatusCodeResult(HttpStatusCode.Forbidden); // 403 Forbidden
             return View();
         }
 
@@ -177,7 +184,7 @@ namespace InventorySystem.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("AdminLogin");
+            return RedirectToAction("Index");
         }
 
         public IActionResult Error()

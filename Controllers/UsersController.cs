@@ -1,6 +1,8 @@
 ﻿using InventorySystem.Data;
 using InventorySystem.Models;
 using InventorySystem.Utilities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -8,22 +10,16 @@ using System.Security.Claims;
 
 namespace InventorySystem.Controllers
 {
-    //[Authorize(Roles = "Admin")]
+    [Authorize]
     public class UsersController(ApplicationDbContext context/*, UserManager<User>? userManager*/) : Controller
     {
         private readonly ApplicationDbContext _context = context;
 
-        // GET: Admin     
-        public async Task<IActionResult> UserDashboard()
+        [Route("dashboard/{username}")]
+        public async Task<IActionResult> UserDashboard(string username)
         {
-
-
-            //var items = await _context.Items.ToListAsync();
-            // Get the UserID from the session
-            //var UserIdString = HttpContext.Session.GetString("UserID");
-            // Get the User ID from the claims
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            Console.WriteLine($"User ID Claim: {userIdClaim}");
+
             if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
             {
                 // Handle the case where the UserID is not available or invalid
@@ -35,10 +31,15 @@ namespace InventorySystem.Controllers
                 .Where(i => i.UserId == userId)
                 .ToListAsync();
 
+            ViewBag.WelcomeMessage = TempData["WelcomeMessage"] as string;
+            ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
+            ViewData["Title"] = "Dashboard";
             return View(items);
+
         }
 
-        public async Task<IActionResult> UserTable()
+        [Route("dashboard/user-table")]
+        public async Task<IActionResult> ItemTable()
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             Console.WriteLine($"User ID Claim: {userIdClaim}");
@@ -56,6 +57,7 @@ namespace InventorySystem.Controllers
         }
 
         // GET: Admin/Details/id?
+        [Route("dashboard/details")]
         #region --Previous ViewDetails Method--
         public async Task<IActionResult> ViewDetails(int? id)
         {
@@ -81,6 +83,7 @@ namespace InventorySystem.Controllers
 
         // GET: Admin/Create
         [HttpGet]
+        [Route("dashboard/add-item")]
         public IActionResult AddItem()
         {
             /*addItemModel.Users = await _context.Users.ToListAsync()
@@ -124,7 +127,7 @@ namespace InventorySystem.Controllers
             return Json(options);
         }
 
-        private static string[] ConsoleOutputs(Item model)
+        /*private static string[] ConsoleOutputs(Item model)
         {
             // Define a string array with each element being a formatted output string
             string[] arr =
@@ -148,7 +151,7 @@ namespace InventorySystem.Controllers
 
             // Return the string array
             return arr;
-        }
+        }*/
 
         // POST: Users/Create/id
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -168,38 +171,21 @@ namespace InventorySystem.Controllers
                 });
             }
 
-            ConsoleOutputs(model);
+            //ConsoleOutputs(model);
 
-            if (string.IsNullOrWhiteSpace(model.ItemCode) || model.ItemCode.Contains(' '))
+            if (string.IsNullOrWhiteSpace(model.ItemCode) || model.ItemCode.Contains(' ')
+                || string.IsNullOrWhiteSpace(model.FirmwareUpdated) || model.FirmwareUpdated.Contains(' ')
+                || string.IsNullOrWhiteSpace(model.Status) || model.Status.Contains("--Select Status--"))
             {
-                ModelState.AddModelError("", "Item code cannot contain spaces");
+                ModelState.AddModelError("", "Required fields should not be empty");
                 return Json(new
                 {
                     isValid = false,
                     html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                    failedMessage = "Item code cannot contain spaces"
+                    failedMessage = "Required fields should not be empty"
                 });
             }
-            if (string.IsNullOrWhiteSpace(model.FirmwareUpdated) || model.FirmwareUpdated.Contains(' '))
-            {
-                ModelState.AddModelError("", "Select firmware update option first");
-                return Json(new
-                {
-                    isValid = false,
-                    html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                    failedMessage = "Select firmware update option first"
-                });
-            }
-            if (string.IsNullOrWhiteSpace(model.Status) || model.Status.Contains("--Select Status--"))
-            {
-                ModelState.AddModelError("", "Select status first");
-                return Json(new
-                {
-                    isValid = false,
-                    html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                    failedMessage = "Select status first"
-                });
-            }
+
 
             if (ModelState.IsValid)
             {
@@ -234,8 +220,8 @@ namespace InventorySystem.Controllers
                         return Json(new
                         {
                             isValid = true,
-                            html = Helper.RenderRazorViewToString(this, "UserTable", items),
-                            successMessage = "Successfully added!"
+                            html = Helper.RenderRazorViewToString(this, "ItemTable", items),
+                            successMessage = "Successfully added!",
                         });
                     }
                     catch (Exception ex)
@@ -261,7 +247,8 @@ namespace InventorySystem.Controllers
             {
                 isValid = false,
                 html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                failedMessage = "Failed to add item!"
+                failedMessage = "Failed to add item!",
+
             });
         }
 
@@ -274,6 +261,7 @@ namespace InventorySystem.Controllers
         // GET: Admin/Update/id?
         #region --Previous Update Method--
         [HttpGet]
+        [Route("dashboard/update-item")]
         public async Task<IActionResult> Update(int? id)
         {
 
@@ -352,7 +340,7 @@ namespace InventorySystem.Controllers
                         return Json(new
                         {
                             isValid = true,
-                            html = Helper.RenderRazorViewToString(this, "UserTable", items),
+                            html = Helper.RenderRazorViewToString(this, "ItemTable", items),
                             successMessage = "Update successful!"
 
                         });
@@ -364,7 +352,6 @@ namespace InventorySystem.Controllers
                 }
 
             }
-
 
             //return PartialView(user);     
             return Json(new
@@ -383,6 +370,7 @@ namespace InventorySystem.Controllers
         // GET: Admin/Delete/id?
         #region --Previous Delete Method--
         [HttpGet]
+        [Route("dashboard/delete-item")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -413,7 +401,7 @@ namespace InventorySystem.Controllers
         #region --Previous DeleteConfirmed Method--
 
         // POST: Admin/Delete/id?
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
@@ -430,8 +418,6 @@ namespace InventorySystem.Controllers
             {
                 try
                 {
-
-
                     _context.Items.Remove(item);
                     await _context.SaveChangesAsync();
                     var items = await _context.Items
@@ -440,7 +426,7 @@ namespace InventorySystem.Controllers
                     return Json(new
                     {
                         isValid = true,
-                        html = Helper.RenderRazorViewToString(this, "UserTable", items),
+                        html = Helper.RenderRazorViewToString(this, "ItemTable", items),
                         successMessage = "Deletion successful!"
                     });
                 }
@@ -451,30 +437,32 @@ namespace InventorySystem.Controllers
             }
             else
             {
-                return Json(new
-                {
-                    isValid = true,
-                    html = Helper.RenderRazorViewToString(this, "UserTable", await _context.Items.ToListAsync()),
-                    successMessage = "Deletion successful!"
-                });
+                return StatusCode(500, new { success = false, message = "Deletion Failed" });
             }
 
         }
 
         #endregion
 
-
-
-
-#pragma warning disable IDE0051 // Remove unused private members
-        private bool UserExists(int id)
-#pragma warning restore IDE0051 // Remove unused private members
-
+        [Route("dashboard/logout")]
+        public IActionResult Logout()
         {
-            return _context.Users.Any(e => e.UserId == id);
+            HttpContext.SignOutAsync();
+            return RedirectToAction("Index", "Home"); // Redirect to a safe page or login page
         }
 
+        /*
+        #pragma warning disable IDE0051 // Remove unused private members
+                private bool UserExists(int id)
+        #pragma warning restore IDE0051 // Remove unused private members
 
+                {
+                    return _context.Users.Any(e => e.UserId == id);
+                }
+
+
+            }
+        */
     }
 }
 

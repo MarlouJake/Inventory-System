@@ -1,9 +1,10 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace InventorySystem.Models
 {
-    public class LoginModel
+    public class LoginModel : IdentityUser
     {
         [DisplayName("User ID")]
         public int UserID { get; set; }

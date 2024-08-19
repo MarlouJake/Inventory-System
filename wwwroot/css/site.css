@@ -147,4 +147,16 @@ body {
     border: 2px solid red;
 }
 
+#welcome-message {
+    position: fixed;
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    text-align: center;
+}
 
+.popup-message {
+    margin-bottom: 10px;
+    display: block;
+}

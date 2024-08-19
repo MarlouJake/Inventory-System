@@ -4,17 +4,18 @@ using InventorySystem.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace InventorySystem.Controllers
 {
     [Authorize]
-    [Route("AdminList/[action]")]
     public class AdminListController(ApplicationDbContext context) : Controller
     {
 
         private readonly ApplicationDbContext _context = context;
 
 
+        [Route("admin/dashboard")]
         public async Task<IActionResult> AdminViewer()
         {
             var admin = await _context.Users.ToListAsync();
@@ -22,19 +23,21 @@ namespace InventorySystem.Controllers
         }
 
 
+        [Route("admin/modify")]
         public IActionResult AdminModify()
         {
             return View();
         }
 
 
-
+        [Route("admin/user-table")]
         public IActionResult ViewUsers()
         {
             return PartialView();
         }
 
         [HttpGet]
+        [Route("admin/create")]
         public IActionResult AdminCreate()
         {
             var admin = new User();
@@ -91,31 +94,49 @@ namespace InventorySystem.Controllers
                 }
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 
-                try
+                var adminIDClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                Console.WriteLine($"User ID Claim: {adminIDClaim}");
+
+                if (adminIDClaim != null && int.TryParse(adminIDClaim, out var adminId))
                 {
-                    adminModel.Password = adminModel.Password != null ? HashHelper.HashPassword(adminModel.Password) : string.Empty;
-                    _context.Users.Add(adminModel);
-                    await _context.SaveChangesAsync();
-                    Console.WriteLine("Submitted");
-                    return Json(new
+                    try
                     {
-                        isValid = true,
-                        html = Helper.RenderRazorViewToString(this, "AdminListView", await _context.Users.ToListAsync()),
-                        successMessage = "Successfuly created!"
-                    });
-                    //return RedirectToAction(nameof(Admin));
-                    //return Json(new(ModelState.IsValid = true, html = "")); 
+                        adminModel.AdminId = adminId;
+                        adminModel.Password = adminModel.Password != null ? HashHelper.HashPassword(adminModel.Password) : string.Empty;
+                        _context.Users.Add(adminModel);
+                        await _context.SaveChangesAsync();
+                        Console.WriteLine("Submitted");
+                        return Json(new
+                        {
+                            isValid = true,
+                            html = Helper.RenderRazorViewToString(this, "AdminListView", await _context.Users.ToListAsync()),
+                            successMessage = "Successfuly created!"
+                        });
+                        //return RedirectToAction(nameof(Admin));
+                        //return Json(new(ModelState.IsValid = true, html = "")); 
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message.ToString());
+                        return Json(new
+                        {
+                            isValid = false,
+                            html = Helper.RenderRazorViewToString(this, "AdminCreate", adminModel),
+                            failedMessage = $"An error occured while saving: {ex.Message}"
+                        });
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    Console.WriteLine(ex.Message.ToString());
+                    ModelState.AddModelError("", "Invalid Admin ID.");
                     return Json(new
                     {
                         isValid = false,
                         html = Helper.RenderRazorViewToString(this, "AdminCreate", adminModel),
-                        failedMessage = $"An error occured while saving: {ex.Message}"
+                        failedMessage = "Invalid Admin ID."
                     });
                 }
+
 
             }
 
@@ -131,9 +152,11 @@ namespace InventorySystem.Controllers
             });
         }
 
+
         // GET: Admin/Delete/id?
         #region --Previous Delete Method--
         [HttpGet]
+        [Route("admin/delete")]
         public async Task<IActionResult> AdminDelete(int? id)
         {
             if (id == null)

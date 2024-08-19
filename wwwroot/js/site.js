@@ -231,7 +231,8 @@ jQueryAjaxPost = form => {
                     console.log("AJAX Fail Response:", res);
                     $("#view-myModal .modal-body").html(res.html);
                     $("#error-message").text(res.failedMessage).fadeIn().delay(500).fadeOut(); 
-                    console.error('Attempt failed: "', res.failedMessage + ' "');
+                    console.error('Attempt failed: "', res.failedMessage + ' "'); showMessage(response.failedMessage, 'error');
+                    showMessage(response.failedMessage, 'error');
                 }
             },
             error: function (err) {
@@ -393,7 +394,7 @@ function logout() {
 
             // Redirect to the admin login
             setTimeout(() => {
-                window.location.href = '/Home/AdminLogin'; // Redirect to login page after successful logout
+                window.location.href = '/Home/Index'; // Redirect to login page after successful logout
             }, 1000); // Ensure redirect happens after the success message fades out
            
         },

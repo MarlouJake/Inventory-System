@@ -25,21 +25,20 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-/*
+
 builder.Services.AddAuthorizationBuilder()
-    .SetFallbackPolicy(new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build());
-*/
+    .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"))
+    .AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Home/AdminLogin"; // Path to the login page
+        //options.LoginPath = "/Home/AccessDenied";
         options.AccessDeniedPath = "/Home/AccessDenied"; // Path for access denied
         options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
         options.Cookie.SameSite = SameSiteMode.Strict;
     });
-
 
 
 builder.Services.AddSession(options =>
@@ -80,6 +79,7 @@ app.UseEndpoints(endpoints =>
     _ = endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
+
 });
 
 app.Run();
