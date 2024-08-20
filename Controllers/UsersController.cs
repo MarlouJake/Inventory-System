@@ -13,10 +13,11 @@ namespace InventorySystem.Controllers
     [Authorize]
     public class UsersController(ApplicationDbContext context/*, UserManager<User>? userManager*/) : Controller
     {
+        private const string UserDashboardRoute = "dashboard/{username}";
         private readonly ApplicationDbContext _context = context;
 
-        [Route("dashboard/{username}")]
-        public async Task<IActionResult> UserDashboard(string username)
+        [Route(UserDashboardRoute)]
+        public async Task<IActionResult> UserDashboard()
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
@@ -300,7 +301,7 @@ namespace InventorySystem.Controllers
             {
                 return NotFound();
             }
-                                         
+
             var existingItem = await _context.Items.FindAsync(id);
             if (existingItem == null)
             {
