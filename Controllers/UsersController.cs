@@ -295,16 +295,12 @@ namespace InventorySystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(int id, [Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,AdditionalInfo,ItemDateUpdated,FirmwareUpdated")] Item model)
         {
-            //ViewData["IsCreationContext"] = false;
-            // Retrieve the success message from TempData if it exists
-
 
             if (id != model.ItemId)
             {
                 return NotFound();
             }
-
-            //var existingUser = await _context.Users.FindAsync(id);
+                                         
             var existingItem = await _context.Items.FindAsync(id);
             if (existingItem == null)
             {

@@ -1,3 +1,4 @@
+using Azure.Identity;
 using InventorySystem.Data;
 using InventorySystem.Models;
 using InventorySystem.Utilities;
@@ -109,6 +110,12 @@ namespace InventorySystem.Controllers
         public IActionResult AdminLogin()
         {
             var admin = new AdminModel();
+
+            string password = HashHelper.HashPassword("user1234");
+            
+            DateTime dateCreated = DateTime.Now;
+            Console.WriteLine($"Password: {password} : Date Created: {dateCreated.ToString("0:MMMM dd, yyyy hh:mm:ss tt")}");
+
             return View(admin);
         }
 
@@ -127,6 +134,7 @@ namespace InventorySystem.Controllers
                 });
 
             }
+
 
             var admin = await _context.Admins
                 .FirstOrDefaultAsync(a => (a.Username == model.Username || a.Email == model.Username) && a.Password == HashHelper.HashPassword(model.Password));
