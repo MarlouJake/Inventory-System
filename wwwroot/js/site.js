@@ -75,15 +75,6 @@ document.addEventListener("DOMContentLoaded", function () {
 */
 
 document.addEventListener('DOMContentLoaded', () => {
-    /*
-    var successMessage = $("#success-message");
-
-    if (successMessage.text().trim() !== "") {
-        successMessage.fadeIn().delay(1500).fadeOut(); // Show for 1.5 seconds
-    }
-    */
-    
-
  
     NewItemAdded();
 
@@ -185,23 +176,7 @@ function ShowPopUpLoginPage(url) {
         }
     });
 }
-/*
-function ShowPopUpLoginPage(url) {
-    $.ajax({
-        type: "GET",
-        url: url,
-        success: function (res) {
-            $("#index-myModal .modal-body").html(res);
-            //$("#view-myModal .modal-title").html(title);
-            $("#index-myModal").modal('show');
-        },
-        error: function (xhr, status, error) {
-            alert("An error occured while loading the form: " + errror);
-        }
-    });
-}
 
-*/
 jQueryAjaxPost = form => {
 
     try {
@@ -343,7 +318,7 @@ jQueryAjaxLoginPost = form => {
                 else {
                     // Hide loading modal
                     setTimeout(() => $('#loading-modal').modal('hide'),500); // Ensure modal hides after error message fades out
-                    $("#error-message").text(res.failedMessage).fadeIn().delay(500).fadeOut();;
+                    $("#error-message").text(res.failedMessage).fadeIn().delay(500).fadeOut();
                     console.log("Error login:" + res.failedMessage);
                     //$('#error-message').removeClass('alert-success').addClass('alert-danger').text(response.errorMessage).show();
                 }
@@ -353,6 +328,7 @@ jQueryAjaxLoginPost = form => {
                 setTimeout(() => $('#loading-modal').modal('hide'), 500); // Ensure modal hides after error message fades out
                 console.error('AJAX Error: ', err.responseText);
                 $("#error-message").text(res.failedMessage).fadeIn().delay(500).fadeOut();
+
                 console.log("Error posting: " + err);
                 
             }
@@ -370,39 +346,7 @@ jQueryAjaxLoginPost = form => {
     return false;
 }
 
-function logout() {
-    $.ajax({
-        type: 'POST',
-        url: '/Home/Logout',
-        success: function () {
-            $('#loading-modal .modal-body').html(`
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="sr-only p-5">Loading...</span>
-                    </div>
-                    <p class="mt-2">Logging out...</p>
-                </div>
-            `);
 
-            // Show modal
-            $('#loading-modal').modal({
-                backdrop: 'static',
-                keyboard: false
-            }).modal('show');
-
-
-
-            // Redirect to the admin login
-            setTimeout(() => {
-                window.location.href = '/Home/Index'; // Redirect to login page after successful logout
-            }, 1000); // Ensure redirect happens after the success message fades out
-           
-        },
-        error: function (err) {
-            console.error('Logout Error: ', err.responseText);
-        }
-    });
-}
 
 
 

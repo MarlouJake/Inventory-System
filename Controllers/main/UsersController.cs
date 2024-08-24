@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace InventorySystem.Controllers
+namespace InventorySystem.Controllers.main
 {
     [Authorize]
     public class UsersController(ApplicationDbContext context/*, UserManager<User>? userManager*/) : Controller
@@ -17,7 +17,7 @@ namespace InventorySystem.Controllers
         private readonly ApplicationDbContext _context = context;
 
         [Route(UserDashboardRoute)]
-        public async Task<IActionResult> UserDashboard()
+        public async Task<IActionResult> UserDashboard(string username)
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
@@ -32,7 +32,8 @@ namespace InventorySystem.Controllers
                 .Where(i => i.UserId == userId)
                 .ToListAsync();
 
-            ViewBag.WelcomeMessage = TempData["WelcomeMessage"] as string;
+            //ViewBag.WelcomeMessage = TempData["WelcomeMessage"] as string;
+            ViewBag.SuccessMessage = $"Welcome, {username}!";
             ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
             ViewData["Title"] = "Dashboard";
             return View(items);
@@ -462,85 +463,3 @@ namespace InventorySystem.Controllers
         */
     }
 }
-
-
-#region --Failure ViewDetails--
-/*
-public async Task<IActionResult> ViewDetails(string encryptedId, byte[] key, byte[] iv)
-{
-
-    if (key == null || iv == null)
-    {
-        return StatusCode(StatusCodes.Status500InternalServerError, "Encryption key or IV not provided.");
-    }
-
-    int id = IdEncryptor.DecryptId(encryptedId, key, iv);
-
-    var user = await _context.Users.FirstOrDefaultAsync(m => m.UserId == id);
-    if (user == null)
-    {
-        return NotFound();
-    }
-
-    return View(user);
-
-}
-*/
-#endregion
-
-
-#region --Failure Update--
-/*
-public async Task<IActionResult> Update(string id)
-{
-    int userId;
-
-    try
-    {
-        userId = IdHasher.UnhashId(id);
-    }
-
-    catch
-    {
-        return NotFound();
-    }
-
-    var user = await _context.Users.FindAsync(userId);
-    if (user == null)
-    {
-        return NotFound();
-    }
-    return View(user);
-
-}
-*/
-#endregion
-
-
-#region --Failure DeleteConfirmed--
-/*
-public async Task<IActionResult> DeleteConfirmed(string id)
-{
-    int userId;
-
-    try
-    {
-        userId = IdHasher.UnhashId(id);
-    }
-
-    catch
-    {
-        return NotFound();
-    }
-
-    var user = await _context.Users.FindAsync(userId);
-    if (user == null)
-    {
-        return NotFound();
-    }
-
-    await _context.SaveChangesAsync();
-    return RedirectToAction(nameof(Admin));
-}
-*/
-#endregion

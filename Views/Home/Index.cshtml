@@ -1,17 +1,16 @@
 ﻿
-@{
-    ViewData["Title"] = "Login";   
-}
-
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 
 <div class="row d-grid d-lg-flex m-2" id="login-page">
-    <div class="col-12 col-lg-6 mt-3 mt-lg-0">    
-        @await Html.PartialAsync("LoginPage", new LoginModel())
+    <div class="col-12 col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0 text-center p-5">
+        <h1 class="p-5">Inventory Management System</h1>
     </div>
+    <div class="col-12 col-lg-6  order-1 mt-3 mt-lg-0">
+        @await Html.PartialAsync("LoginPage", new LoginModel())
+    </div>  
 </div>
 
 <!--Swap order of div in small screen-->

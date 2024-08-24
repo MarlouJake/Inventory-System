@@ -3,17 +3,19 @@
 *@
 @model InventorySystem.Models.LoginModel
 
+
+
+
 @{
-    ViewData["Title"] = "Login Page";
+    //<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 }
-<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 
 <h6 class="text-center">User Login</h6>
 <hr />
 <div class="row justify-content-center align-items-center">
 
-    <form asp-action="LoginPage" class="forms" method="post" asp-route-id="@Model.UserID" onsubmit="return jQueryAjaxLoginPost(this);">
+    <form asp-controller="AuthenticateApi" asp-action="LoginPage" id="user-login" class="forms" method="post" asp-route-id="@Model.UserID" onsubmit="return sendRequest(this);" autocomplete="off">
         <div class="form-group">
             <label asp-for="Username" class="control-label mt-2"></label>
             <div class="input-group">
@@ -26,7 +28,7 @@
 
                     </div>
                 </div>
-                <input asp-for="Username" type="text" class="form-control user-input"
+                <input asp-for="Username" type="text" class="form-control user-input" id="username"  name="username"
                        autocomplete="off"
                        required
                        placeholder="Username or Email"
@@ -50,7 +52,7 @@
 
                     </div>
                 </div>
-                <input asp-for="Password" type="password" class="form-control user-input"
+                <input asp-for="Password" type="password" class="form-control user-input" id="password" name="password"
                        autocomplete="off"
                        placeholder="Password"
                        required

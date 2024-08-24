@@ -1,6 +1,7 @@
 using InventorySystem.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,12 +10,18 @@ var configuration = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddHttpClient();
+
 builder.Services.AddControllersWithViews();
 
-// Configure CORS
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins",
+    options.AddPolicy("AllowAll",
         builder =>
         {
             builder.AllowAnyOrigin()
@@ -30,16 +37,13 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"))
     .AddPolicy("UserOnly", policy => policy.RequireRole("User"));
 
-
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        //options.LoginPath = "/Home/AccessDenied";
         options.AccessDeniedPath = "/Home/AccessDenied"; // Path for access denied
         options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
         options.Cookie.SameSite = SameSiteMode.Strict;
     });
-
 
 builder.Services.AddSession(options =>
 {
@@ -48,15 +52,12 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -68,11 +69,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseCors("AllowAll"); // Apply CORS policy here
 
 app.UseSession();
-app.UseCors("AllowAllOrigins");
-
-
 
 app.UseEndpoints(endpoints =>
 {
@@ -80,6 +79,18 @@ app.UseEndpoints(endpoints =>
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 
+    // Redirect root URL to /login/user
+    _ = endpoints.MapGet("/", context =>
+    {
+        context.Response.Redirect("/home/login");
+        return Task.CompletedTask;
+    });
+
+    // Optionally uncomment this if you have API routes
+    //_ = endpoints.MapControllerRoute(
+    //     name: "api-authenticate-user-login",
+    //     pattern: "api/authenticate/user-login",
+    //     defaults: new { controller = "AuthenticateApi" });
 });
 
 app.Run();

@@ -4,12 +4,14 @@
 
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
-    var welcomemsg = ViewBag.WelcomeMessage as string;
+    //var welcomemsg = ViewBag.WelcomeMessage as string;
+    //var welcomemsg = ViewBag.SuccessMessage as string;
+
 }
-@if (!string.IsNullOrEmpty(welcomemsg))
+@if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
 {
     <div id="welcome-message" class="popup-message alert alert-success">
-        @welcomemsg
+        @ViewBag.SuccessMessage
     </div>
 }
 
@@ -42,7 +44,7 @@
             New Item
         </a>
 
-        <a href="#" class="btn btn-danger btn-sm" onclick="logout()">Logout</a>
+            <a href="#" class="btn btn-danger btn-sm" onclick="Logout(event);">Logout</a>
     </div>
     
 </nav>

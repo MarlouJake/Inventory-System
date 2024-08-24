@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace InventorySystem.Controllers
+namespace InventorySystem.Controllers.main
 {
     [Authorize]
     public class AdminListController(ApplicationDbContext context) : Controller
@@ -17,7 +17,7 @@ namespace InventorySystem.Controllers
 
         [Route("admin/dashboard")]
         public async Task<IActionResult> AdminViewer()
-        {          
+        {
             var adminIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (adminIdClaim == null || !int.TryParse(adminIdClaim, out var adminId))
@@ -63,7 +63,7 @@ namespace InventorySystem.Controllers
 
             if (ModelState.IsValid)
             {
-               
+
                 var adminIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
                 if (adminIdClaim != null && int.TryParse(adminIdClaim, out var adminId))
