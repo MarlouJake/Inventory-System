@@ -13,7 +13,7 @@ namespace InventorySystem.Controllers.main
     [Authorize]
     public class UsersController(ApplicationDbContext context/*, UserManager<User>? userManager*/) : Controller
     {
-        private const string UserDashboardRoute = "dashboard/{username}";
+        private const string UserDashboardRoute = "user-dashboard/{username}";
         private readonly ApplicationDbContext _context = context;
 
         [Route(UserDashboardRoute)]
@@ -32,8 +32,10 @@ namespace InventorySystem.Controllers.main
                 .Where(i => i.UserId == userId)
                 .ToListAsync();
 
-            //ViewBag.WelcomeMessage = TempData["WelcomeMessage"] as string;
             ViewBag.SuccessMessage = $"Welcome, {username}!";
+            ViewBag.Username = username;
+            ViewBag.UserId = userId;
+
             ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
             ViewData["Title"] = "Dashboard";
             return View(items);

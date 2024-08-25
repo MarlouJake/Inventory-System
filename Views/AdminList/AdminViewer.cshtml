@@ -4,7 +4,10 @@
 
 @model IEnumerable<InventorySystem.Models.User>
 @{
-    ViewData["Title"] = "Admin";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    var CurrentUsername = ViewBag.Username as string;
+    var CurrentAdminId = ViewBag.AdminId as int?;
 }
 
 <nav class="navbar p-2 bg-dark border border-top-0 border-3 border-start-0 border-end-0 ">
@@ -16,7 +19,7 @@
             </svg>
             Add New User
         </a>
-        <a href="#" onclick="logout()" class="btn btn-danger btn-sm" >Logout</a>
+        <a href="#" onclick="LogoutRequest('@CurrentAdminId', '@CurrentUsername')" class="btn btn-danger btn-sm">Logout</a>
     </div>
     
 

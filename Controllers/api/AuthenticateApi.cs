@@ -149,74 +149,90 @@ namespace InventorySystem.Controllers.api
         {
             try
             {
-                if (!ModelState.IsValid || string.IsNullOrEmpty(model.Password))
+                if (!ModelState.IsValid)
                 {
-                    var failedMessage = string.IsNullOrEmpty(model.Password) ? "Make sure to enter valid credentials!" : "Attempt failed, try again!";
-                    return new JsonResult(new
+                    return Ok(new
                     {
                         isValid = false,
-                        failedMessage
+                        redirectUrl = (string?)null,
+                        successMessage = (string?)null,
+                        errorMessage = "Please check your input."
                     });
                 }
 
-                var admin = await _context.Admins
-                    .FirstOrDefaultAsync(a => (a.Username == model.Username || a.Email == model.Username) && a.Password == HashHelper.HashPassword(model.Password));
 
-                if (admin != null)
+                if (ModelState.IsValid)
                 {
-                    if (admin.Username == null)
+                    if (string.IsNullOrEmpty(model.Password))
                     {
-                        return new JsonResult(new
+                        return Ok(new
                         {
                             isValid = false,
-                            failedMessage = "Username not found!"
+                            redirectUrl = (string?)null,
+                            successMessage = (string?)null,
+                            errorMessage = "Password cannot be empty"
                         });
                     }
 
-                    var claims = new List<Claim>
+                    var admin = await _context.Admins
+                    .FirstOrDefaultAsync(a => (a.Username == model.Username || a.Email == model.Username) && a.Password == HashHelper.HashPassword(model.Password));
+
+                    if (admin != null)
                     {
-                        new(ClaimTypes.Name, admin.Username),
-                        new(ClaimTypes.NameIdentifier, admin.AdminId.ToString())
-                    };
+                        if (admin.Username == null)
+                        {
+                            return Ok(new
+                            {
+                                isValid = false,
+                                redirectUrl = (string?)null,
+                                successMessage = (string?)null,
+                                errorMessage = "User not found"
+                            });
+                        }
 
-                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    var principal = new ClaimsPrincipal(identity);
+                        var claims = new List<Claim>
+                        {
+                            new(ClaimTypes.Name, admin.Username),
+                            new(ClaimTypes.NameIdentifier, admin.AdminId.ToString())
+                        };
 
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var principal = new ClaimsPrincipal(identity);
 
-                    var adminApiUrl = Url.Action("AdminLogin", "AuthenticateApi", new { controller = "AuthenticateApi" }, Request.Scheme);
-                    PrintUrl(adminApiUrl);
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-                    /*
-                    return new JsonResult(new
-                    {
-                        isValid = true,
-                        redirectUrl = Url.Action("AdminViewer", "AdminList"),
-                        successMessage = "Login Successful!"
-                    });*/
+                        var redirectUrl = Url.Action("AdminViewer", "AdminList", new { username = identity.Name });
+                        PrintUrl(redirectUrl);
 
-                    return Ok(new
-                    {
-                        isValid = true,
-                        redirectUrl = "/dashboard",
-                        successMessage = "Login Successful!"
-                    });
+                        return Ok(new
+                        {
+                            isValid = true,
+                            redirectUrl,
+                            successMessage = "Login Successful!"
+                        });
+
+                    }
+
+
                 }
-                else
+
+                return Ok(new
                 {
-                    return new JsonResult(new
-                    {
-                        isValid = false,
-                        failedMessage = "Username or Password incorrect!"
-                    });
-                }
+                    isValid = false,
+                    redirectUrl = (string?)null,
+                    successMessage = (string?)null,
+                    errorMessage = "Username or Password incorrect"
+                });
+
             }
             catch
             {
-                return new JsonResult(new
+                return Ok(new
                 {
                     isValid = false,
-                    failedMessage = "Username or Password incorrect!"
+                    redirectUrl = (string?)null,
+                    successMessage = (string?)null,
+                    errorMessage = "Username or Password incorrect"
                 });
             }
         }

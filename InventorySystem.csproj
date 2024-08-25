@@ -8,7 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\messages.js" />
+  </ItemGroup>
+
+  <ItemGroup>
 	<None Remove="Monikers.imagemanifest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\messages.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +40,10 @@
 
   <ItemGroup>
 	<Folder Include="wwwroot\fonts\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\messages.js" />
   </ItemGroup>
 
   <ItemGroup>

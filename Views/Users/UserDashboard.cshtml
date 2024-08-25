@@ -4,6 +4,10 @@
 
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    var CurrentUsername = ViewBag.Username as string;
+    var CurrentUserid = ViewBag.UserId as int?;
+
     //var welcomemsg = ViewBag.WelcomeMessage as string;
     //var welcomemsg = ViewBag.SuccessMessage as string;
 
@@ -44,7 +48,7 @@
             New Item
         </a>
 
-            <a href="#" class="btn btn-danger btn-sm" onclick="Logout(event);">Logout</a>
+            <a href="#" class="btn btn-danger btn-sm" onclick="LogoutRequest('@CurrentUserid', '@CurrentUsername');">Logout</a>
     </div>
     
 </nav>

@@ -160,3 +160,9 @@ body {
     margin-bottom: 10px;
     display: block;
 }
+
+
+.input-error {
+    border: 1px solid red;
+    background-color: #fdd;
+}

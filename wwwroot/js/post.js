@@ -1,48 +1,4 @@
-﻿
-
-const LoadingMessages = [
-    'Loging in',
-    'Loging out',
-    'Please wait'
-];
-
-const SuccessMessages = [
-    'Post Success',
-    'Valid',
-    'Login Success'
-];
-
-const ErrorMessages = [
-    'Login Failed',
-    'Logout Failed',
-    'Post Error',
-    'Post Failed',
-    'Invalid',
-    'Login Error',
-    'Logout Error',
-    'Enter valid credentials',
-    'Username or Password incorrect'
-];
-
-const methods = [
-    'POST',
-    'GET',
-    'PUT'
-];
-
-const actions = [
-    'Login',
-    'Logout',
-    'Add',
-    'Delete',
-    'Modify',
-    'Open',
-    'Exit',
-    'Create',
-    'Refresh'
-];
-
-function getUrl(url) {
+﻿function getUrl(url) {
 
     const fullUrl = `${window.location.origin}${url}`;
 
@@ -50,6 +6,65 @@ function getUrl(url) {
     
 }
 
+function Validations() {
+    const Post = methods[0];
+    const Login = actions[0];
+    const Logout = actions[1];
+
+    const PostSuccess = SuccessMessages[0];
+    const ResponseValid = SuccessMessages[1];
+    const LoginSuccess = SuccessMessages[2];
+
+    const LoginFailed = ErrorMessages[0];
+    const PostFailed = ErrorMessages[3];
+    const ResponseInvalid = ErrorMessages[4];
+
+    const FillRequiredFields = ValidateFields[1];
+    const UsernamePasswordIncorrect = ValidateFields[2];
+    const UsernameEmpty = ValidateFields[4];
+    const PasswordEmpty = ValidateFields[6];
+    const UsernameLength = ValidateFields[7];
+    const PasswordLegth = ValidateFields[8];
+    const MatchFound = ValidateFields[9];
+    const InvalidCredentials = ValidateFields[10];
+
+    const LogoutSuccess = SuccessMessages[3]; 
+    const LogoutFailed = ErrorMessages[1];
+
+    const LogingIn = LoadingMessages[0]; 
+    const LogingOut = LoadingMessages[1];
+    const PleaseWait = LoadingMessages[2]; 
+
+    const PostError = ErrorMessages[2];
+
+ 
+
+    return validations = {
+        Post, //0
+        Login, //1
+        PostSuccess, //2
+        ResponseValid, //3
+        LoginSuccess, //4
+        LoginFailed, //5
+        PostFailed, //6
+        ResponseInvalid, //7
+        UsernameEmpty, //8
+        PasswordEmpty, //9
+        UsernameLength, //10
+        PasswordLegth, //11
+        LogoutSuccess, //12
+        LogoutFailed, //13
+        LogingIn, //14
+        LogingOut, //15
+        PleaseWait, //16
+        Logout, //17
+        PostError, //18
+        MatchFound, //19
+        InvalidCredentials, //20
+        UsernamePasswordIncorrect, //21
+        FillRequiredFields //22
+    };
+}
 
 function getBrowserInfo() {
     const userAgent = navigator.userAgent;
@@ -88,20 +103,18 @@ function getBrowserInfo() {
     };
 }
 
-const browserInfo = getBrowserInfo();
-
-
 function jsonResult(
-    method,   _action, _actionMessage1, Val1, _actionMessage2, Val2, data,
+    method, _action, _actionMessage1, Val1, _actionMessage2, Val2, _actionMessage3, data,
     resMessage, api, resStatus, targetRoute, _browser, Val3) {
 
     const ResponseMessage = resMessage;
-    const ApiUrl = getUrl(api);
+    const ApiUrl = api;
     const ResponseStatus = resStatus;
     const TagerRoute = getUrl(targetRoute);
-    const Action = _action 
+    const Action = _action
     const ActionMessage1 = _actionMessage1;
     const ActionMessage2 = _actionMessage2;
+    const ActionMessage3 = _actionMessage3;
     const Validity1 = Val1;
     const Validity2 = Val2;
     const BrowserInfo = _browser;
@@ -120,19 +133,24 @@ function jsonResult(
         actions: {
             action: Action,
             [ActionMessage1]: [Validity1],
-            [ActionMessage2]: [Validity2]
+            [ActionMessage2]: [Validity2],
+            message: ActionMessage3
         },
         data,
         message: ResponseMessage,
         apiurl: ApiUrl,
         response: ResponseStatus,
-        targeroute: TagerRoute,     
+        targeroute: TagerRoute,
         browserdetails: {
             [BrowserInfo]: version
         },
         timestamp
     };
 }
+
+
+const validate = Validations();
+const browserInfo = getBrowserInfo();
 
 async function loading(message) {
     $('#loading-modal .modal-body').html(`
@@ -150,51 +168,69 @@ async function loading(message) {
     }).modal('show');
 }
 
-sendRequest = (form) => {
-    const method = methods[0];
-    const action = actions[0];
-    const successmsg0 = SuccessMessages[0];
-    const successmsg1 = SuccessMessages[1];
-    const successmsg2 = SuccessMessages[2];
-    const errormsg1 = ErrorMessages[0];
-    const errormsg3 = ErrorMessages[3];
-    const errormsg4 = ErrorMessages[4];
+
+UserRequest = (form) => {
+
+    const apiUrl = form.action;
     const formData = new FormData(form);
     const data = {
         username: formData.get("username"),
-        password: formData.get("password")
+        password: formData.get("password"),
+        loginrole: 'standard'
     };
-    
+
+    $('#username-error').text('');
+    $('#password-error').text('');
+    $('.form-control').removeClass('input-error');
+
     if (!$(form).valid()) {
-        $("#error-message").text(ErrorMessages[7]).fadeIn().delay(1000).fadeOut();
+
+        if (!data.username || data.username.trim() === '') {
+            $('#username').addClass('input-error');
+            $('#username-error').text(validate.UsernameEmpty);
+           
+        } else if (data.username.length < 3) {
+            $('#username').addClass('input-error');
+            $('#username-error').text(validate.UsernameLength);
+ 
+        }
+
+
+        if (!data.password || data.password.trim() === '') {
+            $('#password').addClass('input-error');
+            $('#password-error').text(validate.PasswordEmpty);
+
+        } else if (data.password.length < 8) {
+            $('#password').addClass('input-error');
+            $('#password-error').text(validate.PasswordLegth);
+
+        }
+      
         return false; // Prevent form submission if invalid
     }
 
-
     try {
-       
-        
-
         $.ajax({
-            type: method,
-            url: form.action,
+            type: validate.Post,
+            url: apiUrl,
             data: JSON.stringify(data),
             contentType: 'application/json',  
             dataType: 'json',
             success: function (res) {
-                loading(LoadingMessages[0]);
+                loading(validate.LogingIn);
                 if (res.isValid) {
                     const result = jsonResult(
-                        method,
-                        action,
-                        successmsg2,
+                        validate.Post,
+                        validate.Login,
+                        validate.LoginSuccess,
                         true,
-                        errormsg1,
+                        validate.LoginFailed,
                         false,
+                        validate.MatchFound,
                         data,
-                        successmsg0,
-                        form.action,
-                        successmsg1,
+                        validate.PostSuccess,
+                        apiUrl,
+                        validate.ResponseValid,
                         res.redirectUrl,
                         browserInfo.name,
                         browserInfo.version
@@ -207,7 +243,6 @@ sendRequest = (form) => {
                         window.location.href = res.redirectUrl;
                     }, 1000);
 
-                    //$("#success-message").text(res.successMessage).fadeIn().delay(3000).fadeOut();
                 } else {
 
                     setTimeout(() => $('#loading-modal').modal('hide'), 500);
@@ -217,17 +252,18 @@ sendRequest = (form) => {
                    
 
                     const result = jsonResult(
-                        method,
-                        action,
-                        successmsg2,
+                        validate.Post,
+                        validate.Login,
+                        validate.LoginSuccess,
                         false,
-                        errormsg1,
+                        validate.LoginFailed,
                         true,
+                        validate.UsernamePasswordIncorrect,
                         data,
-                        successmsg0,
-                        form.action,
-                        res.errorMessage,
-                        res.redirectUrl,
+                        validate.PostSuccess,
+                        apiUrl,
+                        validate.ResponseValid,
+                        `/dashboard/${data.username}`,
                         browserInfo.name,
                         browserInfo.version
                     );
@@ -242,17 +278,18 @@ sendRequest = (form) => {
                 $("#error-message").text(ErrorMessages[7]).fadeIn().delay(500).fadeOut();
 
                 const result = jsonResult(
-                    method,
-                    action,
-                    successmsg2,
+                    validate.Post,
+                    validate.Login,
+                    validate.LoginSuccess,
                     false,
-                    errormsg1,
+                    validate.LoginFailed,
                     true,
+                    valid.FillRequiredFields,
                     data,
-                    errormsg3,
-                    form.action,
-                    errormsg4,
-                    `dashboard/${data.username}`,
+                    validate.PostFailed,
+                    apiUrl,
+                    validate.ResponseInvalid,
+                    `/dashboard/${data.username}`,
                     browserInfo.name,
                     browserInfo.version
                 );
@@ -261,131 +298,334 @@ sendRequest = (form) => {
             }
         });
         
-    } catch (ex) {
-        setTimeout(() => $('#loading-modal').modal('hide'), 500);
-        console.log("Exception caught: ", ex);
     }
+    catch (ex) {
+        setTimeout(() => $('#loading-modal').modal('hide'), 500);
 
+        const result = jsonResult(
+            validate.Post,
+            validate.Login,
+            validate.LoginSuccess,
+            false,
+            validate.LoginFailed,
+            true,
+            validate.InvalidCredentials+'\n'+ex,
+            data,
+            validate.PostError,
+            apiUrl,
+            validate.ResponseInvalid,
+            `/dashboard/${data.username}`,
+            browserInfo.name,
+            browserInfo.version
+        );
+
+        console.log("Submission Error Data", JSON.stringify(result, null, 2));
+    }
     return false;
 }
 
+AdminRequest = (form) => {
+
+    const apiUrl = form.action;
+    const formData = new FormData(form);
+    const data = {
+        username: formData.get("user"),
+        password: formData.get("pwd"),
+        loginrole: 'admin'
+    };
+
+    $('#user-error').text('');
+    $('#pwd-error').text('');
+    $('.form-control').removeClass('input-error');
+
+    if (!$(form).valid()) {
+
+        if (!data.username || data.username.trim() === '') {
+            $('#user').addClass('input-error');
+            $('#user-error').text(validate.UsernameEmpty);
+
+        } else if (data.username.length < 3) {
+            $('#user').addClass('input-error');
+            $('#user-error').text(validate.UsernameLength);
+
+        }
 
 
-/*
-async function sendRequest(url, method, data, message) {
-    await $.ajax({
-        url: url,
-        type: method,
-        data: JSON.stringify(data),
-        contentType: "application/json",
-        dataType: 'json',
-        success: function (response) {
+        if (!data.password || data.password.trim() === '') {
+            $('#pwd').addClass('input-error');
+            $('#pwd-error').text(validate.PasswordEmpty);
 
-            if (response.isValid) {
+        } else if (data.password.length < 8) {
+            $('#pwd').addClass('input-error');
+            $('#pwd-error').text(validate.PasswordLegth);
 
-                const result = jsonResult(
-                    method,
-                    data,
-                    SuccessMessages[0],
-                    url,
-                    SuccessMessages[1],
-                    response.redirectUrl,
-                    actions[0],
-                    SuccessMessages[2],
-                    true,
-                    ErrorMessages[0],
-                    false,
-                    browserInfo.name,
-                    browserInfo.version
-                );
-                
-                console.log("Submission Data", JSON.stringify(result, null, 2));
+        }
 
-                loading(LoadingMessages[0]);
+        return false; // Prevent form submission if invalid
+    }
 
-                setTimeout(() => {
-                    window.location.href = response.redirectUrl;
-                }, 1000);
+    try {
+        $.ajax({
+            type: validate.Post,
+            url: apiUrl,
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (res) {
+                loading(validate.LogingIn);
+                if (res.isValid) {
+                    const result = jsonResult(
+                        validate.Post,
+                        validate.Login,
+                        validate.LoginSuccess,
+                        true,
+                        validate.LoginFailed,
+                        false,
+                        validate.MatchFound,
+                        data,
+                        validate.PostSuccess,
+                        apiUrl,
+                        validate.ResponseValid,
+                        res.redirectUrl,
+                        browserInfo.name,
+                        browserInfo.version
+                    );
 
-                $("#success-message").text(response.successMessage).fadeIn().delay(3000).fadeOut();
-            } else {
-                setTimeout(() => $('#loading-modal').modal('hide'), 500);
+                    console.log("API Data", JSON.stringify(result, null, 2));
 
-                $("#error-message").text(response.failedMessage).fadeIn().delay(500).fadeOut();
+                    setTimeout(() => $('#loading-modal').modal('hide'), 1000);
+                    setTimeout(() => {
+                        window.location.href = res.redirectUrl;
+                    }, 1000);
 
-                const result = jsonResult(
-                    method,
-                    data,
-                    SuccessMessages[0],
-                    url,
-                    SuccessMessages[1],
-                    response.redirectUrl,
-                    actions[0],
-                    SuccessMessages[2],
-                    false,
-                    ErrorMessages[0],
-                    true,
-                    browserInfo.name,
-                    browserInfo.version
-                );
+                } else {
 
-                console.log("Submission Data", JSON.stringify(result, null, 2));
-            }
-        },
-        error: function (err) {
-            if (err.status === 400) {
-                const errors = err.responseJSON.errors;
-                let errorMessage = "Validation Errors: <br/>";
+                    setTimeout(() => $('#loading-modal').modal('hide'), 500);
+                    setTimeout(() => {
+                        $("#error-message").text(res.errorMessage).fadeIn().delay(1000).fadeOut();
+                    }, 500);
 
-                for (const key in errors) {
-                    if (errors.hasOwnProperty(key)) {
-                        errorMessage += `${errors[key].join('<br/>')}<br/>`;
-                    }
+
+                    const result = jsonResult(
+                        validate.Post,
+                        validate.Login,
+                        validate.LoginSuccess,
+                        false,
+                        validate.LoginFailed,
+                        true,
+                        validate.UsernamePasswordIncorrect,
+                        data,
+                        validate.PostSuccess,
+                        apiUrl,
+                        validate.ResponseValid,
+                        `/dashboard/${data.username}`,
+                        browserInfo.name,
+                        browserInfo.version
+                    );
+
+                    console.log("API Data", JSON.stringify(result, null, 2));
                 }
 
-                $("#error-message").html(errorMessage).fadeIn().delay(3000).fadeOut();
-            } else {
-                $("#error-message").text(err.responseText).fadeIn().delay(500).fadeOut();
+            },
+            error: function (err) {
+                setTimeout(() => $('#loading-modal').modal('hide'), 500);
+
+                $("#error-message").text(ErrorMessages[7]).fadeIn().delay(500).fadeOut();
+
+                const result = jsonResult(
+                    validate.Post,
+                    validate.Login,
+                    validate.LoginSuccess,
+                    false,
+                    validate.LoginFailed,
+                    true,
+                    validate.FillRequiredFields,
+                    data,
+                    validate.PostFailed,
+                    apiUrl,
+                    validate.ResponseInvalid,
+                    `/dashboard/${data.username}`,
+                    browserInfo.name,
+                    browserInfo.version
+                );
+
+                console.log("Submission Data", JSON.stringify(result, null, 2));
+            }
+        });
+
+    }
+    catch (ex) {
+        setTimeout(() => $('#loading-modal').modal('hide'), 500);
+
+        const result = jsonResult(
+            validate.Post,
+            validate.Login,
+            validate.LoginSuccess,
+            false,
+            validate.LoginFailed,
+            true,
+            validate.InvalidCredentials + '\n' + ex,
+            data,
+            validate.PostError,
+            apiUrl,
+            validate.ResponseInvalid,
+            `/dashboard/${data.username}`,
+            browserInfo.name,
+            browserInfo.version
+        );
+
+        console.log("Submission Error Data", JSON.stringify(result, null, 2));
+    }
+    return false;
+}
+
+LogoutRequest = (id, name) => {
+    const url = '/api/authenticate/logout';
+
+    const logoutdata = {
+        userid: id,
+        username: name,
+        logoutrole: 'anonymous'
+    };
+
+    try {
+        $.ajax({
+            type: validate.Post,
+            url: url,
+            data: JSON.stringify(logoutdata),
+            success: function (res) {
+
+                if (res.isValid) {
+
+                    const result = jsonResult(
+                        validate.Post,
+                        validate.Logout,
+                        validate.LogoutSuccess,
+                        true,
+                        validate.LogoutFailed,
+                        false,
+                        validate.LogoutSuccess,
+                        logoutdata,
+                        validate.PostSuccess,
+                        getUrl(url),
+                        validate.ResponseValid,
+                        res.redirectUrl,
+                        browserInfo.name,
+                        browserInfo.version
+                    );
+
+                    console.log("API Data", JSON.stringify(result, null, 2));
+
+                    loading(validate.LogingOut);
+
+                    setTimeout(() => {
+                        window.location.href = res.redirectUrl;
+                    }, 1000);
+
+                    $("#success-message").text(res.successMessage).fadeIn().delay(3000).fadeOut();
+                }
+                else {
+                    setTimeout(() => $('#loading-modal').modal('hide'), 500);
+
+                    $("#error-message").text(res.failedMessage).fadeIn().delay(500).fadeOut();
+
+                    const result = jsonResult(
+                        validate.Post,
+                        validate.action,
+                        validate.LogoutSuccess,
+                        false,
+                        validate.LogoutFailed,
+                        true,
+                        validate.LogoutFailed,
+                        logoutdata,
+                        validate.PostSuccess,
+                        getUrl(url),
+                        validate.ResponseValid,
+                        '/home/login',
+                        browserInfo.name,
+                        browserInfo.version
+                    );
+
+                    console.log("API Data", JSON.stringify(result, null, 2));
+
+                }
+                
+            }, 
+
+            error: function(err) {
+                const result = jsonResult(
+                    validate.Post,
+                    validate.action,
+                    validate.LogoutSuccess,
+                    false,
+                    validate.LogoutFailed,
+                    true,
+                    err,
+                    null,
+                    validate.PostFailed,
+                    getUrl(url),
+                    validate.ResponseInvalid,
+                    '/home/login',
+                    browserInfo.name,
+                    browserInfo.version
+                );
+
+                console.log("Submission Data", JSON.stringify(result, null, 2));
             }
 
-            setTimeout(() => $('#loading-modal').modal('hide'), 500);
+        });
+    }
+    catch (ex){
+        setTimeout(() => $('#loading-modal').modal('hide'), 500);
+        const result = jsonResult(
+            validate.Post,
+            validate.action,
+            validate.LogoutSuccess,
+            false,
+            validate.LogoutFailed,
+            true,
+            validate.InvalidCredentials + '\n' + ex,
+            null,
+            validate.PostError,
+            getUrl(url),
+            validate.ResponseInvalid,
+            '/home/login',
+            browserInfo.name,
+            browserInfo.version
+        );
 
-            console.error(`AJAX Error: ${err.responseText}`);
+        console.log("Submission Error Data", JSON.stringify(result, null, 2));
 
-
-            const result = jsonResult(
-                method,
-                data,
-                SuccessMessages[0],
-                url,
-                SuccessMessages[1],
-                response.redirectUrl,
-                actions[0],
-                SuccessMessages[2],
-                false,
-                ErrorMessages[0],
-                true,
-                browserInfo.name,
-                browserInfo.version
-            );
-
-            console.log("Submission Data", JSON.stringify(result, null, 2));
-        }
-    });
+    }
+    return false;
 }
-*/
+
+/*
 async function logoutRequest(url, method, message) {
     await $.ajax({
         url: url,
         type: method,
         success: function (res) {
-            console.log(SuccessMessages[0], `: ${url}`);
 
             if (res.isValid) {
-                console.log(SuccessMessages[1], `: ${url}`);
-                console.log(`Route: ${res.redirectUrl}`);
 
-                loading(message);
+                const result = jsonResult(
+                    validate.method,
+                    validate.action,
+                    validate.LogoutSuccess,
+                    true,
+                    validate.LogoutFailed,
+                    false,
+                    null,
+                    validate.PostSuccess,
+                    getUrl(url),
+                    validate.ResponseValid,
+                    res.redirectUrl,
+                    browserInfo.name,
+                    browserInfo.version
+                );
+
+                loading(validate.LogingOut);
 
                 setTimeout(() => {
                     window.location.href = res.redirectUrl;
@@ -401,18 +641,51 @@ async function logoutRequest(url, method, message) {
 
                 $("#error-message").text(res.failedMessage).fadeIn().delay(500).fadeOut();
 
-                console.log(ErrorMessages[1], `: ${response.failedMessage}`);
-                console.log(ErrorMessages[3], `: ${res}`);
-                console.log(`Route: ${url}`);
+                const result = jsonResult(
+                    validate.method,
+                    validate.action,
+                    validate.LogoutSuccess,
+                    true,
+                    validate.LogoutFailed,
+                    false,
+                    null,
+                    validate.PostSuccess,
+                    getUrl(url),
+                    validate.ResponseValid,
+                    '/home/login',
+                    browserInfo.name,
+                    browserInfo.version
+                );
+
+                console.log("API Data", JSON.stringify(result, null, 2));
+
             }
         },
         error: function (err) {
             console.error(ErrorMessages[5], `: ${err.responseText}`);
             console.log(ErrorMessages[2], `: ${url}`);
-            }
+
+            const result = jsonResult(
+                validate.method,
+                validate.action,
+                validate.LogoutSuccess,
+                false,
+                validate.LogoutFailed,
+                true,
+                null,
+                validate.PostFailed,
+                getUrl(url),
+                validate.ResponseInvalid,
+                '/home/login',
+                browserInfo.name,
+                browserInfo.version
+            );
+
+            console.log("Submission Data", JSON.stringify(result, null, 2));
+        }
     });
 }
-
+*/
 
 async function UserLogin(event) {
     //event.preventDefault(); // Prevent the default form submission 

@@ -11,14 +11,15 @@ namespace InventorySystem.Controllers.main
     [Authorize]
     public class AdminListController(ApplicationDbContext context) : Controller
     {
-
+        private const string AdminDashboardRoute = "admin-dashboard/{username}";
         private readonly ApplicationDbContext _context = context;
 
 
-        [Route("admin/dashboard")]
+        [Route(AdminDashboardRoute)]
         public async Task<IActionResult> AdminViewer()
         {
             var adminIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var adminnameClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
 
             if (adminIdClaim == null || !int.TryParse(adminIdClaim, out var adminId))
             {
@@ -30,6 +31,14 @@ namespace InventorySystem.Controllers.main
             var users = await _context.Users
                 .Where(u => u.AdminId == adminId)
                 .ToListAsync();
+
+            ViewBag.SuccessMessage = $"Welcome, {adminnameClaim}!";
+            ViewBag.Username = adminnameClaim;
+            ViewBag.AdminID = adminId;
+
+
+            ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
+            ViewData["Title"] = "Dashboard";
 
             return View(users);
         }

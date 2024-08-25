@@ -15,7 +15,7 @@
         <hr />
         <div class="row justify-content-center align-items-center">
 
-            <form id="admin-login" class="forms" asp-route-id="@Model.AdminId" method="post" onsubmit="AdminLogin(event)">
+            <form asp-controller="AuthenticateApi" asp-action="AdminLogin" id="admin-login" class="forms" asp-route-id="@Model.AdminId" method="post" onsubmit="return AdminRequest(this);">
 
                 <!--div asp-validation-summary="ModelOnly" class="text-danger needs-validation" novalidate></!--div-->
                 <div class="form-group">
@@ -36,7 +36,7 @@
 
                             </div>
                         </div>
-                        <input asp-for="Username" type="text" class="form-control user-input" name="username"
+                        <input asp-for="Username" type="text" class="form-control user-input" name="user" id="user"
                                autocomplete="off"
                                required
                                placeholder="Username or Email"
@@ -45,7 +45,7 @@
                                data-val-minlength="Username must be at least 3 characters long."
                                data-val-minlength-min="3" />
                     </div>
-                    <span asp-validation-for="Username" class="text-danger"></span>
+                    <span asp-validation-for="Username" id="user-error" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
@@ -67,7 +67,7 @@
                                 </!--svg-->
                             </div>
                         </div>
-                        <input asp-for="Password" type="text" class="form-control user-input" name="password"
+                        <input asp-for="Password" type="text" class="form-control user-input" name="pwd" id="pwd"
                                autocomplete="off"
                                placeholder="Password"
                                required
@@ -76,7 +76,7 @@
                                data-val-minlength="Password must be at least 8 characters long."
                                data-val-minlength-min="8" />
                     </div>
-                    <span asp-validation-for="Password" class="text-danger"></span>
+                    <span asp-validation-for="Password" id="pwd-error" class="text-danger"></span>
                 </div>
 
                 <div class="form-group mt-3">
