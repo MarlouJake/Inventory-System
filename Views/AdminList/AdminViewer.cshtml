@@ -8,7 +8,31 @@
 
     var CurrentUsername = ViewBag.Username as string;
     var CurrentAdminId = ViewBag.AdminId as int?;
+    var message = ViewBag.SuccessMessage as string;
 }
+
+<script>
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        var PromptMsg = document.getElementById('prompt-message');
+
+        // message is passed from the server-side Razor code.
+        var message = '@Html.Raw(@message)'.trim();
+        if (message.trim() !== '') {
+            PromptMsg.textContent = message;
+        }
+
+
+        if (PromptMsg) {
+            await delay(2000); // Wait for 2 seconds
+            PromptMsg.style.display = 'none';
+        }
+        //console.log(message);
+    });
+</script>
 
 <nav class="navbar p-2 bg-dark border border-top-0 border-3 border-start-0 border-end-0 ">
     <h3 class="text-success">Admin Dashboard</h3>

@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - Inventory System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/popup-messages.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/InventorySystem.styles.css" asp-append-version="true" />
     <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-dy1SU1kWrWlZ+yl+1S2fZ5T1MB58Oay3CnD6Fv2E5+HTZm5zXl+ARpZ1ZpFb21whjR4GpTiwYT+PpQZTLcI1MQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /-->
     <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"-->
@@ -17,7 +18,13 @@
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate.unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 
     <script src="~/js/messages.js" asp-append-version="true" defer></script>
-    <script src="~/js/post.js" asp-append-version="true" defer></script>
+
+    <script src="~/js/utils.js" asp-append-version="true" defer></script>
+    <script src="~/js/auth.js" asp-append-version="true" defer></script>
+
+    <script src="~/js/assets-modal.js" asp-append-version="true" defer></script>
+    <script src="~/js/assets-data.js" asp-append-version="true" defer></script>
+
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 
 
@@ -54,9 +61,12 @@
 
 
     <div role="main" class="pb-3 m-2" id="container-main">
+
+        <div id="prompt-message" class="popup-message alert alert-success">
+        </div>
         @RenderBody()
     </div>
-    </div>
+
 
     <footer class="border-top footer text-muted">
         <div class="container text-center">

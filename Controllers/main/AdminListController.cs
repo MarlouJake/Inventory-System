@@ -36,7 +36,6 @@ namespace InventorySystem.Controllers.main
             ViewBag.Username = adminnameClaim;
             ViewBag.AdminID = adminId;
 
-
             ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
             ViewData["Title"] = "Dashboard";
 

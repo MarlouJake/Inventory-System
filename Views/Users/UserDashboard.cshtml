@@ -7,35 +7,31 @@
 
     var CurrentUsername = ViewBag.Username as string;
     var CurrentUserid = ViewBag.UserId as int?;
-
-    //var welcomemsg = ViewBag.WelcomeMessage as string;
-    //var welcomemsg = ViewBag.SuccessMessage as string;
-
-}
-@if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
-{
-    <div id="welcome-message" class="popup-message alert alert-success">
-        @ViewBag.SuccessMessage
-    </div>
+    var message = ViewBag.SuccessMessage as String;
 }
 
-    <script>
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+<script>
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        var PromptMsg = document.getElementById('prompt-message');
+
+        // message is passed from the server-side Razor code.
+        var message = '@Html.Raw(@message)'.trim();
+        if (message.trim() !== '') {
+            PromptMsg.textContent = message;
         }
 
-        document.addEventListener('DOMContentLoaded', async function () {
-            var welcomeMsg = document.getElementById('welcome-message');
 
-            if (welcomeMsg) {
-                await delay(3000); // Wait for 3 seconds
-                welcomeMsg.style.display = 'none';
-            }
-        });
-
-    </script>
-
-
+        if (PromptMsg) {
+            await delay(2000); // Wait for 2 seconds
+            PromptMsg.style.display = 'none';
+        }
+        //console.log(message);
+    });
+</script>
 
 <header>
 <nav class="navbar p-2 bg-dark border border-top-0 border-3 border-start-0 border-end-0 rounded">

@@ -1,0 +1,60 @@
+﻿#prompt-message {
+    position: fixed;
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    text-align: center;
+}
+
+    .popup-message {
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 300px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        color: #fff;
+        font-size: 14px;
+        z-index: 9999;
+    }
+
+    .notification.success {
+        background-color: #28a745;
+    }
+
+    .notification.error {
+        background-color: #dc3545;
+    } 
+
+#success-message {
+    display: none; /* Initially hidden */
+    position: fixed; /* Fixed position to stay in place when scrolling */
+    top: 10px; /* Distance from the top */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Offset by half its width to center */
+    padding: 10px;
+    background-color: #008000; /* Green background */
+    color: white; /* White text color */
+    border-radius: 5px; /* Rounded corners */
+    z-index: 9999; /* High z-index to ensure it appears above other elements */
+}
+
+#error-message {
+    display: none; /* Initially hidden */
+    position: fixed; /* Fixed position to stay in place when scrolling */
+    top: 10px; /* Distance from the top */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Offset by half its width to center */
+    padding: 10px;
+    background-color: #FF5252; /* Green background */
+    color: white; /* White text color */
+    border-radius: 5px; /* Rounded corners */
+    z-index: 9999; /* High z-index to ensure it appears above other elements */
+}
