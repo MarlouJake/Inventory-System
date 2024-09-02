@@ -29,14 +29,12 @@
 
                     </div>
                 </div>
-                <input asp-for="Username" type="text" class="form-control user-input" id="username"  name="username"
+                <input asp-for="Username" type="text" class="form-control user-input" id="username" name="username"
                        autocomplete="off"
                        required
                        placeholder="Username or Email"
                        data-val="true"
-                       data-val-required="Username or Email is required!"
-                       data-val-minlength="Username must be at least 3 characters long."
-                       data-val-minlength-min="3"/>
+                       data-val-required="Username or Email is required!" />
             </div>
             <span asp-validation-for="Username" id="username-error" class="text-danger"></span>
         </div>
@@ -58,11 +56,9 @@
                        placeholder="Password"
                        required
                        data-val="true"
-                       data-val-required="Password is required!"
-                       data-val-minlength="Password must be at least 8 characters long."
-                       data-val-minlength-min="8" />
+                       data-val-required="Password is required!" />
             </div>
-            <span asp-validation-for="Password" id="password-error"  class="text-danger"></span>
+            <span asp-validation-for="Password" id="password-error" class="text-danger"></span>
         </div>
 
         <div class="form-group mt-3">
@@ -82,7 +78,7 @@
             }
         </div>
     }-->
-   
+
 </div>
 
 @section Scripts {

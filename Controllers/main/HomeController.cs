@@ -60,7 +60,7 @@ namespace InventorySystem.Controllers.main
         }
 
 
-
+        [Route("/home/access-denied")]
         public IActionResult AccessDenied()
         {
             //return new HttpStatusCodeResult(HttpStatusCode.Forbidden); // 403 Forbidden

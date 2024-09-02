@@ -12,6 +12,22 @@
 }
 
 <script>
+
+    var currentadmin = '@Html.Raw(@CurrentAdminId)';
+
+    //check userid in session storage
+    const storedadminname = sessionStorage.getItem('currentadmin');
+
+    if (!storedadminname) {
+        // If userId is not found in sessionStorage, store it
+        if (currentadmin) {
+            sessionStorage.setItem('storedadminname', currentadmin);
+
+        } else {
+            console.log('Admin username  is not available.');
+        }
+    }
+
     function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -45,7 +61,7 @@
         </a>
         <a href="#" onclick="LogoutRequest('@CurrentAdminId', '@CurrentUsername')" class="btn btn-danger btn-sm">Logout</a>
     </div>
-    
+
 
 </nav>
 <div id="admin-view">

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/popup-messages.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/pagination.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/InventorySystem.styles.css" asp-append-version="true" />
     <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-dy1SU1kWrWlZ+yl+1S2fZ5T1MB58Oay3CnD6Fv2E5+HTZm5zXl+ARpZ1ZpFb21whjR4GpTiwYT+PpQZTLcI1MQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /-->
     <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"-->
@@ -19,24 +20,26 @@
 
     <script src="~/js/messages.js" asp-append-version="true" defer></script>
 
-    <script src="~/js/utils.js" asp-append-version="true" defer></script>
-    <script src="~/js/auth.js" asp-append-version="true" defer></script>
-
     <script src="~/js/assets-modal.js" asp-append-version="true" defer></script>
     <script src="~/js/assets-data.js" asp-append-version="true" defer></script>
+    <script src="~/js/utils.js" asp-append-version="true" defer></script>
+    <script src="~/js/auth.js" asp-append-version="true" defer></script>
+    <script src="~/js/services.js" asp-append-version="true" defer></script>
+
 
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 
 
 </head>
-<body>
-    
+<body class="bg-dark">
+
     <div class="container">
 
-        <div id="success-message" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px; background-color: #7eca8f; color: white; border-radius: 5px;">
+        <div id="message-success" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px; background-color: #7eca8f; color: white; border-radius: 5px; z-index: 1050;">
         </div>
-        <div id="error-message" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px; background-color: #FF5252; color: white; border-radius: 5px;">
+        <div id="message-error" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px; background-color: #FF5252; color: white; border-radius: 5px; z-index: 1050;">
         </div>
+
 
         <!-- Loading Modal -->
         <div id="loading-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
@@ -49,38 +52,31 @@
         </div>
     </div>
 
-    <!--Info modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="info-modal" aria-hidden="true">
+    <!--Modal for Add/Edit/Delete/View-->
+    <!-- Modal -->
+    <div class="modal fade" id="crud-modal" tabindex="-1" role="dialog" aria-labelledby="crudModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-body">
+                    <!-- Content loaded dynamically -->
                 </div>
+
             </div>
         </div>
     </div>
 
 
-    <div role="main" class="pb-3 m-2" id="container-main">
+    <div role="main" class="bg-danger" id="container-main" style="width:100%; height:100%">
 
-        <div id="prompt-message" class="popup-message alert alert-success">
+        <div id="prompt-message" class="popup-message alert alert-success ">
         </div>
         @RenderBody()
     </div>
 
 
-    <footer class="border-top footer text-muted">
-        <div class="container text-center">
-            &copy; 2024 - Inventory System - Marlou Jake Napoli
-        </div>
-    </footer>
 
-    <div class="modal fade" role="dialog" tabindex="-1" id="view-myModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-body"></div>
-            </div>
-        </div>
-    </div>
+
+
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

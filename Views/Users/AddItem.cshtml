@@ -1,13 +1,15 @@
 ﻿@model InventorySystem.Models.Item
 @{
     ViewData["Title"] = "Add new item";
-    Layout = null;   
+    Layout = null;
 }
 
 
 <script>
+
     $(document).ready(function () {
-        
+
+
         $.ajax({
             url: '@Url.Action("GetStatuses")',
             type: 'GET',
@@ -29,8 +31,8 @@
                 console.log('Error fetching statuses: ' + error);
             }
         });
-        
-  
+
+
 
         $.ajax({
             url: '@Url.Action("GetOptions")',
@@ -58,81 +60,78 @@
             }
         });
     });
+
 </script>
 
 
 <h5 class="text-break"><strong>Add new item</strong></h5>
 <hr />
-<form asp-action="AddItem" method="post" class="forms" asp-route-id="@Model.ItemId" onsubmit="return jQueryAjaxPost(this);">
+<form asp-controller="ServicesApi" asp-action="AddItem" id="add-item" method="post" class="forms" asp-route-id="@Model.ItemId" onsubmit="return AddItem(this)">
+
     <div class="form-group">
         <label asp-for="ItemCode" for="itemCode" class="control-label"></label>
-        <input asp-for="ItemCode" id="itemCode" type="text" class="form-control user-input"
-                   autocomplete="off"
-                   required
-                   placeholder="Item Code"
-                   data-val = "true"
-                   data-val-required="Item code is required!"
-                   data-val-minlength="Item code must be at least 3 characters long."
-                   data-val-minlength-min="3"
-                   pattern="\S+" />
+        <input asp-for="ItemCode" id="itemCode" type="text" class="form-control user-input" name="itemCode"
+               autocomplete="off"
+               required
+               placeholder="Item Code"
+               data-val="true"
+               data-val-required="Item code is required!"
+               data-val-minlength="Item code must be at least 3 characters long."
+               data-val-minlength-min="3"
+               pattern="\S+" />
 
         <span asp-validation-for="ItemCode" class="text-danger"></span>
     </div>
     <div class="form-group mt-2">
         <label asp-for="ItemName" for="itemName" class="control-label"></label>
-        <input asp-for="ItemName" id="itemName" class="form-control user-input"
-                   autocomplete="off"
-                   required
-                   placeholder="Item Name"
-                   data-val="true"
-                   data-val-required="Item name is required!"
-                   data-val-minlength="Item name must be at least 3 characters long." />
+        <input asp-for="ItemName" id="itemName" class="form-control user-input" name="itemName"
+               autocomplete="off"
+               required
+               placeholder="Item Name"
+               data-val="true"
+               data-val-required="Item name is required!"
+               data-val-minlength="Item name must be at least 3 characters long." />
         <span asp-validation-for="ItemName" class="text-danger"></span>
     </div>
 
     <div class="form-group mt-2">
         <label asp-for="ItemDescription" for="itemDescription" class="control-label"></label>
-        <textarea asp-for="ItemDescription" id="itemDescription" type="text" class="form-control user-input"
-               autocomplete="off"
-                   placeholder="Description"></textarea>
+        <textarea asp-for="ItemDescription" id="itemDescription" type="text" class="form-control user-input" name="itemDescription"
+                  autocomplete="off"
+                  placeholder="Description"></textarea>
         <span asp-validation-for="ItemDescription" class="text-danger"></span>
     </div>
 
     <div class="form-group mt-2">
         <label asp-for="Status" for="statusDropdown" class="control-label"></label>
-        <select asp-for="Status" id="statusDropdown" class="form-control" required>
+        <select asp-for="Status" id="statusDropdown" class="form-control" required name="statusDropdown">
             <option value="" class="text-muted">--Select Status--</option>
-        </select>      
-                 
+        </select>
+
         <span asp-validation-for="Status" class="text-danger"></span>
     </div>
-  
 
-
-
-
-
-      <div class="form-group mt-2">
+    <div class="form-group mt-2">
         <label asp-for="AdditionalInfo" for="item-info" class="control-label"></label>
-        <textarea asp-for="AdditionalInfo" id="item-info" class="form-control user-input"
-               autocomplete="off"
-               placeholder="Additional inforamtion"></textarea>
+        <textarea asp-for="AdditionalInfo" id="item-info" class="form-control user-input" name="item-info"
+                  autocomplete="off"
+                  placeholder="Additional inforamtion"></textarea>
         <span asp-validation-for="AdditionalInfo" class="text-danger"></span>
     </div>
 
 
     <div class="form-group mt-2">
         <label asp-for="FirmwareUpdated" for="updateDropdown" class="control-label"></label>
-        <select asp-for="FirmwareUpdated" id="updateDropdown" class="form-control" required>
+        <select asp-for="FirmwareUpdated" id="updateDropdown" class="form-control" required name="updateDropdown">
             <option value="" class="text-muted">--Select Option--</option>
         </select>
-
         <span asp-validation-for="FirmwareUpdated" class="text-danger"></span>
     </div>
-    <hr class="mt-4"/>
+
+    <hr class="mt-4" />
     <div class="form-group mt-4">
-        <input type="submit" value="Add Item" class="btn btn-success form-control"/>
-        <input type="button" value="Cancel" class="btn btn-outline-secondary form-control mt-3"  data-bs-dismiss="modal" />
+        <input type="submit" value="Add Item" class="btn btn-success form-control" />
+        <input type="button" value="Cancel" class="btn btn-outline-secondary form-control mt-3" data-bs-dismiss="modal" />
     </div>
 </form>
 
@@ -140,6 +139,8 @@
 
 
 @section Scripts {
-     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-  
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
 }

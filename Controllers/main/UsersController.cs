@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-
 namespace InventorySystem.Controllers.main
 {
     [Authorize]
@@ -17,8 +16,12 @@ namespace InventorySystem.Controllers.main
         private readonly ApplicationDbContext _context = context;
 
         [Route(UserDashboardRoute)]
-        public async Task<IActionResult> UserDashboard(string username)
+        [HttpGet]
+        public async Task<IActionResult> UserDashboard(string username, int page = 1)
         {
+
+
+            // Retrieve UserID of logged in user from session
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
@@ -27,41 +30,78 @@ namespace InventorySystem.Controllers.main
                 return RedirectToAction("AccessDenied");
             }
 
+            const int pageSize = 24; // Number of items per page
             // Retrieve items associated with the logged-in user
-            var items = await _context.Items
-                .Where(i => i.UserId == userId)
+            var itemsQuery = _context.Items.Where(i => i.UserId == userId);
+
+
+            // Calculate total items and total pages
+            var totalItems = await itemsQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            // Get items for the current page
+            var items = await itemsQuery
+                .OrderBy(i => i.ItemName) // Or any other ordering
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            var model = new ItemListViewModel
+            {
+                Items = items,
+                CurrentPage = page,
+                TotalPages = totalPages
+            };
 
             ViewBag.SuccessMessage = $"Welcome, {username}!";
             ViewBag.Username = username;
             ViewBag.UserId = userId;
 
             ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
-            ViewData["Title"] = "Dashboard";
-            return View(items);
+            ViewData["title"] = "UserDashboard";
 
+            return View(model);
         }
 
         [Route("dashboard/user-table")]
-        public async Task<IActionResult> ItemTable()
+        [HttpGet]
+        public async Task<IActionResult> ItemTable(int page = 1)
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            Console.WriteLine($"User ID Claim: {userIdClaim}");
+
             if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
             {
-                // Handle the case where the UserID is not available or invalid
                 return RedirectToAction("AccessDenied");
             }
+            const int pageSize = 24;
+            var itemsQuery = _context.Items.Where(i => i.UserId == userId);
 
-            // Retrieve items associated with the logged-in user
-            var items = await _context.Items
-                .Where(i => i.UserId == userId)
+            var totalItems = await itemsQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var items = await itemsQuery
+                .OrderBy(i => i.ItemName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
-            return PartialView(items);
+
+            var model = new ItemListViewModel
+            {
+                Items = items,
+                CurrentPage = page,
+                TotalPages = totalPages
+            };
+
+            return PartialView(model);
         }
+
+
+
+
 
         // GET: Admin/Details/id?
         [Route("dashboard/details")]
+        [HttpGet]
         #region --Previous ViewDetails Method--
         public async Task<IActionResult> ViewDetails(int? id)
         {
@@ -77,9 +117,8 @@ namespace InventorySystem.Controllers.main
                 return NotFound();
             }
             //user.Password = user.Password != null ? HashHelper.HashPassword(user.Password) : string.Empty;
-            return View(item);
+            return PartialView(item);
         }
-
         #endregion
 
 
@@ -96,8 +135,6 @@ namespace InventorySystem.Controllers.main
             var model = new Item();
 
             return PartialView(model);
-
-
         }
 
         [HttpGet]
@@ -160,101 +197,7 @@ namespace InventorySystem.Controllers.main
         // POST: Users/Create/id
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddItem([Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,AdditionalInfo,ItemDateAdded,ItemDateUpdated,FirmwareUpdated,UserId")] Item model)
-        {
-            if (model == null)
-            {
-                ModelState.AddModelError("", "Item data is null");
-                return Json(new
-                {
-                    isValid = false,
-                    html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                    failedMessage = "Item data is null"
-                });
-            }
 
-            //ConsoleOutputs(model);
-
-            if (string.IsNullOrWhiteSpace(model.ItemCode) || model.ItemCode.Contains(' ')
-                || string.IsNullOrWhiteSpace(model.FirmwareUpdated) || model.FirmwareUpdated.Contains(' ')
-                || string.IsNullOrWhiteSpace(model.Status) || model.Status.Contains("--Select Status--"))
-            {
-                ModelState.AddModelError("", "Required fields should not be empty");
-                return Json(new
-                {
-                    isValid = false,
-                    html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                    failedMessage = "Required fields should not be empty"
-                });
-            }
-
-
-            if (ModelState.IsValid)
-            {
-                var existingCode = await _context.Items.AnyAsync(i => i.ItemCode == model.ItemCode);
-
-                if (existingCode)
-                {
-                    TempData["ErrorMessage"] = "Code already exists.";
-                    return Json(new
-                    {
-                        isValid = false,
-                        html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                        failedMessage = "Code already exists!"
-                    });
-                }
-
-                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                Console.WriteLine($"User ID Claim: {userIdClaim}");
-
-                if (userIdClaim != null && int.TryParse(userIdClaim, out var userId))
-                {
-                    model.UserId = userId;
-
-                    try
-                    {
-                        _context.Items.Add(model);
-                        await _context.SaveChangesAsync();
-                        var items = await _context.Items
-                            .Where(i => i.UserId == userId)
-                            .ToListAsync();
-                        TempData["SuccessMessage"] = "Item added successfully.";
-                        return Json(new
-                        {
-                            isValid = true,
-                            html = Helper.RenderRazorViewToString(this, "ItemTable", items),
-                            successMessage = "Successfully added!",
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        return StatusCode(500, new { success = false, message = ex.Message });
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Invalid User ID.");
-                    return Json(new
-                    {
-                        isValid = false,
-                        html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                        failedMessage = "Invalid User ID."
-                    });
-                }
-            }
-
-            TempData["ErrorMessage"] = "Failed to add item!";
-
-            return Json(new
-            {
-                isValid = false,
-                html = Helper.RenderRazorViewToString(this, "AddItem", model),
-                failedMessage = "Failed to add item!",
-
-            });
-        }
 
 
 

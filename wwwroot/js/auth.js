@@ -19,24 +19,26 @@ UserRequest = (form) => {
             $('#username').addClass('input-error');
             $('#username-error').text(validate.UsernameEmpty);
 
-        } else if (data.username.length < 3) {
+        }/* else if (data.username.length < 3) {
             $('#username').addClass('input-error');
             $('#username-error').text(validate.UsernameLength);
 
-        }
+        }*/
 
 
         if (!data.password || data.password.trim() === '') {
             $('#password').addClass('input-error');
             $('#password-error').text(validate.PasswordEmpty);
 
-        } else if (data.password.length < 8) {
+        }/* else if (data.password.length < 8) {
             $('#password').addClass('input-error');
             $('#password-error').text(validate.PasswordLegth);
 
-        }
-
-        return false; // Prevent form submission if invalid
+        }*/
+        //$('#username').addClass('input-error');
+        //$('#password').addClass('input-error');
+        $("#error-message").text(validate.UsernamePasswordIncorrect).fadeIn().delay(500).fadeOut();
+       return false; // Prevent form submission if invalid
     }
 
     try {
@@ -70,9 +72,7 @@ UserRequest = (form) => {
                     console.log("API Data", JSON.stringify(result, null, 2));
 
                     //setTimeout(() => $('#loading-modal').modal('hide'), 1000);
-                    setTimeout(() => {
-                        window.location.href = res.redirectUrl;
-                    }, 1000);
+                    window.location.href = res.redirectUrl;
 
                 } else {
                     
@@ -90,7 +90,7 @@ UserRequest = (form) => {
                         true,
                         validate.UsernamePasswordIncorrect,
                         data,
-                        validate.PostSuccess,
+                        validate.PostFailed,
                         apiUrl,
                         validate.ResponseValid,
                         `/dashboard/${data.username}`,
@@ -111,9 +111,9 @@ UserRequest = (form) => {
                     false,
                     validate.LoginFailed,
                     true,
-                    validate.FillRequiredFields,
+                    validate.UsernamePasswordIncorrect,
                     data,
-                    validate.PostFailed,
+                    validate.PostError,
                     apiUrl,
                     validate.ResponseInvalid,
                     `/dashboard/${data.username}`,
@@ -121,9 +121,9 @@ UserRequest = (form) => {
                     browserInfo.version
                 );
 
-                console.log("Submission Data", JSON.stringify(result, null, 2));
+                console.log("Submission Error Data", JSON.stringify(result, null, 2));
                 setTimeout(() => $('#loading-modal').modal('hide'), 500);
-                $("#error-message").text(validate.FillRequiredFields).fadeIn().delay(500).fadeOut();
+                $("#error-message").text(validate.UsernamePasswordIncorrect).fadeIn().delay(500).fadeOut();
             }
         });
 
@@ -148,7 +148,7 @@ UserRequest = (form) => {
             browserInfo.version
         );
 
-        console.log("Submission Error Data", JSON.stringify(result, null, 2));
+        console.log("Submission Failure Data", JSON.stringify(result, null, 2));
         setTimeout(() => $('#loading-modal').modal('hide'), 500);
         $("#error-message").text(validate.InvalidCredentials).fadeIn().delay(500).fadeOut();
     }
@@ -227,9 +227,7 @@ AdminRequest = (form) => {
                     console.log("API Data", JSON.stringify(result, null, 2));
 
                     //setTimeout(() => $('#loading-modal').modal('hide'), 1000);
-                    setTimeout(() => {
-                        window.location.href = res.redirectUrl;
-                    }, 1000);
+                    window.location.href = res.redirectUrl;
 
                 } else {
 
@@ -243,7 +241,7 @@ AdminRequest = (form) => {
                         true,
                         validate.UsernamePasswordIncorrect,
                         data,
-                        validate.PostSuccess,
+                        validate.PostFailed,
                         apiUrl,
                         validate.ResponseValid,
                         `/dashboard/${data.username}`,
@@ -271,7 +269,7 @@ AdminRequest = (form) => {
                     true,
                     validate.FillRequiredFields,
                     data,
-                    validate.PostFailed,
+                    validate.PostError,
                     apiUrl,
                     validate.ResponseInvalid,
                     `/dashboard/${data.username}`,
@@ -279,7 +277,7 @@ AdminRequest = (form) => {
                     browserInfo.version
                 );
 
-                console.log("Submission Data", JSON.stringify(result, null, 2));
+                console.log("Submission Error Data", JSON.stringify(result, null, 2));
 
                 setTimeout(() => $('#loading-modal').modal('hide'), 500);
                 $("#error-message").text(validate.FillRequiredFields).fadeIn().delay(500).fadeOut();
@@ -308,7 +306,7 @@ AdminRequest = (form) => {
             browserInfo.version
         );
 
-        console.log("Submission Error Data", JSON.stringify(result, null, 2));
+        console.log("Submission Failure Data", JSON.stringify(result, null, 2));
         setTimeout(() => $('#loading-modal').modal('hide'), 500);
         $("#error-message").text(validate.InvalidCredentials).fadeIn().delay(500).fadeOut();
     }
@@ -356,10 +354,11 @@ LogoutRequest = (id, name) => {
                     );
 
                     console.log("API Data", JSON.stringify(result, null, 2));
-                    
-                    setTimeout(() => {
-                        window.location.href = res.redirectUrl;
-                    }, 1000);      
+                
+                    sessionStorage.removeItem('storedUsername');
+                    sessionStorage.removeItem('storedadminname');
+
+                    window.location.href = res.redirectUrl;  
 
                     $("#success-message").text(validate.LogoutSuccess).fadeIn().delay(3000).fadeOut();
                 }
@@ -374,7 +373,7 @@ LogoutRequest = (id, name) => {
                         true,
                         validate.LogoutFailed,
                         logoutdata,
-                        validate.PostSuccess,
+                        validate.PostFailed,
                         getUrl(url),
                         validate.ResponseValid,
                         '/home/login',
@@ -401,7 +400,7 @@ LogoutRequest = (id, name) => {
                     true,
                     validate.LogoutFailed  + ':\n' + err,
                     logoutdata,
-                    validate.PostFailed,
+                    validate.PostError,
                     getUrl(url),
                     validate.ResponseInvalid,
                     '/home/login',
@@ -409,7 +408,7 @@ LogoutRequest = (id, name) => {
                     browserInfo.version
                 );
 
-                console.log("Submission Data", JSON.stringify(result, null, 2));
+                console.log("Submission Error Data", JSON.stringify(result, null, 2));
 
                 setTimeout(() => $('#loading-modal').modal('hide'), 500);
                 $("#error-message").text(validate.LogoutFailed).fadeIn().delay(500).fadeOut();
@@ -436,7 +435,7 @@ LogoutRequest = (id, name) => {
             browserInfo.version
         );
 
-        console.log("Submission Error Data", JSON.stringify(result, null, 2));
+        console.log("Submission Failure Data", JSON.stringify(result, null, 2));
         setTimeout(() => $('#loading-modal').modal('hide'), 500);
         $("#error-message").text(validate.LogoutError).fadeIn().delay(500).fadeOut();
 

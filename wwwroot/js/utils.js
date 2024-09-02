@@ -1,6 +1,16 @@
-﻿//initialize Validation Function
-const validate = Validations();
-const browserInfo = getBrowserInfo();
+﻿
+
+
+
+// Format timestamp as "MMMM dd, yyyy hh:mm:ss tt"
+function DateFormatOptions() {
+    return options = {
+        year: 'numeric', month: 'long', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: true
+    };
+}
+
 //Function for input-error class
 function RemoveClass(element) {
     element.classList.remove('input-error');
@@ -87,16 +97,26 @@ function getBrowserInfo() {
 
 function Validations() {
     const Post = methods[0];
+    const Put = methods[2];
+
     const Login = actions[0];
     const Logout = actions[1];
+    const Add = actions[2];
+    const Modify = actions[4];
 
     const PostSuccess = SuccessMessages[0];
     const ResponseValid = SuccessMessages[1];
     const LoginSuccess = SuccessMessages[2];
+    const AddingSuccess = SuccessMessages[4];
+    const PutSuccess = SuccessMessages[5];
+    const UpdateSuccess = SuccessMessages[6];
 
     const LoginFailed = ErrorMessages[0];
     const PostFailed = ErrorMessages[3];
     const ResponseInvalid = ErrorMessages[4];
+    const AddingFailed = ErrorMessages[7];
+    const PutFaield = ErrorMessages[9];
+    const UpdateFailed = ErrorMessages[11];
 
 
     const FillRequiredFields = ValidateFields[1];
@@ -107,10 +127,19 @@ function Validations() {
     const PasswordLegth = ValidateFields[8];
     const MatchFound = ValidateFields[9];
     const InvalidCredentials = ValidateFields[10];
+    const SuccessToAddDatabase = ValidateFields[11];
+    const FailedToAddDatabase = ValidateFields[12];
+    const InvalidInput = ValidateFields[13];
+
+    const UpdatedSuccessfully = ActionMessages[0];
+    const FailedToUpdate = ActionMessages[1];
+
 
     const LogoutSuccess = SuccessMessages[3];
     const LogoutFailed = ErrorMessages[1];
     const LogoutError = ErrorMessages[6];
+    const AddingError = ErrorMessages[8];
+    const PutError = ErrorMessages[10];
 
     const LogingIn = LoadingMessages[0];
     const LogingOut = LoadingMessages[1];
@@ -142,10 +171,36 @@ function Validations() {
         InvalidCredentials, //20
         UsernamePasswordIncorrect, //21
         FillRequiredFields, //22
-        LogoutError //23
+        LogoutError, //23
+        AddingSuccess,
+        AddingFailed,
+        AddingError,
+        Add,
+        SuccessToAddDatabase,
+        FailedToAddDatabase,
+        InvalidInput,
+        Put, 
+        Modify,
+        PutSuccess,
+        PutError,
+        PutFaield,
+        UpdateSuccess,
+        UpdateFailed,
+        UpdatedSuccessfully,
+        FailedToUpdate
     };
 }
 
+
+function ProcessRequest() {
+    const JsonApp = DataType[0];
+    const JsonFile = DataType[1];
+
+    return processes = {
+        JsonApp,
+        JsonFile
+    };
+}
 
 //Returns  JSON Format text
 function jsonResult(
@@ -165,13 +220,8 @@ function jsonResult(
     const BrowserInfo = _browser;
     const version = Val3;
 
-    // Format timestamp as "MMMM dd, yyyy hh:mm:ss tt"
-    const options = {
-        year: 'numeric', month: 'long', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-        hour12: true
-    };
-    const timestamp = new Date().toLocaleString('en-US', options);
+
+    const timestamp = new Date().toLocaleString('en-US', DateFormatOptions);
 
     return {
         method,
@@ -220,24 +270,29 @@ function UserLoginValidateField() {
     //User Login Form input fields client-side validation
     if (username || password) {
         username.addEventListener('input', function () {
-            if (username.value.trim() == '') {
+            usernameError.textContent = '';
+            RemoveClass(username);
+            /*if (username.value.trim() == '') {
                 usernameError.textContent = validate.UsernameEmpty;
             } else if (username.value.length < 3) {
                 usernameError.textContent = validate.UsernameLength;
             } else {
                 usernameError.textContent = '';
                 RemoveClass(username);
-            }
+            }*/
         });
         password.addEventListener('input', function () {
+            passwordError.textContent = '';
+            RemoveClass(password);
+            /*
             if (password.value.trim() == '') {
-                paswordError.textContent = validate.PasswordEmpty;
+                passwordError.textContent = validate.PasswordEmpty;
             } else if (password.value.length < 8) {
                 passwordError.textContent = validate.PasswordLegth;
             } else {
                 passwordError.textContent = '';
                 RemoveClass(password);
-            }
+            }*/
         });
 
     }
@@ -252,6 +307,9 @@ function AdminLoginValidateField() {
     //Admin Login Form input fields client-side validation
     if (user || pwd) {
         user.addEventListener('input', function () {
+            userError.textContent = '';
+            RemoveClass(user);
+            /*
             if (user.value.trim() == '') {
                 userError.textContent = validate.UsernameEmpty;
             } else if (user.value.length < 3) {
@@ -259,9 +317,12 @@ function AdminLoginValidateField() {
             } else {
                 userError.textContent = '';
                 RemoveClass(user);
-            }
+            }*/
         });
         pwd.addEventListener('input', function () {
+            pwdError.textContent = '';
+            RemoveClass(pwd);
+            /*
             if (pwd.value.trim() == '') {
                 pwdError.textContent = validate.PasswordEmpty;
             } else if (pwd.value.length < 8) {
@@ -269,7 +330,7 @@ function AdminLoginValidateField() {
             } else {
                 pwdError.textContent = '';
                 RemoveClass(pwd);
-            }
+            }*/
         });
     }
 }
@@ -293,4 +354,11 @@ function DisplaySuccessAndError() {
     function trimInput(element) {
         element.value = element.value.trim();
     }
-}
+} 
+
+
+
+//initialize Validation Function
+const validate = Validations();
+const browserInfo = getBrowserInfo();
+const process = ProcessRequest();

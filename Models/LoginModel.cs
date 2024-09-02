@@ -9,13 +9,13 @@ namespace InventorySystem.Models
 
         [DisplayName("User ID")]
         public int UserID { get; set; }
-        [MinLength(3, ErrorMessage = "Username must be at least 3 characters long.")]
+        //[MinLength(3, ErrorMessage = "Username must be at least 3 characters long.")]
         [Required(ErrorMessage = "Username or Email is required!")]
         [DisplayName("Username")]
         [JsonPropertyName("username")]
         public string? Username { get; set; }
 
-        [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
+        // [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
         [Required(ErrorMessage = "Password is required!")]
         [DisplayName("Password")]
         [JsonPropertyName("password")]

@@ -15,24 +15,27 @@ function ShowPopInfoUp(url) {
 }
 
 
-//ShowPopUp(url, title)
+
 //Modal PopUp - CRUD Dashboard
-function ShowPopUp(url) {
+function ShowModal(url) {
     try {
         $.ajax({
             type: "GET",
             url: url,
             success: function (res) {
-                $("#view-myModal .modal-body").html(res);
-                //$("#view-myModal .modal-title").html(title);
-                $("#view-myModal").modal('show');
+                $("#crud-modal .modal-body").html(res);
+                $("#crud-modal").modal('show');
             },
             error: function (xhr, status) {
-                alert("An error occured while loading the form: " + { status });
+                console.error("Error details: ", xhr.responseText);
+                alert("An error occurred while loading the form: " + xhr.status + " " + xhr.statusText + " - " + error);
             }
         });
     }
     catch(ex){
-        alert("An error occured while loading the form: " + { ex });
+        alert("An error occurred while loading the form: " + ex);
     }
 }
+
+
+ 

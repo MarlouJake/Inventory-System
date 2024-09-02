@@ -1,0 +1,73 @@
+﻿#container-main {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 15px;
+    box-sizing: border-box;
+    min-height: 600px;
+    background-color: #f8f9fa;
+}
+
+/* Pagination styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 0.5rem;
+}
+
+    .pagination a {
+        display: block;
+        padding: 0.5rem 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        text-decoration: none;
+        color: #007bff;
+        margin: 0 5px;
+    }
+
+        .pagination a.active {
+            background-color: #007bff !important;
+            font-weight: bold;
+            color: white !important;
+        }
+
+        .pagination a:hover {
+            background-color: #e9ecef;
+        }
+
+        .pagination a.disabled {
+            color: #6c757d;
+            border-color: #dee2e6;
+            cursor: not-allowed;
+            pointer-events: none;
+            background-color: #f8f9fa;
+        }
+
+#user-dashboard {
+    display: flex;
+    flex-direction: row;
+    height: 100%; /* Full viewport height */
+    overflow: hidden;
+}
+
+.navbar {
+    width: 200px; /* Width of the sidebar */
+    height: 100%; /* Full height of the container */
+    background-color: red ;/*#343a40; /* Background color for the sidebar */
+    color: #fff; /* Text color for the sidebar */
+    display: flex;
+    flex-direction: column;
+    padding: 5x;
+    box-sizing: border-box;
+}
+
+#data-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    min-height: 600px;
+    padding: 15px;
+    box-sizing: border-box;
+}

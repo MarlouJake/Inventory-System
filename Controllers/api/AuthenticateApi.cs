@@ -16,17 +16,7 @@ namespace InventorySystem.Controllers.api
     {
         private readonly ApplicationDbContext _context = context;
 
-        public void PrintUrl(string? url)
-        {
-            if (url != null)
-            {
-                Console.WriteLine($"API URL: {url}");
-            }
-            else
-            {
-                Console.WriteLine("API is null.");
-            }
-        }
+
 
         [HttpPost("user-login")]
         public async Task<IActionResult> LoginPage([FromBody] LoginModel model)
@@ -104,9 +94,7 @@ namespace InventorySystem.Controllers.api
 
                         var redirectUrl = Url.Action("UserDashboard", "Users", new { username = identity.Name });
 
-                        PrintUrl(redirectUrl);
-
-
+                        Console.WriteLine(Messages.PrintUrl(redirectUrl));
 
                         return Ok(new
                         {
@@ -202,7 +190,7 @@ namespace InventorySystem.Controllers.api
                         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
                         var redirectUrl = Url.Action("AdminViewer", "AdminList", new { username = identity.Name });
-                        PrintUrl(redirectUrl);
+                        Console.WriteLine(Messages.PrintUrl(redirectUrl));
 
                         return Ok(new
                         {
@@ -247,7 +235,7 @@ namespace InventorySystem.Controllers.api
             var logOutUrl = Url.Action("LoginPage", "Home");
             var returnUrl = Url.Action("Index", "Home");
             // Print the URL to the console
-            Console.WriteLine($"Login page URL: {logOutUrl}");
+            Console.WriteLine(Messages.PrintUrl(logOutUrl));
             //return Redirect("/");
             return new JsonResult(new
             {
