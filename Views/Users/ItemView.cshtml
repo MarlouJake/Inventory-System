@@ -1,11 +1,12 @@
 ﻿@model ItemListViewModel
 
 @{
-    ViewData["Title"] = "Items List";
-    Layout = null;
+    ViewData["Title"] = "Items View";
+    //Layout = null;
     int count = 0; // Initialize a counter to track the number of items rendered
-}
 
+    var CurrentUsername = ViewBag.Username as string;
+}
 
 
 <div class="card-container">
@@ -27,6 +28,9 @@
     }
 
 </div>
+
+
+
 
 
 

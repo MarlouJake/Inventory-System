@@ -357,9 +357,51 @@ function DisplaySuccessAndError() {
 }
 
 
+function UserLogoutAction() {
+    const logoutbutton = document.getElementById('user-logout');
+
+    if (logoutbutton) {
+        logoutbutton.addEventListener('click', function () {
+            sessionStorage.removeItem('datauser');
+            LogoutRequest(storedUserid, storedUsername);
+        });
+    }
+}
+
+/*
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+*/
+
+function getUsername() {
+    const usernameElement = document.getElementById('username-container');
+
+    //console.log(storedUsername);
+    var getuserdata = sessionStorage.getItem('datauser');
+    if (!getuserdata) {
+        console.log("No Username stored");
+    }
+    if (usernameElement) {
+        $(usernameElement).text(getuserdata);
+    } else {
+        console.error('Element: ' + usernameElement + 'not found');
+    }
+
+    const prompt = document.getElementById('prompt-message')
+    if (prompt) {
+        $(prompt).text(`Welcome ${getuserdata.toUpperCase()}!`).fadeIn().delay(1000).fadeOut();
+    } else {
+        console.error('Element: '+prompt+'not found');
+    }
+}
 
 
-
+function WelcomeMessage() {
+    sessionStorage.removeItem('storedUsername');
+    sessionStorage.getItem('storedUsername');
+    
+}
 
 //initialize Validation Function
 const validate = Validations();

@@ -97,15 +97,12 @@ app.UseEndpoints(endpoints =>
          pattern: "api/authenticate/admin-login",
          defaults: new { controller = "AuthenticateApi" });
 
-    _ = endpoints.MapControllerRoute(
-      name: "user-dashboard",
-      pattern: "user-dashboard/{username}",
-      defaults: new { controller = "Users" });
+
 
     _ = endpoints.MapControllerRoute(
-     name: "admin-dashboard",
-     pattern: "admin-dashboard/{username}",
-     defaults: new { controller = "AdminList" });
+      name: "admin-dashboard",
+      pattern: "admin-dashboard/{username}",
+      defaults: new { controller = "AdminList" });
 });
 
 app.Run();

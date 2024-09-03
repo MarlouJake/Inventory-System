@@ -70,8 +70,9 @@ UserRequest = (form) => {
                     );
 
                     console.log("API Data", JSON.stringify(result, null, 2));
-
-                    //setTimeout(() => $('#loading-modal').modal('hide'), 1000);
+                    sessionStorage.removeItem('datauser');
+                    sessionStorage.setItem('datauser', data.username);
+                    setTimeout(() => $('#loading-modal').modal('hide'), 500);
                     window.location.href = res.redirectUrl;
 
                 } else {
@@ -225,7 +226,7 @@ AdminRequest = (form) => {
                     );
 
                     console.log("API Data", JSON.stringify(result, null, 2));
-
+                    setTimeout(() => $('#loading-modal').modal('hide'), 500);
                     //setTimeout(() => $('#loading-modal').modal('hide'), 1000);
                     window.location.href = res.redirectUrl;
 
@@ -325,7 +326,8 @@ LogoutRequest = (id, name) => {
         username: name,
         logoutrole: 'anonymous'
     };
-
+    sessionStorage.removeItem('storedUsername');
+    sessionStorage.removeItem('storedadminname');
     try {
         loading(validate.LogingOut);
         $.ajax({
@@ -359,7 +361,7 @@ LogoutRequest = (id, name) => {
                     sessionStorage.removeItem('storedadminname');
 
                     window.location.href = res.redirectUrl;
-
+                    setTimeout(() => $('#loading-modal').modal('hide'), 500);
                     $("#success-message").text(validate.LogoutSuccess).fadeIn().delay(3000).fadeOut();
                 }
                 else {

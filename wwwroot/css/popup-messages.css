@@ -1,10 +1,11 @@
-﻿#prompt-message {
+﻿#prompt-message, #message-success, #message-error {
     position: fixed;
     top: 5%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1000;
+    z-index: 3000;
     text-align: center;
+    display: none;
 }
 
     .popup-message {

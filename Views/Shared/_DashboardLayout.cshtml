@@ -8,32 +8,33 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/popup-messages.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/pagination.css" asp-append-version="true" />
+
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--script src="https://code.jquery.com/jquery-3.6.0.min.js"></!--script-->
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.3/jquery.validate.min.js"></script>
-    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate.unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+    <!--script src="https://ajax.aspnetcdn.com/ajax/jquery.validate.unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></!--script-->
 
     <script src="~/js/messages.js" asp-append-version="true" defer></script>
     <script src="~/js/assets-modal.js" asp-append-version="true" defer></script>
     <script src="~/js/assets-data.js" asp-append-version="true" defer></script>
+    
     <script src="~/js/utils.js" asp-append-version="true" defer></script>
     <script src="~/js/auth.js" asp-append-version="true" defer></script>
     <script src="~/js/services.js" asp-append-version="true" defer></script>
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 </head>
 
-<body class="bg-light">
+<body>
 
     <div class="container">
-
-        <div id="message-success" class="alert alert-success fixed-top" style="display: none; z-index: 1050;">
+        <div id="message-success" class="alert alert-success fixed-top popup-message" style="display: none; z-index: 2000;">
             <!-- Success message content -->
         </div>
-        <div id="message-error" class="alert alert-danger fixed-top" style="display: none; z-index: 1050;">
+        <div id="message-error" class="alert alert-danger fixed-top popup-message" style="display: none; z-index: 2000;">
             <!-- Error message content -->
         </div>
-
 
         <!-- Loading Modal -->
         <div id="loading-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
@@ -44,34 +45,59 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!--Modal for Add/Edit/Delete/View-->
-    <!-- Modal -->
-    <div class="modal fade" id="crud-modal" tabindex="-1" role="dialog" aria-labelledby="crudModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <!-- Content loaded dynamically -->
+        <!--Modal for Add/Edit/Delete/View-->
+        <div class="modal fade" id="crud-modal" tabindex="-1" role="dialog" aria-labelledby="crudModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <!-- Content loaded dynamically -->
+                    </div>
                 </div>
-
             </div>
         </div>
-    </div>
+     </div>   
 
-
-    <div role="main" id="container-main" style="width:100%; height:100%">
-
-        <div id="prompt-message" class="popup-message alert alert-success ">
+        <div role="main" id="container-main" style="width:100%; height:100%">
+        <div id="prompt-message" class="popup-message alert alert-success">
         </div>
-        @RenderBody()
-    </div>
+            <!-- Sidebar Navigation -->
+            <nav id="sidebar" class="bg-dark text-white">
+                <div class="d-flex justify-content-between">
+                     <div class="d-flex">
+                        <h4 class="text-success">Dashboard</h4>
+                     </div>
 
+                    <div class="d-flex btn-sm">
+                        <button class="btn btn-danger s" title="Logout" id="user-logout">></button>
+                    </div>
 
+                </div>
 
+                <div class="border border-light border-top-0 border-start-0 border-end-0">
+                <h5 href="#" class="text-decoration-none text-light text-start text-uppercase" id="username-container"></h5>
+                </div>
+            
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" id="table-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" id="summary-link" href="#">Summary</a>
+                    </li>
+                </ul>
+            </nav>
 
+            <!-- Top Bar -->
+        <span id="top-bar-bg" class="bg-dark container-fluid fixed-top">
+            
+        </span>
 
+            @RenderBody()
+        </div>
 
-    @await RenderSectionAsync("Scripts", required: false)
+        @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

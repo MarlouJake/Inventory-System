@@ -4,61 +4,13 @@
     Layout = null;
 }
 
-
 <script>
 
     $(document).ready(function () {
 
+        getStatuses();
+        getOptions();
 
-        $.ajax({
-            url: '@Url.Action("GetStatuses")',
-            type: 'GET',
-            success: function (data) {
-                var $statusDropdown = $('#statusDropdown');
-                $.each(data, function (index, item) {
-                    var $option = $('<option></option>').val(item.value).text(item.text);
-                    if (item.value === "Complete") {
-                        $option.addClass('text-success'); // Set color attribute
-                    } else if (item.value === "Incomplete(Usable)") {
-                        $option.addClass('text-primary');
-                    } else if (item.value === "Incomplete(Unusable)") {
-                        $option.addClass('text-danger');
-                    }
-                    $statusDropdown.append($option);
-                });
-            },
-            error: function (xhr, status, error) {
-                console.log('Error fetching statuses: ' + error);
-            }
-        });
-
-
-
-        $.ajax({
-            url: '@Url.Action("GetOptions")',
-            type: 'GET',
-            success: function (data) {
-                var $statusDropdown = $('#updateDropdown');
-                $.each(data, function (index, item) {
-                    var $option = $('<option></option>').val(item.value).text(item.text);
-
-                    if (item.value === "N/A") {
-                        $option.addClass('text-secondary'); // Apply gray color
-                    }
-                    else if (item.value.startsWith("YES")) {
-                        $option.addClass('text-success'); // Apply green color
-                    }
-                    else if (item.value.startsWith("NO")) {
-                        $option.addClass('text-danger'); // Apply red color
-                    }
-
-                    $statusDropdown.append($option);
-                });
-            },
-            error: function (xhr, status, error) {
-                console.log('Error fetching options: ' + error);
-            }
-        });
     });
 
 </script>

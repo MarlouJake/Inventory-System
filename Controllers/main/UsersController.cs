@@ -4,18 +4,19 @@ using InventorySystem.Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+
 namespace InventorySystem.Controllers.main
 {
     [Authorize]
+    [Route("inventory/{username}")]
     public class UsersController(ApplicationDbContext context/*, UserManager<User>? userManager*/) : Controller
     {
-        private const string UserDashboardRoute = "user-dashboard/{username}";
+
         private readonly ApplicationDbContext _context = context;
 
-        [Route(UserDashboardRoute)]
+        [Route("dashboard")]
         [HttpGet]
         public async Task<IActionResult> UserDashboard(string username, int page = 1)
         {
@@ -58,14 +59,25 @@ namespace InventorySystem.Controllers.main
             ViewBag.UserId = userId;
 
             ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
-            ViewData["title"] = "UserDashboard";
+            ViewData["title"] = "User Dashboard";
 
             return View(model);
         }
 
-        [Route("dashboard/user-table")]
+        [Route("dashboard/summary")]
         [HttpGet]
-        public async Task<IActionResult> ItemTable(int page = 1)
+        public IActionResult Summary(string username)
+        {
+            ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
+            ViewData["title"] = "Summary";
+            ViewBag.Username = username;
+            return PartialView();
+        }
+
+
+        [Route("dashboard/item-view")]
+        [HttpGet]
+        public async Task<IActionResult> ItemView(string username, int page = 1)
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
@@ -91,7 +103,9 @@ namespace InventorySystem.Controllers.main
                 CurrentPage = page,
                 TotalPages = totalPages
             };
-
+            ViewBag.Username = username;
+            ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
+            ViewData["title"] = "Item View";
             return PartialView(model);
         }
 
@@ -125,8 +139,9 @@ namespace InventorySystem.Controllers.main
 
 
         // GET: Admin/Create
+        [Route("add-item")]
         [HttpGet]
-        [Route("dashboard/add-item")]
+
         public IActionResult AddItem()
         {
             /*addItemModel.Users = await _context.Users.ToListAsync()
@@ -137,36 +152,7 @@ namespace InventorySystem.Controllers.main
             return PartialView(model);
         }
 
-        [HttpGet]
-        public JsonResult GetStatuses()
-        {
-            var statuses = new List<SelectListItem>
-            {
-                //new() {Value = "--Select Status--", Text = "--Select Status--"},
-                new () { Value = "Complete", Text = "Complete" },
-                new() { Value = "Incomplete(Usable)", Text = "Incomplete(Usable)" },
-                new () { Value = "Incomplete(Unusable)", Text = "Incomplete(Unusable)" }
-            };
 
-            return Json(statuses);
-        }
-
-
-
-        [HttpGet]
-        public JsonResult GetOptions()
-        {
-            var options = new List<SelectListItem>
-            {
-                //new() {Value = "--Select Status--", Text = "--Select Status--"},
-                 new () { Value = "N/A", Text = "N/A" },
-                new () { Value = "YES", Text = "YES" },
-                new() { Value = "NO", Text = "NO" }
-
-            };
-
-            return Json(options);
-        }
 
         /*private static string[] ConsoleOutputs(Item model)
         {

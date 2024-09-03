@@ -55,8 +55,6 @@
                 NewItemAdded();
                 $("#message-success").text(validate.AddingSuccess).fadeIn().delay(500).fadeOut();
 
-
-
                 const result = jsonResult(
                     validate.Post,
                     validate.Add,

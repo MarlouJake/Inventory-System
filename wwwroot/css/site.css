@@ -60,6 +60,7 @@ body {
     left: 0;
     padding: 15px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 1060;
 }
 
     #sidebar h3 {
@@ -75,7 +76,6 @@ body {
 #main-content {
     margin-left: 220px;
     padding: 15px;
-    height: 100vh;
     overflow: auto;
 }
 
@@ -83,11 +83,24 @@ body {
     background-color: #343a40;
     color: #ffffff;
     padding: 10px 15px;
+    padding-inline-start: 15%;
+    z-index: 1050;
 }
 
     #top-bar .btn {
         font-size: 0.875rem;
     }
+
+#top-bar-bg {
+    height: 3rem;
+}
+
+
+
+#username-container {
+    overflow: clip;
+    z-index: 1051;
+}
 
 /* Card styles */
 .card-container {
@@ -115,63 +128,18 @@ body {
     text-align: start;
 }
 
-.card-footer {
-    padding: 0.5rem;
-    border-top: 1px solid #dee2e6;
-    background-color: #f8f9fa;
-}
-
-
-/* Card styles */
-/*
-.card-container {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr); /* Ensure 6 items per row 
-    gap: 0.5rem; /* Space between cards 
-    justify-content: center;
-    margin: 0 auto;
-    max-width: 100%;
-    padding: 0 1rem; /* Padding for smaller screens 
-}
-
-.card {
-    width: 100%; /* Make card width responsive 
-    max-width: 140px; /* Maximum width of card 
-    height: auto; /* Auto-adjust height based on content 
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #dee2e6;
-    border-radius: 0.25rem;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.card-body {
-    flex: 1;
-    padding: 0.5rem;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.card-title, .card-text {
+.card-titlke {
     font-size: 0.75rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: start;
 }
 
 .card-footer {
     padding: 0.5rem;
     border-top: 1px solid #dee2e6;
     background-color: #f8f9fa;
-    display: flex;
-    justify-content: center;
-    gap: 0.25rem;
 }
-*/
+
+
+
 .no-items {
     display: flex;
     justify-content: center; /* Center horizontally */
@@ -194,47 +162,98 @@ body {
 
 /* Responsive styles */
 
-@media (max-width: 1024px) {
+@media (max-width: 1469px) {
+    .card-container {
+        grid-template-columns: repeat(7, 1fr); /* Adjust to 7 items per row on medium screens */
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        margin-left: 19%;
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 1369px) {
+    .card-container {
+        grid-template-columns: repeat(6, 1fr); /* Adjust to 6 items per row on medium screens */
+    }
+}
+
+@media (max-width: 1159px) {
+    .card-container {
+        grid-template-columns: repeat(5, 1fr); /* Adjust to 5 items per row on medium screens */
+    }
+}
+
+@media (max-width: 1025px) {
     .card-container {
         grid-template-columns: repeat(4, 1fr); /* Adjust to 4 items per row on medium screens */
     }
+
+
+    .pagination {
+        font-size: 1.3rem;
+        margin-right: 0;
+        margin-left: 24.3%;
+        bottom: 10%;
+        position: fixed;
+    }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 890) {
+
+
+    .pagination {
+        margin-right: 0;
+        margin-left: 24.3%;
+        bottom: 5%;
+        position: fixed;
+    }
+}
+
+
+@media (max-width: 725px) {
     .card-container {
-        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); /* Adjust to 4 items per row */
+        grid-template-columns: repeat(3, 1fr); /* Adjust to 3 items per row */
     }
 
-    .card {
-        max-width: 110px;
-    }
-
-    .btn-common {
+    .pagination {
         font-size: 0.9rem;
-        padding: 0.3rem 0.6rem;
-    }
-
-    .btn-container {
-        justify-content: center;
-    }
-
-    #user-dashboard {
-        flex-direction: column;
-    }
-
-    nav {
-        width: 100%;
-        margin-bottom: 1rem;
+        display: flex;
+        margin-right: 18%;
+        margin-left: 0rem;
     }
 }
 
-@media (max-width: 576px) {
-    .card-container {
-        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); /* Adjust to 2 items per row */
+@media (max-width: 630) {
+
+
+    .pagination {
+        font-size: 1rem;
+        display: flex;
+        padding-right: 0;
+        padding-left: 100%;
+        background-color: red;
+    }
+
+
+    #main-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        width: 100%;
+        padding: 0 1rem;
+        margin: 0;
+        width: 10%;
     }
 
     .card {
-        max-width: 90px;
+        max-width: 100%;
     }
 
     .btn-common {
@@ -248,17 +267,75 @@ body {
     }
 }
 
-@media (max-width: 400px) {
-    .card {
-        max-width: 80px;
+@media (max-width: 620px) {
+    #main-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        width: 100%;
+        padding: 0 1rem;
+        margin: 0;
     }
 
-    .btn-common {
-        font-size: 0.8rem;
-        padding: 0.2rem 0.4rem;
+    #sidebar {
+        display: none;
+    }
+
+    .card {
+        max-width: 100%;
     }
 
     .card-container {
-        grid-template-columns: 1fr; /* Adjust to 1 item per row on very small screens */
+        grid-template-columns: repeat(4, 1fr); /* Adjust to 3 items per row */
+    }
+
+    .btn-common {
+        font-size: 0.85rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    .btn-container {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+
+@media (max-width: 545px) {
+
+    .card {
+        max-width: 100%;
+    }
+
+    .card-container {
+        grid-template-columns: repeat(3, 1fr); /* Adjust to 3 items per row */
+    }
+
+
+    .pagination {
+        font-size: 1.1rem;
+        display: block;
+        justify-content: start;
+        align-items: start;
+        text-align: start;
+        bottom: 1%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 415) {
+    .pagination {
+        font-size: 1.2rem;
+        padding-bottom: 0.3rem;
+    }
+}
+
+@media (max-width: 380) {
+    .pagination {
+        font-size: 0.4rem;
+        padding-bottom: 0.3rem;
+        border: 1px solid red;
     }
 }

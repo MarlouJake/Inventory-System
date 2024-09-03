@@ -28,7 +28,7 @@ function ShowModal(url) {
             },
             error: function (xhr, status) {
                 console.error("Error details: ", xhr.responseText);
-                alert("An error occurred while loading the form: " + xhr.status + " " + xhr.statusText + " - " + error);
+                alert("An error occurred while loading the form: " + xhr.status + " " + xhr.statusText);
             }
         });
     }

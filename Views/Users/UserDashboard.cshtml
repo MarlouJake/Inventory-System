@@ -7,12 +7,16 @@
     var currentPage = Model.CurrentPage; // Store the current page number for use in JavaScript
     var totalPages = Model.TotalPages; // Store total pages for use in JavaScript
 }
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.2/jquery.twbsPagination.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.2/jquery.twbsPagination.min.js"></script>
 <script>
     var currentUsername = '@Html.Raw(CurrentUsername)';
+    var currentUserid = '@Html.Raw(CurrentUserid)';
 
     // Check username in session storage
     const storedUsername = sessionStorage.getItem('currentUsername');
+    const storedUserid = sessionStorage.getItem('currentUserid');
+
     if (!storedUsername) {
         if (currentUsername) {
             sessionStorage.setItem('currentUsername', currentUsername);
@@ -21,150 +25,179 @@
         }
     }
 
-    function delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+    if (!storedUserid) {
+        if (currentUserid) {
+            sessionStorage.setItem('currentUserid', currentUserid);
+        } else {
+            console.log('Use Id is not available.');
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', async function () {
-        var PromptMsg = document.getElementById('prompt-message');
-        var message = '@Html.Raw(message)'.trim();
-        if (message.trim() !== '') {
-            PromptMsg.textContent = message;
-        }
-        if (PromptMsg) {
-            await delay(2000);
-            PromptMsg.style.display = 'none';
-        }
+
+    document.addEventListener('DOMContentLoaded', () => {
+            getUsername();
+            WelcomeMessage();
     });
+
+
 
     var currentPage = @currentPage;  // Current page number
     var totalPages = @totalPages;    // Total number of pages
 
-    function updatePagination() {
-        // Update "Previous" button
-        if (currentPage <= 1) {
-            $('.pagination .prev').addClass('disabled').attr('href', '#').off('click');
-        } else {
-            $('.pagination .prev').removeClass('disabled').attr('href', '#').on('click', function (e) {
-                e.preventDefault();
-                loadItems(currentPage - 1);
-            });
-        }
-
-        // Update "Next" button
-        if (currentPage >= totalPages) {
-            $('.pagination .next').addClass('disabled').attr('href', '#').off('click');
-        } else {
-            $('.pagination .next').removeClass('disabled').attr('href', '#').on('click', function (e) {
-                e.preventDefault();
-                loadItems(currentPage + 1);
-            });
-        }
-
-        // Highlight the current page
-        $('.pagination a').removeClass('active');
-        $('.pagination a').each(function () {
-            var href = $(this).attr('href');
-            var page = new URLSearchParams(href.split('?')[1]).get('page');
-            if (parseInt(page) === currentPage) {
-                $(this).addClass('active');
-            }
-        });
-    }
-
-    function loadItems(page) {
-        $.ajax({
-            url: '@Url.Action("ItemTable", "Users")',
-            data: { page: page },
-            success: function (data) {
-                $('#view-all').html(data);
-                currentPage = page;  // Update currentPage
-                updatePagination();
-            },
-            error: function (xhr) {
-                console.error(xhr);
-            }
-        });
-    }
-
     $(document).ready(function () {
-        // Initialize pagination on page load
-        updatePagination();
-
-        // Handle pagination clicks
-        $(document).on('click', '.pagination a:not(.disabled)', function (e) {
-            e.preventDefault();
-            var href = $(this).attr('href');
-            var page = new URLSearchParams(href.split('?')[1]).get('page');
-            if (page) {
-                loadItems(parseInt(page));
+        // Initialize twbs-pagination
+        $('.pagination').twbsPagination({
+            totalPages: @Model.TotalPages,    // Set the total number of pages
+            startPage: @Model.CurrentPage,    // Set the starting page
+            visiblePages: 5,                  // Number of visible pages in pagination
+            initiateStartPageClick: false,    // Prevent the first page from being loaded automatically
+            onPageClick: function (event, page) {
+                // Trigger the loadItems function on page click
+                loadItems(page);
             }
         });
+
+        // Function to load items for the selected page
+        function loadItems(page) {
+            $.ajax({
+                url: '@Url.Action("ItemView", "Users", new { username = @CurrentUsername })',
+                data: { page: page },
+                success: function (data) {
+                    $('#view-all').html(data); // Update the content with the new page data
+                    currentPage = page;        // Update the current page number
+                },
+                error: function (xhr) {
+                    console.error(xhr);       // Log any errors
+                }
+            });
+        }
     });
 </script>
 
 
 <!-- Main Content Area -->
-<div id="main-content" class="d-flex flex-column">
-    <!-- Sidebar Navigation -->
-    <nav id="sidebar" class="bg-dark text-white">
-        <h3 class="text-success">Dashboard</h3>
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <button class="btn btn-success" onclick="ShowModal('@Url.Action("AddItem", "Users")')">Add New Item</button>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="#">Settings</a>
-            </li>
-
-        </ul>
-    </nav>
-
-    <!-- Top Bar -->
-    <div id="top-bar" class="d-flex justify-content-between ps-2 pe-2 bg-dark text-white">
-        <a href="#" class="text-decoration-none mt-2 text-light text-uppercase ms-1">@CurrentUsername</a>
-        <div class="d-flex align-items-center">
-            <button class="btn btn-danger" onclick="LogoutRequest('@CurrentUserid', '@CurrentUsername')">Logout</button>
+<div id="main-content" class="d-flex flex-column mt-5 p-3">
+    <div id="top-bar" class="d-flex justify-content-between bg-dark text-white container-fluid fixed-top ">
+        <div class="ms-5 ps-4">
+            <!--For Seacrhbar-->
         </div>
     </div>
+    <div class="d-flex justify-content-between mt-1  p-0 container-fluid position-relative">
+        <div class="ms-0">
+            <h4 class="d-flex">ITEMS</h4>
+        </div>
+        <div id="screensizer">
+
+        </div>
+        <div class="d-flex align-items-center m-0">
+            <button class="btn btn-success" onclick="ShowModal('@Url.Action("AddItem", "Users", new { username = @CurrentUsername})')">Add Item</button>
+        </div>
+
+    </div>
+    
 
     <!-- Content -->
-    <div class="mt-3">
-        <div id="view-all" class="container-fluid p-0">
-            @await Html.PartialAsync("ItemTable", Model)
-        </div>
+    
 
-        <!-- Pagination -->
-        <div class="pagination mt-3">
-            @if (Model.CurrentPage > 1)
-            {
-                <a href="@Url.Action("ItemTable", new { page = Model.CurrentPage - 1 })" class="prev">Previous</a>
-            }
-            else
-            {
-                <a href="#" class="prev disabled">Previous</a>
-            }
+    <div id="view-all" class="container-fluid p-0 mt-3">
+      
 
-            @for (int i = 1; i <= Model.TotalPages; i++)
-            {
-                <a href="@Url.Action("ItemTable", new { page = i })" class="@(Model.CurrentPage == i ? "active" : "")">@i</a>
-            }
+        @await Html.PartialAsync("ItemView", Model)
 
-            @if (Model.CurrentPage < Model.TotalPages)
-            {
-                <a href="@Url.Action("ItemTable", new { page = Model.CurrentPage + 1 })" class="next">Next</a>
-            }
-            else
-            {
-                <a href="#" class="next disabled">Next</a>
-            }
-        </div>
-
+        
     </div>
+
+
+    <!-- Pagination -->
+    <div class="pagination position-fixed bottom-0">
+    </div>
+   
+
+   
 </div>
 
 
-@section Scripts { }
+@section Scripts {
+
+   
+    <!--div class="pagination-button position-fixed bottom-0">
+        <!-- Pagination links will be dynamically added here -->
+        <!--div class="pagination position-fixed bottom-0">
+
+
+        </!--div>
+    </!--div-->
+    <script>
+        /*
+        function updatePagination() {
+            // Update "Previous" button
+            if (currentPage <= 1) {
+                $('.pagination .prev').addClass('disabled').attr('href', '#').off('click');
+            } else {
+                $('.pagination .prev').removeClass('disabled').attr('href', '#').on('click', function (e) {
+                    e.preventDefault();
+                    loadItems(currentPage - 1);
+                });
+            }
+
+            // Update "Next" button
+            if (currentPage >= totalPages) {
+                $('.pagination .next').addClass('disabled').attr('href', '#').off('click');
+            } else {
+                $('.pagination .next').removeClass('disabled').attr('href', '#').on('click', function (e) {
+                    e.preventDefault();
+                    loadItems(currentPage + 1);
+                });
+            }
+
+            // Highlight the current page
+            $('.pagination a').removeClass('active');
+            $('.pagination a').each(function () {
+                var href = $(this).attr('href');
+                var page = new URLSearchParams(href.split('?')[1]).get('page');
+                if (parseInt(page) === currentPage) {
+                    $(this).addClass('active');
+                }
+            });
+        }
+
+        function loadItems(page) {
+            $.ajax({
+                url: 'Url.Action("ItemView", "Users", new { username = CurrentUsername })',
+                data: { page: page },
+                success: function (data) {
+                    $('#view-all').html(data);
+                    currentPage = page;  // Update currentPage
+                    updatePagination();
+                },
+                error: function (xhr) {
+                    console.error(xhr);
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            // Initialize pagination on page load
+            updatePagination();
+
+            // Handle pagination clicks
+            $(document).on('click', '.pagination a:not(.disabled)', function (e) {
+                e.preventDefault();
+                var href = $(this).attr('href');
+                var page = new URLSearchParams(href.split('?')[1]).get('page');
+                if (page) {
+                    loadItems(parseInt(page));
+                }
+            });
+        });
+        */
+    </script>
+
+
+}
+
+
+
+
+
+

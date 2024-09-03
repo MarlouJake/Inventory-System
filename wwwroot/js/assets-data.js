@@ -164,6 +164,77 @@ jQueryAjaxLoginPost = form => {
     return false;
 }
 
+getStatuses = function () {
+    $.ajax({
+        url: '/api/values/get-statuses',
+        type: 'GET',
+        success: function (data) {
+            var $statusDropdown = $('#statusDropdown');
+            $.each(data, function (index, item) {
+                var $option = $('<option></option>').val(item.value).text(item.text);
+                if (item.value === "Complete") {
+                    $option.addClass('text-success'); // Set color attribute
+                } else if (item.value === "Incomplete(Usable)") {
+                    $option.addClass('text-primary');
+                } else if (item.value === "Incomplete(Unusable)") {
+                    $option.addClass('text-danger');
+                }
+                $statusDropdown.append($option);
+            });
+        },
+        error: function (xhr, status, error) {
+            console.log('Error fetching statuses: ' + error);
+        }
+    });
+
+};
+
+getOptions = function () {
+    $.ajax({
+        url: '/api/values/get-options',
+        type: 'GET',
+        success: function (data) {
+            var $updateDropdown = $('#updateDropdown');
+            $.each(data, function (index, item) {
+                var $option = $('<option></option>').val(item.value).text(item.text);
+
+                if (item.value === "N/A") {
+                    $option.addClass('text-secondary'); // Apply gray color
+                } else if (item.value.startsWith("YES")) {
+                    $option.addClass('text-success'); // Apply green color
+                } else if (item.value.startsWith("NO")) {
+                    $option.addClass('text-danger'); // Apply red color
+                }
+
+                $updateDropdown.append($option);
+            });
+        },
+        error: function (xhr, status, error) {
+            console.log('Error fetching options: ' + error);
+        }
+    });
+};
 
 
 
+/*
+function loadpage(viewurl) {
+    fetch(viewurl)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('view-content').innerHTML = html;
+        })
+        .catch(error => console.error('Error loading view:', error));
+};
+
+document.getElementById('summary-link').addEventListener('click', function (event) {
+    event.preventDefault();
+    loadpage('dashboard/summary'); // URL of the summary view
+});
+
+document.getElementById('table-link').addEventListener('click', function (event) {
+    event.preventDefault();
+    loadpage('dashboard'); // URL of the table view
+});
+
+            */
