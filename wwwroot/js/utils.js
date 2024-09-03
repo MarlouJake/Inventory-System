@@ -179,7 +179,7 @@ function Validations() {
         SuccessToAddDatabase,
         FailedToAddDatabase,
         InvalidInput,
-        Put, 
+        Put,
         Modify,
         PutSuccess,
         PutError,
@@ -354,7 +354,10 @@ function DisplaySuccessAndError() {
     function trimInput(element) {
         element.value = element.value.trim();
     }
-} 
+}
+
+
+
 
 
 

@@ -17,89 +17,112 @@
     fetch(url, {
         method: 'POST',
         headers: {
-            'Content-Type': media,  
+            'Content-Type': media,
             'Accept': media
         },
         body: JSON.stringify(itemdata)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.isValid) {
-            $("#view-all").html(data.html); 
-            //document.getElementById("view-all").innerHTML = data.html;
+        .then(response => response.json())
+        .then(data => {
 
-         
+            if (data.isValid) {
+                //$("#view-all").html(data.html); 
+                //document.getElementById("view-all").innerHTML = data.html;
+                // Add new item to the view
+
+                const newItemHtml = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title mb-1 fs-6"><strong>${itemdata.itemname}</strong></h6>
+                            <p class="card-text mb-1"><strong>Code:</strong> ${itemdata.itemcode}</p>
+                            <p class="card-text mb-0"><strong>Status:</strong> ${itemdata.status}</p>
+                        </div>
+                        <div class="card-footer">
+                            <a onclick="ShowModal('@Url.Action("ViewDetails", "Users", new { id = item.id })')"
+                               class="btn btn-primary btn-crud btn-sm form-control">
+                                View
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+
+
+                $("#view-all").append(newItemHtml); // Append the new item to the list
+                loadItems(currentPage);
+                $("#crud-modal .modal-body").html('');
+                $("#crud-modal").modal('hide');
+                NewItemAdded();
+                $("#message-success").text(validate.AddingSuccess).fadeIn().delay(500).fadeOut();
+
+
+
+                const result = jsonResult(
+                    validate.Post,
+                    validate.Add,
+                    validate.AddingSuccess,
+                    true,
+                    validate.AddingFailed,
+                    false,
+                    data.successsmessage,
+                    itemdata,
+                    validate.PostSuccess,
+                    form.action,
+                    200, // Assuming 200 is the response status for success
+                    `/user-dashboard/${itemdata.userid}`,
+                    browserInfo.name,
+                    browserInfo.version
+                );
+
+                console.log('API Response', JSON.stringify(result, null, 2));
+            } else {
+
+                $("#message-error").text(data.errormessage).fadeIn().delay(500).fadeOut();
+                $("#crud-modal .modal-body").html('');
+                $("#crud-modal").modal('hide');
+                const result = jsonResult(
+                    validate.Post,
+                    validate.Add,
+                    validate.AddingSuccess,
+                    false,
+                    validate.AddingFailed,
+                    true,
+                    data.errormessage,
+                    itemdata,
+                    validate.PostFailed,
+                    form.action,
+                    400, // Assuming 400 is the response status for failure
+                    `/user-dashboard/${itemdata.userid}`,
+                    browserInfo.name,
+                    browserInfo.version
+                );
+
+                console.log('API Response Error', JSON.stringify(result, null, 2));
+            }
+        })
+        .catch(error => {
+            $("#message-error").text('An error occurred. Please try again.').fadeIn().delay(500).fadeOut();
             $("#crud-modal .modal-body").html('');
             $("#crud-modal").modal('hide');
-            NewItemAdded();
-            $("#message-success").text(validate.AddingSuccess).fadeIn().delay(500).fadeOut();
-
             const result = jsonResult(
                 validate.Post,
                 validate.Add,
                 validate.AddingSuccess,
-                true,
-                validate.AddingFailed,
                 false,
-                data.successsmessage,
+                validate.AddingFailed,
+                true,
+                error.message,
                 itemdata,
-                validate.PostSuccess,
+                validate.PostError,
                 form.action,
-                200, // Assuming 200 is the response status for success
+                error,
                 `/user-dashboard/${itemdata.userid}`,
                 browserInfo.name,
                 browserInfo.version
             );
 
-            console.log('API Response', JSON.stringify(result, null, 2));
-        } else {
-            const errorMessage = data.errormessage || validate.InvalidInput;
-            $("#message-error").text(errorMessage).fadeIn().delay(500).fadeOut();
-            $("#crud-modal .modal-body").html('');
-            $("#crud-modal").modal('hide');
-            const result = jsonResult(
-                validate.Post,
-                validate.Add,
-                validate.AddingSuccess,
-                false,
-                validate.AddingFailed,
-                true,
-                errorMessage,
-                itemdata,
-                validate.PostFailed,
-                form.action,
-                400, // Assuming 400 is the response status for failure
-                `/user-dashboard/${itemdata.userid}`,
-                browserInfo.name,
-                browserInfo.version
-            );
-
-            console.log('API Response Error', JSON.stringify(result, null, 2));
-        }
-    })
-    .catch(error => {
-        $("#message-error").text('An error occurred. Please try again.').fadeIn().delay(500).fadeOut();
-        $("#crud-modal .modal-body").html('');
-        $("#crud-modal").modal('hide');
-        const result = jsonResult(
-            validate.Post,
-            validate.Add,
-            validate.AddingSuccess,
-            false,
-            validate.AddingFailed,
-            true,
-            error,
-            itemdata,
-            validate.PostError,
-            form.action,
-            error,
-            `/user-dashboard/${itemdata.userid}`,
-            browserInfo.name,
-            browserInfo.version
-        );
-
-        console.log('Request API Error', JSON.stringify(result, null, 2));
-    });
+            console.log('Request API Error', JSON.stringify(result, null, 2));
+        });
 
     return false; // Prevent default form submission
 }
@@ -145,7 +168,7 @@ RequestUpdate = (form) => {
             $('#itemname').addClass('input-error');
             $('#itemname-error').text(validate.UsernameEmpty);
 
-        }  else if (data.itemname.length < 3) {
+        } else if (data.itemname.length < 3) {
             $('#itemstatus').addClass('input-error');
             $('#status-error').text(validate.UsernameLength);
 

@@ -8,36 +8,30 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/popup-messages.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/pagination.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/InventorySystem.styles.css" asp-append-version="true" />
-    <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-dy1SU1kWrWlZ+yl+1S2fZ5T1MB58Oay3CnD6Fv2E5+HTZm5zXl+ARpZ1ZpFb21whjR4GpTiwYT+PpQZTLcI1MQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /-->
-    <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"-->
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.3/jquery.validate.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate.unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 
     <script src="~/js/messages.js" asp-append-version="true" defer></script>
-
     <script src="~/js/assets-modal.js" asp-append-version="true" defer></script>
     <script src="~/js/assets-data.js" asp-append-version="true" defer></script>
     <script src="~/js/utils.js" asp-append-version="true" defer></script>
     <script src="~/js/auth.js" asp-append-version="true" defer></script>
     <script src="~/js/services.js" asp-append-version="true" defer></script>
-
-
     <script src="~/js/site.js" asp-append-version="true" defer></script>
-
-
 </head>
-<body class="bg-dark">
+
+<body class="bg-light">
 
     <div class="container">
 
-        <div id="message-success" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px; background-color: #7eca8f; color: white; border-radius: 5px; z-index: 1050;">
+        <div id="message-success" class="alert alert-success fixed-top" style="display: none; z-index: 1050;">
+            <!-- Success message content -->
         </div>
-        <div id="message-error" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px; background-color: #FF5252; color: white; border-radius: 5px; z-index: 1050;">
+        <div id="message-error" class="alert alert-danger fixed-top" style="display: none; z-index: 1050;">
+            <!-- Error message content -->
         </div>
 
 
@@ -66,7 +60,7 @@
     </div>
 
 
-    <div role="main" class="bg-danger" id="container-main" style="width:100%; height:100%">
+    <div role="main" id="container-main" style="width:100%; height:100%">
 
         <div id="prompt-message" class="popup-message alert alert-success ">
         </div>

@@ -11,32 +11,16 @@
 <div class="card-container">
     @if (Model.Items == null || !Model.Items.Any())
     {
-        <p>No items found.</p>
+        <div class="no-items text-center">
+            <p class="text-center">No items found.</p>
+        </div>
     }
     else
     {
         @foreach (var item in Model.Items)
         {
             if (count >= 24) break; // Stop rendering cards after 12 items
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title mb-1"><strong>@item.ItemName</strong></h5>
-                    <p class="card-text mb-1"><strong>Code:</strong> @item.ItemCode</p>
-                    <p class="card-text mb-0"><strong>Status:</strong> @item.Status</p>
-                </div>
-                <div class="card-footer">
-                    <a onclick="ShowModal('@Url.Action("Update", "Users", new { id = item.ItemId })')"
-                       class="btn btn-crud btn-sm text-light"
-                       style="background-color: rgb(0, 201, 195);">
-                        Update
-                    </a>
-                    <a onclick="ShowModal('@Url.Action("ViewDetails", "Users", new { id = item.ItemId })')"
-                       class="btn btn-primary btn-crud btn-sm">
-                        View
-                    </a>
-                </div>
-            </div>
+            @await Html.PartialAsync("ItemCard", item)
 
             count++; // Increment the counter after rendering each item
         }

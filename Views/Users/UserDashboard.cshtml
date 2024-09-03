@@ -40,7 +40,6 @@
     var currentPage = @currentPage;  // Current page number
     var totalPages = @totalPages;    // Total number of pages
 
-    // Update pagination buttons and links
     function updatePagination() {
         // Update "Previous" button
         if (currentPage <= 1) {
@@ -73,7 +72,6 @@
         });
     }
 
-    // Load items for the specified page
     function loadItems(page) {
         $.ajax({
             url: '@Url.Action("ItemTable", "Users")',
@@ -88,10 +86,6 @@
             }
         });
     }
-
-
-
-
 
     $(document).ready(function () {
         // Initialize pagination on page load
@@ -109,65 +103,68 @@
     });
 </script>
 
-<div id="user-dashboard" style="width:100%; height:100%;" class="bg-info">
+
+<!-- Main Content Area -->
+<div id="main-content" class="d-flex flex-column">
     <!-- Sidebar Navigation -->
-    <nav class="navbar p-2 bg-dark border border-top-0 border-3 border-start-0 border-end-0 rounded me-3" style="width: 200px; height:100vh;">
+    <nav id="sidebar" class="bg-dark text-white">
         <h3 class="text-success">Dashboard</h3>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <button class="btn btn-success" onclick="ShowModal('@Url.Action("AddItem", "Users")')">Add New Item</button>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#">Settings</a>
+            </li>
+
+        </ul>
     </nav>
 
-    <!-- Data Container -->
-    <div id="data-container">
-        <!-- Upper part of data container with buttons -->
-        <div class="d-flex flex-column flex-md-row justify-content-between mb-2">
-            <div>
-                <!-- Add Item Button (already in the navbar) -->
-            </div>
-            <div class="btn-container">
-                <a onclick="ShowModal('@Url.Action("AddItem", "Users", null)')" class="btn btn-common btn-success btn-sm">
-                    <!--a onclick="ShowModal('Url.Action("AddItem", "Users", null, Context.Request.Scheme)')" class="btn btn-common btn-success btn-sm"-->
-                    New Item
-                    <!--a-->
-                </a>
-                <button class="btn btn-common btn-danger btn-sm" onclick="LogoutRequest('@CurrentUserid', '@CurrentUsername');">
-                    Logout
-                </button>
-            </div>
+    <!-- Top Bar -->
+    <div id="top-bar" class="d-flex justify-content-between ps-2 pe-2 bg-dark text-white">
+        <a href="#" class="text-decoration-none mt-2 text-light text-uppercase ms-1">@CurrentUsername</a>
+        <div class="d-flex align-items-center">
+            <button class="btn btn-danger" onclick="LogoutRequest('@CurrentUserid', '@CurrentUsername')">Logout</button>
         </div>
+    </div>
 
-        <!-- Data Content -->
-        <div id="view-all">
+    <!-- Content -->
+    <div class="mt-3">
+        <div id="view-all" class="container-fluid p-0">
             @await Html.PartialAsync("ItemTable", Model)
         </div>
 
         <!-- Pagination -->
-        @if (Model.TotalPages > 1)
-        {
-            <div class="pagination">
-                @if (Model.CurrentPage > 1)
-                {
-                    <a href="@Url.Action("ItemTable", new { page = Model.CurrentPage - 1 })" class="prev">Previous</a>
-                }
-                else
-                {
-                    <a href="#" class="prev disabled">Previous</a>
-                }
+        <div class="pagination mt-3">
+            @if (Model.CurrentPage > 1)
+            {
+                <a href="@Url.Action("ItemTable", new { page = Model.CurrentPage - 1 })" class="prev">Previous</a>
+            }
+            else
+            {
+                <a href="#" class="prev disabled">Previous</a>
+            }
 
-                @for (int i = 1; i <= Model.TotalPages; i++)
-                {
-                    <a href="@Url.Action("ItemTable", new { page = i })" class="@(Model.CurrentPage == i ? "active" : "")">@i</a>
-                }
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <a href="@Url.Action("ItemTable", new { page = i })" class="@(Model.CurrentPage == i ? "active" : "")">@i</a>
+            }
 
-                @if (Model.CurrentPage < Model.TotalPages)
-                {
-                    <a href="@Url.Action("ItemTable", new { page = Model.CurrentPage + 1 })" class="next">Next</a>
-                }
-                else
-                {
-                    <a href="#" class="next disabled">Next</a>
-                }
-            </div>
-        }
+            @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <a href="@Url.Action("ItemTable", new { page = Model.CurrentPage + 1 })" class="next">Next</a>
+            }
+            else
+            {
+                <a href="#" class="next disabled">Next</a>
+            }
+        </div>
+
     </div>
 </div>
+
 
 @section Scripts { }

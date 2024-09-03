@@ -38,7 +38,7 @@ UserRequest = (form) => {
         //$('#username').addClass('input-error');
         //$('#password').addClass('input-error');
         $("#error-message").text(validate.UsernamePasswordIncorrect).fadeIn().delay(500).fadeOut();
-       return false; // Prevent form submission if invalid
+        return false; // Prevent form submission if invalid
     }
 
     try {
@@ -75,10 +75,10 @@ UserRequest = (form) => {
                     window.location.href = res.redirectUrl;
 
                 } else {
-                    
+
                     setTimeout(() => $('#loading-modal').modal('hide'), 500);
                     setTimeout(() => {
-                        $("#error-message").text(validate.UsernamePasswordIncorrect).fadeIn().delay(1000).fadeOut();
+                        $("#error-message").text(res.errorMessage).fadeIn().delay(1000).fadeOut();
                     }, 500);
 
                     const result = jsonResult(
@@ -88,11 +88,11 @@ UserRequest = (form) => {
                         false,
                         validate.LoginFailed,
                         true,
-                        validate.UsernamePasswordIncorrect,
+                        res.errorMessage,
                         data,
                         validate.PostFailed,
                         apiUrl,
-                        validate.ResponseValid,
+                        validate.ResponseInvalid,
                         `/dashboard/${data.username}`,
                         browserInfo.name,
                         browserInfo.version
@@ -102,7 +102,7 @@ UserRequest = (form) => {
                 }
 
             },
-            error: function (err) {            
+            error: function (err) {
 
                 const result = jsonResult(
                     validate.Post,
@@ -129,7 +129,7 @@ UserRequest = (form) => {
 
     }
     catch (ex) {
-        
+
 
         const result = jsonResult(
             validate.Post,
@@ -231,7 +231,7 @@ AdminRequest = (form) => {
 
                 } else {
 
-                   
+
                     const result = jsonResult(
                         validate.Post,
                         validate.Login,
@@ -259,7 +259,7 @@ AdminRequest = (form) => {
 
             },
             error: function (err) {
-                
+
                 const result = jsonResult(
                     validate.Post,
                     validate.Login,
@@ -287,7 +287,7 @@ AdminRequest = (form) => {
 
     }
     catch (ex) {
-       
+
 
         const result = jsonResult(
             validate.Post,
@@ -354,16 +354,16 @@ LogoutRequest = (id, name) => {
                     );
 
                     console.log("API Data", JSON.stringify(result, null, 2));
-                
+
                     sessionStorage.removeItem('storedUsername');
                     sessionStorage.removeItem('storedadminname');
 
-                    window.location.href = res.redirectUrl;  
+                    window.location.href = res.redirectUrl;
 
                     $("#success-message").text(validate.LogoutSuccess).fadeIn().delay(3000).fadeOut();
                 }
                 else {
-                    
+
                     const result = jsonResult(
                         validate.Post,
                         validate.action,
@@ -398,7 +398,7 @@ LogoutRequest = (id, name) => {
                     false,
                     validate.LogoutFailed,
                     true,
-                    validate.LogoutFailed  + ':\n' + err,
+                    validate.LogoutFailed + ':\n' + err,
                     logoutdata,
                     validate.PostError,
                     getUrl(url),

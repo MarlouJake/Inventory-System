@@ -1,0 +1,15 @@
+﻿@model InventorySystem.Models.Item
+
+<div class="card">
+    <div class="card-body">
+        <h6 class="card-title mb-1 fs-6"><strong>@Model.ItemName</strong></h6>
+        <p class="card-text mb-1"><strong>Code:</strong> @Model.ItemCode</p>
+        <p class="card-text mb-0"><strong>Status:</strong> @Model.Status</p>
+    </div>
+    <div class="card-footer">
+        <a onclick="ShowModal('@Url.Action("ViewDetails", "Users", new { id = Model.ItemId })')"
+           class="btn btn-primary btn-crud btn-sm form-control">
+            View
+        </a>
+    </div>
+</div>

@@ -49,21 +49,95 @@ body {
     flex-wrap: wrap;
 }
 
+
+
+/* Sidebar styles */
+#sidebar {
+    width: 220px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 15px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+    #sidebar h3 {
+        margin-bottom: 20px;
+    }
+
+    #sidebar .nav-link {
+        color: #ffffff;
+        margin: 5px 0;
+    }
+
+/* Main content area */
+#main-content {
+    margin-left: 220px;
+    padding: 15px;
+    height: 100vh;
+    overflow: auto;
+}
+
+#top-bar {
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 10px 15px;
+}
+
+    #top-bar .btn {
+        font-size: 0.875rem;
+    }
+
 /* Card styles */
 .card-container {
     display: grid;
-    grid-template-columns: repeat(6, 1fr); /* Ensure 6 items per row */
-    gap: 0.5rem; /* Space between cards */
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1rem;
     justify-content: center;
-    margin: 0 auto;
-    max-width: 100%;
-    padding: 0 1rem; /* Padding for smaller screens */
 }
 
 .card {
-    width: 100%; /* Make card width responsive */
-    max-width: 140px; /* Maximum width of card */
-    height: auto; /* Auto-adjust height based on content */
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 1rem;
+}
+
+.card-text {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: start;
+}
+
+.card-footer {
+    padding: 0.5rem;
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+
+/* Card styles */
+/*
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* Ensure 6 items per row 
+    gap: 0.5rem; /* Space between cards 
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 100%;
+    padding: 0 1rem; /* Padding for smaller screens 
+}
+
+.card {
+    width: 100%; /* Make card width responsive 
+    max-width: 140px; /* Maximum width of card 
+    height: auto; /* Auto-adjust height based on content 
     display: flex;
     flex-direction: column;
     border: 1px solid #dee2e6;
@@ -97,6 +171,15 @@ body {
     justify-content: center;
     gap: 0.25rem;
 }
+*/
+.no-items {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    width: 100%;
+    margin-top: 20px; /* Add margin if needed */
+    text-align: center;
+}
+
 .input-error {
     border: 1px solid red;
 }
@@ -174,8 +257,8 @@ body {
         font-size: 0.8rem;
         padding: 0.2rem 0.4rem;
     }
+
     .card-container {
         grid-template-columns: 1fr; /* Adjust to 1 item per row on very small screens */
     }
 }
-

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\js\messages.js" />
+	<Content Remove="wwwroot\js\messages.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="wwwroot\js\messages.js" />
+	<_ContentIncludedByDefault Remove="wwwroot\js\messages.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,7 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\js\messages.js" />
+	<None Include="wwwroot\js\messages.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,7 +55,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
 </Project>
