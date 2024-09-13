@@ -1,4 +1,5 @@
-﻿@model InventorySystem.Models.Item
+﻿@using InventorySystem.Models.DataEntities
+@model Item
 @{
     ViewData["Title"] = "Add new item";
     Layout = null;
@@ -18,7 +19,7 @@
 
 <h5 class="text-break"><strong>Add new item</strong></h5>
 <hr />
-<form asp-controller="ServicesApi" asp-action="AddItem" id="add-item" method="post" class="forms" asp-route-id="@Model.ItemId" onsubmit="return AddItem(this)">
+<form asp-controller="ServicesApi" asp-action="AddItem" id="add-item" method="post" class="forms" asp-route-id="@Model.ItemId">
 
     <div class="form-group">
         <label asp-for="ItemCode" for="itemCode" class="control-label"></label>
@@ -57,25 +58,16 @@
     <div class="form-group mt-2">
         <label asp-for="Status" for="statusDropdown" class="control-label"></label>
         <select asp-for="Status" id="statusDropdown" class="form-control" required name="statusDropdown">
-            <option value="" class="text-muted">--Select Status--</option>
+            <option id="statusvalue" value="" class="text-muted">--Select Status--</option>
         </select>
 
         <span asp-validation-for="Status" class="text-danger"></span>
     </div>
 
     <div class="form-group mt-2">
-        <label asp-for="AdditionalInfo" for="item-info" class="control-label"></label>
-        <textarea asp-for="AdditionalInfo" id="item-info" class="form-control user-input" name="item-info"
-                  autocomplete="off"
-                  placeholder="Additional inforamtion"></textarea>
-        <span asp-validation-for="AdditionalInfo" class="text-danger"></span>
-    </div>
-
-
-    <div class="form-group mt-2">
         <label asp-for="FirmwareUpdated" for="updateDropdown" class="control-label"></label>
         <select asp-for="FirmwareUpdated" id="updateDropdown" class="form-control" required name="updateDropdown">
-            <option value="" class="text-muted">--Select Option--</option>
+            <option id="updatevalue" value="" class="text-muted">--Select Option--</option>
         </select>
         <span asp-validation-for="FirmwareUpdated" class="text-danger"></span>
     </div>

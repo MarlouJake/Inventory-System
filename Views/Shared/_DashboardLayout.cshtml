@@ -9,10 +9,12 @@
     <link rel="stylesheet" href="~/css/popup-messages.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/pagination.css" asp-append-version="true" />
 
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <!--script src="https://code.jquery.com/jquery-3.6.0.min.js"></!--script-->
+
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.3/jquery.validate.min.js"></script>
     <!--script src="https://ajax.aspnetcdn.com/ajax/jquery.validate.unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></!--script-->
 
@@ -26,7 +28,7 @@
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 </head>
 
-<body>
+<body id="dashboard-layout">
 
     <div class="container">
         <div id="message-success" class="alert alert-success fixed-top popup-message" style="display: none; z-index: 2000;">
@@ -36,19 +38,9 @@
             <!-- Error message content -->
         </div>
 
-        <!-- Loading Modal -->
-        <div id="loading-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-body">
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!--Modal for Add/Edit/Delete/View-->
-        <div class="modal fade" id="crud-modal" tabindex="-1" role="dialog" aria-labelledby="crudModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+        <div class="modal fade" id="crud-modal" tabindex="-1" role="dialog" aria-labelledby="crudModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
                         <!-- Content loaded dynamically -->
@@ -58,18 +50,21 @@
         </div>
      </div>   
 
-        <div role="main" id="container-main" style="width:100%; height:100%">
+        <div role="main" id="dashboard-main" style="width:100%; height:100%">
         <div id="prompt-message" class="popup-message alert alert-success">
         </div>
             <!-- Sidebar Navigation -->
-            <nav id="sidebar" class="bg-dark text-white">
+        <nav id="sidebar" class="bg-dark text-white" style="z-index: 1900;">
                 <div class="d-flex justify-content-between">
                      <div class="d-flex">
                         <h4 class="text-success">Dashboard</h4>
                      </div>
 
+
                     <div class="d-flex btn-sm">
-                        <button class="btn btn-danger s" title="Logout" id="user-logout">></button>
+                        <a class="btn btn-danger" title="Logout" id="user-logout" onclick="LogoutRequest('@Url.Action("Logout", "ValidateApi", new { username = Html.Raw(ViewBag.Username) })');">
+                            <i class="fa-solid fa-right-to-bracket"></i> 
+                        </a>
                     </div>
 
                 </div>

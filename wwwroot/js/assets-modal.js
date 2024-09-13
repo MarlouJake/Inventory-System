@@ -1,40 +1,25 @@
-﻿//Info Modal - Login Page
-function ShowPopInfoUp(url) {
+﻿function ModalShow(url) {
+    $('.modal').each(function () {
+        $(this).modal('hide');
+    });
+
+    $('.container').append(DynamicModal);
+    GetData(url);
+};
+
+function GetData(url) {
     $.ajax({
-        type: "GET",
+        type: 'GET',
         url: url,
-        success: function (res) {
-            $("#info-modal .modal-body").html(res);
-            //$("#view-myModal .modal-title").html(title);
-            $("#info-modal").modal('show');
+        success: function (fallback) {
+            $('#dynamic-modal .modal-body').html(fallback);
+            $('#dynamic-modal').modal('show');
         },
-        error: function (xhr, status, error) {
-            alert("An error occured while loading the form: " + errror);
+        error: function (jqXHR, status) {
+            console.error("Error details: ", jqXHR.responseText);
+            alert("An error occurred while loading the form: " + jqXHR.status + " " + status);
         }
     });
-}
-
-
-
-//Modal PopUp - CRUD Dashboard
-function ShowModal(url) {
-    try {
-        $.ajax({
-            type: "GET",
-            url: url,
-            success: function (res) {
-                $("#crud-modal .modal-body").html(res);
-                $("#crud-modal").modal('show');
-            },
-            error: function (xhr, status) {
-                console.error("Error details: ", xhr.responseText);
-                alert("An error occurred while loading the form: " + xhr.status + " " + xhr.statusText);
-            }
-        });
-    }
-    catch (ex) {
-        alert("An error occurred while loading the form: " + ex);
-    }
 }
 
 function checkSession() {
@@ -44,8 +29,8 @@ function checkSession() {
             if (!data.isValid) {
                 // Define the modal HTML content
                 const sessionTimeout = `
-                        <div class="modal fade" id="sessionTimeoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
+                        <div class="modal fade" id="sessionTimeoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="exampleModalLabel">Session Timeout</h5>
@@ -73,8 +58,6 @@ function checkSession() {
             }
         });
 }
-
-
 
 // Check session validity periodically
 //setInterval(checkSession, 60000); // Check every minute

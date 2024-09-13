@@ -1,4 +1,6 @@
-﻿@model InventorySystem.Models.Item
+﻿@using InventorySystem.Models.DataEntities
+@model Item
+
 
 <div class="card">
     <div class="card-body">
@@ -7,7 +9,7 @@
         <p class="card-text mb-0"><strong>Status:</strong> @Model.Status</p>
     </div>
     <div class="card-footer">
-        <a onclick="ShowModal('@Url.Action("ViewDetails", "Users", new { id = Model.ItemId })')"
+        <a onclick="ShowModal('@Url.Action("ViewDetails", "Users", new {itemid = Model.ItemId })')"
            class="btn btn-primary btn-crud btn-sm form-control">
             View
         </a>

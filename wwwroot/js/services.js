@@ -1,6 +1,6 @@
 ﻿AddItem = (form) => {
     var media = process.JsonApp;
-    const url = '/api/services/add-item/';
+    const url = '/api/u/services/add-item/';
     //const user = sessionStorage.getItem('storedUsername');
     const formData = new FormData(form);
     const itemdata = {

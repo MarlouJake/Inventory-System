@@ -8,14 +8,11 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/popup-messages.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/InventorySystem.styles.css" asp-append-version="true" />
-    <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-dy1SU1kWrWlZ+yl+1S2fZ5T1MB58Oay3CnD6Fv2E5+HTZm5zXl+ARpZ1ZpFb21whjR4GpTiwYT+PpQZTLcI1MQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /-->
-    <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"-->
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.3/jquery.validate.min.js"></script>
-    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate.unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 
     <script src="~/js/messages.js" asp-append-version="true" defer></script>
 
@@ -29,7 +26,7 @@
 
     
 </head>
-<body>
+<body id="layoutbody">
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -43,11 +40,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="AdminLogin">Admin</a>
-                        </li>
+                        
                     </ul>
+                    
                 </div>
+                
             </div>
         </nav>
     </header>
@@ -58,31 +55,7 @@
         <div id="error-message" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px; background-color: #FF5252; color: white; border-radius: 5px;">
         </div>        
 
-        <!-- Loading Modal -->
-        <div id="loading-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-body">
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!--Info modal-->
-        <div class="modal fade" tabindex="-1" role="dialog" id="info-modal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div role="main" class="pb-3 m-2" id="container-main">
+        <div role="main" class="pb-3 m-2 mt-5" id="container-main">
             @RenderBody()
         </div>
     </div>
@@ -93,19 +66,6 @@
         </div>
     </footer>
     
-
-
-
-
-
-
-    <div class="modal fade" role="dialog" tabindex="-1" id="view-myModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-body"></div>
-            </div>
-        </div>
-    </div>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -1,0 +1,103 @@
+@using InventorySystem.Models.DataEntities;
+@model User
+
+
+@{
+}
+
+<script src="~/js/utils.js" asp-append-version="true" defer></script>
+<script>
+    $(document).ready(function () {
+        var signupbutton = $('#signup-button');
+        signupbutton.html('Sign Up');
+
+        var password$ = $('#signup-password');
+        var container$ = $('.icons-container .show-pass');
+        var show$ = $('.show-icon');
+        ValidateSignUpForm();
+        ShowPassword(password$, show$, container$);
+    });
+</script>
+
+<h5 class="text-break"><strong>Sign Up</strong></h5>
+
+<form action="/" method="post" class="forms">
+    <div class="form-group">
+        <label asp-for="Username" class="control-label mt-2"></label>
+        <input asp-for="Username" type="text" class="form-control user-input" id="signup-username" name="signup-username"
+               autocomplete="off"
+               required
+               placeholder="Username"
+               maxlength="64"
+               data-val="true"
+               data-val-required="Username is required!" />
+        <span asp-validation-for="Username" id="usernameSignup-error" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Email" class="control-label mt-2"></label>
+        <input asp-for="Email" type="email" class="form-control user-input" id="signup-email" name="signup-email"
+               autocomplete="off"
+               required
+               placeholder="Email"
+               maxlength="64"
+               data-val="true"
+               data-val-required="Email is required!" />
+        <span asp-validation-for="Email" id="emailSignup-error" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Password" class="control-label mt-2"></label>
+        <div class="input-group">
+            <input asp-for="Password" type="password" class="form-control user-input" id="signup-password" name="signup-password"
+                   autocomplete="off"
+                   required
+                   placeholder="Password"
+                   maxlength="128"
+                   data-val="true"
+                   data-val-required="Password is required!" />
+            <div class="input-group-append show-icon">
+                <div class="input-group-text icons-container">
+                    <i class="fa-regular fa-eye icons-size show-pass"></i>
+                </div>
+            </div>
+        </div>
+        <span asp-validation-for="Password" id="signupPass-error" class="text-danger"></span>
+    </div>
+    
+    <div class="form-group">
+        <label for="signup-retypepassword" class="control-label mt-2">Confirm Password</label>
+        <div class="input-group">
+
+            <input asp-for="Password" type="password" class="form-control user-input" id="signup-retypepassword" name="signup-retypepassword"
+                   autocomplete="off"
+                   required
+                   placeholder="Confirm Password"
+                   maxlength="128"
+                   data-val="true"
+                   data-val-required="Password is required!" />
+            <div class="input-group-append retype-iconpass">
+                <div class="input-group-text icons-container">
+                    <i class="fa-regular fa-eye icons-size retype-pass"></i>
+                </div>
+                <script>
+                    var passwordinput = $('#signup-retypepassword');
+                    var iconcontainer = $('.retype-pass');
+                    var showcontainer= $('.retype-iconpass');
+                    var holdTimeout;
+
+                    ShowPassword(passwordinput, showcontainer, iconcontainer);
+                </script>
+            </div>
+        </div>
+        <span asp-validation-for="Password" id="signupPass-confirmError" class="text-danger"></span>
+    </div>
+   
+    <div class="d-flex mt-3 form-group">
+        <button id="signup-button" class="ms-auto btn btn-success d-flex"></button>
+        <a class="btn btn-outline-secondary d-flex ms-2" data-bs-dismiss="modal">Cancel</a>
+    </div>
+
+
+
+</form>

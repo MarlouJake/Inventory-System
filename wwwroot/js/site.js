@@ -80,12 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
     //Function for changing color of text in Userdashboard
     NewItemAdded();
 
+    //initialize Validation Function
+    const validate = Validations();
+    const browserInfo = getBrowserInfo();
+    const process = ProcessRequest();
 
     //Client-side input field validation
     UserLoginValidateField();
     AdminLoginValidateField();
 
-    UserLogoutAction();
+    //UserLogoutAction();
     DisplaySuccessAndError();
     const loginButton = document.getElementById('loginButton');
     if (loginButton) {
@@ -93,9 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = '/';
         });
     }
-
-
-    
+ 
 });
 
 function getScreenSize() {
@@ -116,9 +118,81 @@ window.addEventListener('resize', function () {
 });
 
 
+const NoInternetPopUp = `
+    <div id="NoInternetPopUp" style="display: none; z-index: 2000; position: fixed; top: 5px; left: 50%; transform: translateX(-50%); padding: 5px; background-color: #FF5252; color: white; border-radius: 5px;">
+    </div>
+                        `;
+
+const NoInternet =  `
+                        <div class="modal fade" id="noInternetModal" style="z-index: 2000;" tabindex="-1" aria-labelledby="noInternetModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                            <div class="modal-dialog modal-dialog-centered modal-lg modal-sm modal-md">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <span class="text-danger">
+                                            <h5 class="modal-title" id="noInternetModalLabel">No Internet Connection</h5>
+                                        </span>
+                                        
+                                        It looks like you are not connected to the internet. Please check your connection and try again.
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        
+                     `;
 
 
 
+let disconnected = false;
+function checkInternetConnection() {
+    
+    if (navigator.onLine) {
+        // Connection is available
+     
+        $('#noInternetModal').modal('hide').fadeOut().remove();  
+        $('#NoInternetPopUp').remove();
+        if(disconnected){
+             $('#success-message').text('Connected to internet').fadeIn().delay(1000).fadeOut();
+             disconnected = false;
+        }
+       
+    } else {
+        // No internet connection
+        disconnected = true;
+        showNoInternetConnectionMessage();
+    }
+}
+
+function showNoInternetConnectionMessage() {
+    // Check if the modal or message element exists
+    var homescreen = $('#container-main');
+    var homebody = $('#layoutbody');
+    var dashboardbody = $('#dashboard-layout');
+    if(homescreen) {
+        homescreen.append(NoInternet);
+        homebody.append(NoInternetPopUp);
+    }
+
+    if (dashboardbody) {
+        dashboardbody.append(NoInternet);
+        dashboardbody.append(NoInternetPopUp);
+    }
+    
+    var noInternetModal = document.getElementById('noInternetModal');
+    if (noInternetModal) { 
+        $('#noInternetModal').modal('show').fadeIn();
+        $('#NoInternetPopUp').text('No internet connection').fadeIn().delay(500).fadeOut();
+    } else {
+        $('#NoInternetPopUp').text('No internet connection').fadeIn().delay(5000).fadeOut();
+    }
+}
+
+// Check the internet connection status when the page loads
+document.addEventListener('DOMContentLoaded', checkInternetConnection);
+
+// Optionally, you can add an event listener to handle online/offline events
+window.addEventListener('online', checkInternetConnection);
+window.addEventListener('offline', checkInternetConnection);
 
 
 

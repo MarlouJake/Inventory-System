@@ -49,6 +49,16 @@ body {
     flex-wrap: wrap;
 }
 
+/* Ensures that the modal is vertically and horizontally centered */
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 1rem); /* Ensure vertical centering */
+}
+
+.modal-content {
+    border-radius: 0.5rem; /* Optional: For rounded corners */
+}
 
 
 /* Sidebar styles */
@@ -77,6 +87,13 @@ body {
     margin-left: 220px;
     padding: 15px;
     overflow: auto;
+}
+
+#view-all {
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    border-top: 1px solid gray;
 }
 
 #top-bar {
@@ -153,12 +170,25 @@ body {
 }
 
 
-    .input-error:focus {
-        outline: none; /* Remove default focus outline */
-        box-shadow: 0 0 5px red; /* Add a red glow */
-        border-color: red; /* Keep border red on focus */
-        caret-color: red; /* Change the text cursor (caret) color to red */
-    }
+.form-control {
+    border-color: none; /* Green border when focused */
+    outline: none; /* Remove the default outline */
+    box-shadow: 0; /* Add a green shadow */
+}
+
+
+.input-success:focus {
+    border-color: #4CAF50; /* Green border when focused */
+    outline: none; /* Remove the default outline */
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* Add a green shadow */
+}
+
+.input-error:focus {
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 0 5px red; /* Add a red glow */
+    border-color: red; /* Keep border red on focus */
+    caret-color: red; /* Change the text cursor (caret) color to red */
+}
 
 /* Responsive styles */
 
@@ -217,6 +247,17 @@ body {
 
 
 @media (max-width: 725px) {
+
+    #main-content {
+        margin: 0;
+        padding: 0;
+    }
+
+    .no-items {
+        display: flex;
+        margin-left: 170%;
+    }
+
     .card-container {
         grid-template-columns: repeat(3, 1fr); /* Adjust to 3 items per row */
     }
@@ -227,59 +268,11 @@ body {
         margin-right: 18%;
         margin-left: 0rem;
     }
-}
-
-@media (max-width: 630) {
-
-
-    .pagination {
-        font-size: 1rem;
-        display: flex;
-        padding-right: 0;
-        padding-left: 100%;
-        background-color: red;
-    }
-
-
-    #main-content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        width: 100%;
-        padding: 0 1rem;
-        margin: 0;
-        width: 10%;
-    }
-
-    .card {
-        max-width: 100%;
-    }
-
-    .btn-common {
-        font-size: 0.85rem;
-        padding: 0.2rem 0.5rem;
-    }
-
-    .btn-container {
-        flex-direction: column;
-        align-items: center;
-    }
-}
-
-@media (max-width: 620px) {
-    #main-content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        width: 100%;
-        padding: 0 1rem;
-        margin: 0;
-    }
 
     #sidebar {
         display: none;
+        margin: 0;
+        padding: 0;
     }
 
     .card {
@@ -298,44 +291,5 @@ body {
     .btn-container {
         flex-direction: column;
         align-items: center;
-    }
-}
-
-
-@media (max-width: 545px) {
-
-    .card {
-        max-width: 100%;
-    }
-
-    .card-container {
-        grid-template-columns: repeat(3, 1fr); /* Adjust to 3 items per row */
-    }
-
-
-    .pagination {
-        font-size: 1.1rem;
-        display: block;
-        justify-content: start;
-        align-items: start;
-        text-align: start;
-        bottom: 1%;
-        margin-left: 0;
-        margin-right: 0;
-    }
-}
-
-@media (max-width: 415) {
-    .pagination {
-        font-size: 1.2rem;
-        padding-bottom: 0.3rem;
-    }
-}
-
-@media (max-width: 380) {
-    .pagination {
-        font-size: 0.4rem;
-        padding-bottom: 0.3rem;
-        border: 1px solid red;
     }
 }

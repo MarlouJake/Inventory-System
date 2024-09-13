@@ -1,7 +1,6 @@
 ﻿using InventorySystem.Data;
-using InventorySystem.Models;
-using InventorySystem.Utilities;
-using Microsoft.AspNetCore.Authentication;
+using InventorySystem.Models.DataEntities;
+using InventorySystem.Models.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,32 +8,48 @@ using System.Security.Claims;
 
 namespace InventorySystem.Controllers.main
 {
-    [Authorize]
-    [Route("inventory/{username}")]
-    public class UsersController(ApplicationDbContext context/*, UserManager<User>? userManager*/) : Controller
+    [Authorize("RequireUserRole")]
+    [Route("inventory/")]
+    public class UsersController(ApplicationDbContext context) : Controller
     {
-
         private readonly ApplicationDbContext _context = context;
 
-        [Route("dashboard")]
+        [Route("dashboard/{roleName}/{username}")]
         [HttpGet]
-        public async Task<IActionResult> UserDashboard(string username, int page = 1)
+        public async Task<IActionResult> UserDashboard(string roleName, string username, int page = 1)
         {
-
-
-            // Retrieve UserID of logged in user from session
+            // Retrieve UserId of logged-in user from claims
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
             {
                 // Handle the case where the UserID is not available or invalid
-                return RedirectToAction("AccessDenied");
+                return RedirectToAction("AccessDenied", "Home");
+            }
+
+            // Ensure the logged-in user matches the username provided in the URL
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null || user.Username != username)
+            {
+                // Handle the case where the username doesn't match the logged-in user
+                return RedirectToAction("AccessDenied", "Home");
+            }
+
+            // Optionally check if the roleName matches one of the user's roles
+            var userRoles = await _context.UserRoles
+                .Where(ur => ur.UserId == userId)
+                .Select(ur => ur.Role!.Name)
+                .ToListAsync();
+
+            if (!userRoles.Contains(roleName))
+            {
+                // Handle the case where the roleName is not associated with the user
+                return RedirectToAction("AccessDenied", "Home");
             }
 
             const int pageSize = 24; // Number of items per page
-            // Retrieve items associated with the logged-in user
+                                     // Retrieve items associated with the logged-in user
             var itemsQuery = _context.Items.Where(i => i.UserId == userId);
-
 
             // Calculate total items and total pages
             var totalItems = await itemsQuery.CountAsync();
@@ -57,12 +72,14 @@ namespace InventorySystem.Controllers.main
             ViewBag.SuccessMessage = $"Welcome, {username}!";
             ViewBag.Username = username;
             ViewBag.UserId = userId;
+            ViewBag.PageSize = pageSize;
 
             ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
             ViewData["title"] = "User Dashboard";
 
             return View(model);
         }
+
 
         [Route("dashboard/summary")]
         [HttpGet]
@@ -146,52 +163,13 @@ namespace InventorySystem.Controllers.main
         {
             /*addItemModel.Users = await _context.Users.ToListAsync()
             addItemModel.Items_ = await _context.Items.ToListAsync();*/
+            var item = new Item();
 
-            var model = new Item();
-
-            return PartialView(model);
+            return PartialView(item);
         }
 
 
 
-        /*private static string[] ConsoleOutputs(Item model)
-        {
-            // Define a string array with each element being a formatted output string
-            string[] arr =
-            [
-                $"Item code: {model.ItemCode}",
-                $"Item name: {model.ItemName}",
-                $"Item description: {model.ItemDescription}",
-                $"Item status: {model.Status}",
-                $"Item additional info: {model.AdditionalInfo}",
-                $"Item firmware updated: {model.FirmwareUpdated}",
-                $"Item date added: {model.ItemDateAdded}",
-                $"Item date updated: {model.ItemDateUpdated}",
-                $"Item user id: {model.UserId}"
-            ];
-
-            // Print each element of the string array
-            foreach (var output in arr)
-            {
-                Console.WriteLine(output);
-            }
-
-            // Return the string array
-            return arr;
-        }*/
-
-        // POST: Users/Create/id
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-
-
-
-
-
-
-
-
-        // GET: Admin/Update/id?
         #region --Previous Update Method--
         [HttpGet]
         [Route("dashboard/update-item")]
@@ -269,7 +247,7 @@ namespace InventorySystem.Controllers.main
                         return Json(new
                         {
                             isValid = true,
-                            html = Helper.RenderRazorViewToString(this, "ItemTable", items),
+
                             successMessage = "Update successful!"
 
                         });
@@ -286,7 +264,7 @@ namespace InventorySystem.Controllers.main
             return Json(new
             {
                 isValid = false,
-                html = Helper.RenderRazorViewToString(this, "Update", model),
+
                 failedMessage = "Update failed!"
             });
         }
@@ -355,7 +333,7 @@ namespace InventorySystem.Controllers.main
                     return Json(new
                     {
                         isValid = true,
-                        html = Helper.RenderRazorViewToString(this, "ItemTable", items),
+
                         successMessage = "Deletion successful!"
                     });
                 }
@@ -372,25 +350,5 @@ namespace InventorySystem.Controllers.main
         }
 
         #endregion
-
-        [Route("dashboard/logout")]
-        public IActionResult Logout()
-        {
-            HttpContext.SignOutAsync();
-            return RedirectToAction("Index", "Home"); // Redirect to a safe page or login page
-        }
-
-        /*
-        #pragma warning disable IDE0051 // Remove unused private members
-                private bool UserExists(int id)
-        #pragma warning restore IDE0051 // Remove unused private members
-
-                {
-                    return _context.Users.Any(e => e.UserId == id);
-                }
-
-
-            }
-        */
     }
 }

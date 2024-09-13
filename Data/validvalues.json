@@ -1,0 +1,36 @@
+{
+  "firmwarestatus": {
+    "notapplicable": {
+      "Value": "N/A",
+      "Text": "N/A"
+    },
+    "updated": {
+      "Value": "Updated",
+      "Text": "Updated"
+    },
+    "notupdated": {
+      "Value": "Not Updated",
+      "Text": "Not Updated"
+    }
+
+  },
+
+  "itemstatus": {
+    "complete": {
+      "Value": "Complete",
+      "Text": "Complete"
+    },
+    "inc(usable)": {
+      "Value": "Incomplete(Usable)",
+      "Text": "Incomplete(Usable)"
+    },
+    "inc(unusable": {
+      "Value": "Incomplete(Unusable)",
+      "Text": "Incomplete(Unusable)"
+    }
+
+  }
+
+}
+
+

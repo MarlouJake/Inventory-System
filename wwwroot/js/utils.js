@@ -11,10 +11,7 @@ function DateFormatOptions() {
     };
 }
 
-//Function for input-error class
-function RemoveClass(element) {
-    element.classList.remove('input-error');
-};
+
 
 
 //Function for changing text color depending on text
@@ -203,62 +200,36 @@ function ProcessRequest() {
 }
 
 //Returns  JSON Format text
-function jsonResult(
-    method, _action, _actionMessage1, Val1, _actionMessage2, Val2, _actionMessage3, data,
-    resMessage, api, resStatus, targetRoute, _browser, Val3) {
-
-    const ResponseMessage = resMessage;
-    const ApiUrl = api;
-    const ResponseStatus = resStatus;
-    const TagerRoute = getUrl(targetRoute);
-    const Action = _action
-    const ActionMessage1 = _actionMessage1;
-    const ActionMessage2 = _actionMessage2;
-    const ActionMessage3 = _actionMessage3;
-    const Validity1 = Val1;
-    const Validity2 = Val2;
-    const BrowserInfo = _browser;
-    const version = Val3;
-
+function jsonResult( method, _action, _actionMessage1, boolvalue1, _actionMessage2, boolvalue2, actionresponse,
+    requestmessage, api, responsestatus, _targetroute, _browserinfo) {
 
     const timestamp = new Date().toLocaleString('en-US', DateFormatOptions);
 
     return {
         method,
         actions: {
-            action: Action,
-            [ActionMessage1]: [Validity1],
-            [ActionMessage2]: [Validity2],
-            message: ActionMessage3
+            action: _action,
+            [_actionMessage1]: [boolvalue1],
+            [_actionMessage2]: [boolvalue2],
+            message: actionresponse
         },
-        data,
-        message: ResponseMessage,
-        apiurl: ApiUrl,
-        response: ResponseStatus,
-        targeroute: TagerRoute,
+        requestmessage: requestmessage,
+        apiurl: api,
+        response: responsestatus,
+        targeroute: getUrl(_targetroute),
         browserdetails: {
-            [BrowserInfo]: version
+            [browserInfo.name]: browserInfo.version
         },
         timestamp
     };
 };
 
+    
 
-//Function for Loading Modal
-async function loading(message) {
-    $('#loading-modal .modal-body').html(`
-        <div class="text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only p-5">Loading...</span>
-            </div>
-            <p class="mt-2">${message}...</p>
-        </div>
-    `);
 
-    await $('#loading-modal').modal({
-        backdrop: 'static',
-        keyboard: false
-    }).modal('show');
+//Function for input-error class
+function RemoveClass(element) {
+    element.classList.remove('input-error');
 };
 
 function UserLoginValidateField() {
@@ -272,27 +243,30 @@ function UserLoginValidateField() {
         username.addEventListener('input', function () {
             usernameError.textContent = '';
             RemoveClass(username);
-            /*if (username.value.trim() == '') {
-                usernameError.textContent = validate.UsernameEmpty;
-            } else if (username.value.length < 3) {
-                usernameError.textContent = validate.UsernameLength;
+            if (username.value.length < 3) {
+                usernameError.textContent = "Username or Email should be atleast 3 characters";
+                
+            }
+            else if (username.value.length >= 64) {
+                usernameError.textContent = "Username or Email reached maximum limit of 64 characters";
             } else {
                 usernameError.textContent = '';
                 RemoveClass(username);
-            }*/
+            }
         });
         password.addEventListener('input', function () {
             passwordError.textContent = '';
             RemoveClass(password);
-            /*
-            if (password.value.trim() == '') {
-                passwordError.textContent = validate.PasswordEmpty;
-            } else if (password.value.length < 8) {
-                passwordError.textContent = validate.PasswordLegth;
+
+            if (password.value.length < 3) {
+                passwordError.textContent = "Password should be atleast 8 characters";
+            }
+            else if (password.value.length >= 128) {
+                passwordError.textContent = "Password reached maximum limit of 128 characters";
             } else {
                 passwordError.textContent = '';
                 RemoveClass(password);
-            }*/
+            }
         });
 
     }
@@ -356,54 +330,83 @@ function DisplaySuccessAndError() {
     }
 }
 
+const newModal = `
+                    <div class="modal fade" id="display-modal" tabindex="-1" role="dialog" aria-labelledby="displaymodal" data-bs-backdrop="static" data-bs-keyboard="false">
+                            <div class="modal-dialog modal-dialog-centered">                               
+                                <div class="modal-content">         
+                                    <div class="modal-body">
+                                        <!-- Content loaded dynamically -->
+                                        <h5 class="modal-title"></h5>
+                                        <p class="details-title"></p>
+                                        <span class="modal-details h6 fs-6"></span>
+                                        <div id="btn-footer" class="text-end">
+                                            <button class="btn btn-primary mt-1" data-bs-dismiss="modal">
+                                                Okay
+                                            </button>
+                                        </div>                                    
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                `;
 
-function UserLogoutAction() {
-    const logoutbutton = document.getElementById('user-logout');
+const DynamicModal = `
+                         <div id="dynamic-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                  <div class="modal-content">
+                                        <div class="modal-body">
+ 
+                                        </div>
+                                  </div>
+                           </div>
+                        </div>
+                `;
 
-    if (logoutbutton) {
-        logoutbutton.addEventListener('click', function () {
-            sessionStorage.removeItem('datauser');
-            LogoutRequest(storedUserid, storedUsername);
+
+function ShowPassword(input, main, icon) {
+    main.on('mousedown', function () {
+        holdTimeout = setTimeout(() => {
+
+            if (main) {
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('fa-regular').addClass('fa-solid');
+                }
+            }
+        }, 50);
+        $(this).addClass('holding');
+
+        $(this).on('mouseup', function () {
+            clearTimeout(holdTimeout);
+            input.attr('type', 'password');
+            icon.removeClass('fa-solid').addClass('fa-regular');
+            $(this).removeClass('holding');
         });
-    }
-}
-
-/*
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-*/
-
-function getUsername() {
-    const usernameElement = document.getElementById('username-container');
-
-    //console.log(storedUsername);
-    var getuserdata = sessionStorage.getItem('datauser');
-    if (!getuserdata) {
-        console.log("No Username stored");
-    }
-    if (usernameElement) {
-        $(usernameElement).text(getuserdata);
-    } else {
-        console.error('Element: ' + usernameElement + 'not found');
-    }
-
-    const prompt = document.getElementById('prompt-message')
-    if (prompt) {
-        $(prompt).text(`Welcome ${getuserdata.toUpperCase()}!`).fadeIn().delay(1000).fadeOut();
-    } else {
-        console.error('Element: '+prompt+'not found');
-    }
+    });
 }
 
 
-function WelcomeMessage() {
-    sessionStorage.removeItem('storedUsername');
-    sessionStorage.getItem('storedUsername');
-    
+
+function ValidateSignUpForm() {
+    var password = document.getElementById('signup-password');
+    var confirm = document.getElementById('signup-retypepassword');
+
+    function checkPasswordMatch() {
+        if (password.value.length === 0) {
+            $('#signupPass-error').text('');
+            $('#signupPass-confirmError').text('');
+        } else if (confirm.value.length === 0) {
+            $('#signupPass-confirmError').text('Retype your password');
+        } else if (confirm.value !== password.value) {
+            $('#signupPass-error').text('Passwords do not match');
+            $('#signupPass-confirmError').text('Passwords do not match');
+        } else {
+            $('#signupPass-error').text('');
+            $('#signupPass-confirmError').text('');
+        }
+    }
+
+    password.addEventListener('input', checkPasswordMatch);
+    confirm.addEventListener('input', checkPasswordMatch);
 }
 
-//initialize Validation Function
-const validate = Validations();
-const browserInfo = getBrowserInfo();
-const process = ProcessRequest();

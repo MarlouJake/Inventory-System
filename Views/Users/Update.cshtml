@@ -1,4 +1,5 @@
-﻿@model InventorySystem.Models.Item;
+﻿@using InventorySystem.Models.DataEntities
+@model Item;
 
 @{
     ViewData["Title"] = "Edit Details";
@@ -96,16 +97,6 @@
         </select>
 
         <span asp-validation-for="Status" id="status-errror" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mt-2">
-        <label asp-for="AdditionalInfo" class="control-label"></label>
-        <textarea asp-for="AdditionalInfo" class="form-control user-input"
-                  name="iteminfo"
-                  id="iteminfo"
-                  autocomplete="off"
-                  placeholder="Additional inforamtion"></textarea>
-        <span asp-validation-for="AdditionalInfo" class="text-danger"></span>
     </div>
 
     <div class="form-group mt-2">
