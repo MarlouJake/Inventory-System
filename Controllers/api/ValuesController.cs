@@ -30,8 +30,8 @@ namespace InventorySystem.Controllers.api
             {
                 //new() { Value = "--Select Status--", Text = "--Select Status--" },
                 new() { Value = "N/A", Text = "N/A" },
-                new() { Value = "Yes", Text = "Yes" },
-                new() { Value = "No", Text = "No" }
+                new() { Value = "Updated", Text = "Updated" },
+                new() { Value = "Not Updated", Text = "Not Updated" }
             };
 
             return new JsonResult(options);

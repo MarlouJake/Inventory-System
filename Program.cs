@@ -154,8 +154,20 @@ internal class Program
             // Standard dashboard route
             _ = endpoints.MapControllerRoute(
                 name: "standard-dashboard",
-                pattern: "inventory/dashboard/{roleName}/{username}",
+                pattern: "{roleName}/inventory/{username}/dashboard",
                 defaults: new { controller = "Users", action = "UserDashboard" })
+                .RequireAuthorization("RequireUserRole");
+
+            _ = endpoints.MapControllerRoute(
+            name: "viewdetails",
+            pattern: "{roleName}/inventory/{username}/dashboard/details/{id?}",
+            defaults: new { controller = "Users", action = "ViewDetails" })
+            .RequireAuthorization("RequireUserRole");
+
+            _ = endpoints.MapControllerRoute(
+                name: "update",
+                pattern: "{roleName}/inventory/{username}/dashboard/update/{id?}",
+                defaults: new { controller = "Users", action = "Update" })
                 .RequireAuthorization("RequireUserRole");
         });
     }

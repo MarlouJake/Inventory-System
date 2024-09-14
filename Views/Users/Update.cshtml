@@ -10,61 +10,18 @@
 
 <script>
     $(document).ready(function () {
-        $.ajax({
-            url: '@Url.Action("GetStatuses")',
-            type: 'GET',
-            success: function (data) {
-                var $statusDropdown = $('#statusDropdown');
-                $.each(data, function (index, item) {
-                    var $option = $('<option></option>').val(item.value).text(item.text);
 
-                    if (item.value === "Complete") {
-                        $option.addClass('text-success'); // Apply green color
-                    }
-                    else if (item.value.startsWith("Incomplete(Usable)")) {
-                        $option.addClass('text-primary'); // Apply blue color
-                    }
-                    else if (item.value.startsWith("Incomplete(Unusable)")) {
-                        $option.addClass('text-danger'); // Apply red color
-                    }
+        getStatuses();
+        getOptions();
 
-                    $statusDropdown.append($option);
-                });
-            },
-            error: function (xhr, status, error) {
-                console.log('Error fetching statuses: ' + error);
-            }
-        });
+    });
 
-        $.ajax({
-            url: '@Url.Action("GetOptions")',
-            type: 'GET',
-            success: function (data) {
-                var $statusDropdown = $('#updateDropdown');
-                $.each(data, function (index, item) {
-                    var $option = $('<option></option>').val(item.value).text(item.text);
-
-                    if (item.value === "N/A") {
-                        $option.addClass('text-secondary'); // Apply gray color
-                    }
-                    else if (item.value.startsWith("YES")) {
-                        $option.addClass('text-success'); // Apply green color
-                    }
-                    else if (item.value.startsWith("NO")) {
-                        $option.addClass('text-danger'); // Apply red color
-                    }
-
-                    $statusDropdown.append($option);
-                });
-            },
-            error: function (xhr, status, error) {
-                console.log('Error fetching statuses: ' + error);
-            }
-        });
+    $(document).on('hidden.bs.modal', '.container #dynamic-modal', function (e) {
+         $(this).remove();
     });
 </script>
 
-<h5><strong>Edit</strong></h5>
+<h5><strong>Modify Details</strong></h5>
 <hr />
 <form asp-action="update" class="forms" asp-route-id="@Model.ItemId" onsubmit="return UpdateRe;">
     <!--div asp-validation-summary="ModelOnly" class="text-danger"></!--div-->

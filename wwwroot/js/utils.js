@@ -31,11 +31,11 @@ function NewItemAdded() {
     });
 
     Array.from(firmwareUpdateDisplay).forEach(firmwareUpdateDisplay => {
-        if (firmwareUpdateDisplay.textContent.trim() === "YES") {
+        if (firmwareUpdateDisplay.textContent.trim() === "Updated") {
             firmwareUpdateDisplay.classList.add('text-success');
         } else if (firmwareUpdateDisplay.textContent.trim() === "N/A") {
             firmwareUpdateDisplay.classList.add('text-muted');
-        } else if (firmwareUpdateDisplay.textContent.trim() === "NO") {
+        } else if (firmwareUpdateDisplay.textContent.trim() === "Not Updated") {
             firmwareUpdateDisplay.classList.add('text-danger');
         }
     });
@@ -410,3 +410,7 @@ function ValidateSignUpForm() {
     confirm.addEventListener('input', checkPasswordMatch);
 }
 
+//initialize Validation Function
+const validate = Validations();
+const browserInfo = getBrowserInfo();
+const process = ProcessRequest();

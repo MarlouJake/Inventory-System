@@ -240,7 +240,6 @@ UserRequest = (form) => {
         ShowError(details);  
     }
     
-    console.log('default');
     return false;
 };
 
@@ -248,7 +247,6 @@ UserRequest = (form) => {
 
 
 AuthRequest = (data, url) => {
-    console.log(JSON.stringify(data));
     const method = validate.Post;
     const login = validate.Login;
     const loginsuccess = validate.LoginSuccess;

@@ -3,11 +3,14 @@
         $(this).modal('hide');
     });
 
-    $('.container').append(DynamicModal);
-    GetData(url);
+    setTimeout(() => {
+        $('.container').append(DynamicModal);
+        GetData(url);
+    },100);
 };
 
 function GetData(url) {
+    console.error(url)
     $.ajax({
         type: 'GET',
         url: url,
@@ -16,6 +19,7 @@ function GetData(url) {
             $('#dynamic-modal').modal('show');
         },
         error: function (jqXHR, status) {
+            $('#dynamic-modal').modal('show');
             console.error("Error details: ", jqXHR.responseText);
             alert("An error occurred while loading the form: " + jqXHR.status + " " + status);
         }

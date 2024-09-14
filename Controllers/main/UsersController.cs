@@ -9,12 +9,12 @@ using System.Security.Claims;
 namespace InventorySystem.Controllers.main
 {
     [Authorize("RequireUserRole")]
-    [Route("inventory/")]
+    [Route("{roleName}/inventory/{username}/")]
     public class UsersController(ApplicationDbContext context) : Controller
     {
         private readonly ApplicationDbContext _context = context;
 
-        [Route("dashboard/{roleName}/{username}")]
+        [Route("dashboard")]
         [HttpGet]
         public async Task<IActionResult> UserDashboard(string roleName, string username, int page = 1)
         {
@@ -76,7 +76,6 @@ namespace InventorySystem.Controllers.main
 
             ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
             ViewData["title"] = "User Dashboard";
-
             return View(model);
         }
 
@@ -131,11 +130,19 @@ namespace InventorySystem.Controllers.main
 
 
         // GET: Admin/Details/id?
-        [Route("dashboard/details")]
+        [Route("dashboard/details/{id?}")]
         [HttpGet]
         #region --Previous ViewDetails Method--
-        public async Task<IActionResult> ViewDetails(int? id)
+        public async Task<IActionResult> ViewDetails(int? id, string username, string roleName)
         {
+
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+            {
+                return RedirectToAction("AccessDenied");
+            }
+
             if (id == null)
             {
                 return NotFound();
@@ -147,6 +154,9 @@ namespace InventorySystem.Controllers.main
             {
                 return NotFound();
             }
+            ViewBag.Username = username;
+            ViewBag.RoleName = roleName;
+            Console.WriteLine(username);
             //user.Password = user.Password != null ? HashHelper.HashPassword(user.Password) : string.Empty;
             return PartialView(item);
         }
@@ -156,10 +166,10 @@ namespace InventorySystem.Controllers.main
 
 
         // GET: Admin/Create
-        [Route("add-item")]
+        [Route("dashboard/add-item")]
         [HttpGet]
 
-        public IActionResult AddItem()
+        public IActionResult AddItem(string username)
         {
             /*addItemModel.Users = await _context.Users.ToListAsync()
             addItemModel.Items_ = await _context.Items.ToListAsync();*/
@@ -172,8 +182,8 @@ namespace InventorySystem.Controllers.main
 
         #region --Previous Update Method--
         [HttpGet]
-        [Route("dashboard/update-item")]
-        public async Task<IActionResult> Update(int? id)
+        [Route("dashboard/update/{id?}")]
+        public async Task<IActionResult> Update(int? id, string username)
         {
 
             if (id == null)

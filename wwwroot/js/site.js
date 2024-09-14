@@ -80,11 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
     //Function for changing color of text in Userdashboard
     NewItemAdded();
 
-    //initialize Validation Function
-    const validate = Validations();
-    const browserInfo = getBrowserInfo();
-    const process = ProcessRequest();
-
     //Client-side input field validation
     UserLoginValidateField();
     AdminLoginValidateField();

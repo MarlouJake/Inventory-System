@@ -1,6 +1,15 @@
 ﻿@using InventorySystem.Models.DataEntities
 @model Item
 
+@{
+    var currentusername = ViewBag.Username as string;
+    var role = ViewBag.RoleName as string;
+}
+<script>
+    $(document).on('hidden.bs.modal', '.container #dynamic-modal', function (e) {
+        $(this).remove();
+    });
+</script>
 
 <div class="card">
     <div class="card-body">
@@ -9,7 +18,7 @@
         <p class="card-text mb-0"><strong>Status:</strong> @Model.Status</p>
     </div>
     <div class="card-footer">
-        <a onclick="ShowModal('@Url.Action("ViewDetails", "Users", new {itemid = Model.ItemId })')"
+        <a onclick="ModalShow('dashboard/details/@Model.ItemId')"
            class="btn btn-primary btn-crud btn-sm form-control">
             View
         </a>

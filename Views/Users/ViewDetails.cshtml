@@ -5,6 +5,11 @@
     ViewData["Title"] = "User Details";
     Layout = null;
 }
+<script>
+    $(document).on('hidden.bs.modal', '.container #dynamic-modal', function (e) {
+        $(this).remove();
+    });
+</script>
 
 <div class="">
     <h5><strong>User Details</strong></h5>
@@ -54,6 +59,6 @@
 
 </div>
 <div class="form-group m-0">
-    <a onclick="ShowModal('@Url.Action("Update", "Users",  new{id = Model.ItemId}, Context.Request.Scheme)','Update Details')" class="btn btn-success form-control">Update Details</a>
+    <a onclick="ModalShow('dashboard/update/@Model.ItemId')" class="btn btn-success form-control">Update Details</a>
     <input type="button" value="Cancel" class="btn btn-outline-secondary form-control mt-3 close-modalBtn" data-bs-dismiss="modal" />
 </div>
