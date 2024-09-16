@@ -2,7 +2,7 @@
     $('.modal').each(function () {
         $(this).modal('hide');
     });
-
+    $('#dynamic-modal').remove();
     setTimeout(() => {
         $('.container').append(DynamicModal);
         GetData(url);
@@ -10,7 +10,6 @@
 };
 
 function GetData(url) {
-    console.error(url)
     $.ajax({
         type: 'GET',
         url: url,

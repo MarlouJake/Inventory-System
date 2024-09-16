@@ -12,6 +12,7 @@ using System.Security.Claims;
 namespace InventorySystem.Controllers.api
 {
     [Route("api/u/")]
+    [ApiController]
     public class AuthApi(ILogger<AuthApi> logger, ApplicationDbContext context) : ControllerBase
     {
 #pragma warning disable IDE0052 // Remove unread private members

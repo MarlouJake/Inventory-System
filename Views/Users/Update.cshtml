@@ -2,7 +2,7 @@
 @model Item;
 
 @{
-    ViewData["Title"] = "Edit Details";
+    ViewData["Title"] = "Modify";
     //bool isCreationContext = ViewData["IsCreationContext"] is bool value && value;
     //var isCreationContext = ViewData["IsCreationContext"] != null && (bool)ViewData["IsCreationContext"];
     Layout = null;
@@ -10,14 +10,8 @@
 
 <script>
     $(document).ready(function () {
-
         getStatuses();
         getOptions();
-
-    });
-
-    $(document).on('hidden.bs.modal', '.container #dynamic-modal', function (e) {
-         $(this).remove();
     });
 </script>
 

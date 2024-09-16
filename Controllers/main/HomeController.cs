@@ -34,6 +34,10 @@ namespace InventorySystem.Controllers.main
         {
             var url = Url.Action("SignUp", "Home");
             Messages.PrintUrl(url);
+            var demouser = "demo1 || demo1@user.com";
+            var demouserpass = "@demo2024";
+            var demoUserPass = HashHelper.HashPassword(demouserpass);
+            Console.WriteLine("Temp Demo Username: {0}\nTemp Demo Password: {1}", demouser, demoUserPass);
             return PartialView();
         }
 
@@ -55,7 +59,7 @@ namespace InventorySystem.Controllers.main
             return PartialView();
         }
 
-        [Route("/home/access-denied")]
+        [Route("/access-denied")]
         public IActionResult AccessDenied()
         {
             //return new HttpStatusCodeResult(HttpStatusCode.Forbidden); // 403 Forbidden

@@ -26,7 +26,7 @@ namespace InventorySystem.Models.DataEntities
 
         [DisplayName(DisplayNames.Description)]
         [DataType(DataType.MultilineText)]
-        [CustomRange(0, 5000)]
+        [MaxLength(5000, ErrorMessage = "Description must not exceed 5000 characters")]
         public string? ItemDescription { get; set; }
 
         [DisplayName(DisplayNames.ItemStatus)]
@@ -36,12 +36,12 @@ namespace InventorySystem.Models.DataEntities
         public string? Status { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:MMMM dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
-        [DisplayName(DisplayNames.DateAdded)]
+        [DisplayName("Date Added")]
         [DataType(DataType.DateTime)]
         public DateTime ItemDateAdded { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:MMMM dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
-        [DisplayName(DisplayNames.DateModified)]
+        [DisplayName("Last Modified")]
         [DataType(DataType.DateTime)]
         public DateTime ItemDateUpdated { get; set; }
 

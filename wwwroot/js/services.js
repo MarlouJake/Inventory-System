@@ -1,130 +1,238 @@
-﻿AddItem = (form) => {
-    var media = process.JsonApp;
-    const url = '/api/u/services/add-item/';
+﻿AddRequest = (form, id)  => {
+    var type = 'POST';
+    var add = validate.Add;
+    var addsuccess = validate.AddingSuccess;
+    var addfailed = validate.AddingFailed;
+    const requestroute = form.action;
     //const user = sessionStorage.getItem('storedUsername');
     const formData = new FormData(form);
     const itemdata = {
         //username: user,
+        itemid: id,
         itemcode: formData.get('itemCode'),
         itemname: formData.get('itemName'),
         itemdescription: formData.get('itemDescription'),
         status: formData.get('statusDropdown'),
-        additionalinfo: formData.get('item-info'),
         firmwareupdated: formData.get('updateDropdown'),
         datecreated: new Date().toLocaleString('en-US', DateFormatOptions)
     };
 
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': media,
-            'Accept': media
-        },
-        body: JSON.stringify(itemdata)
-    })
-        .then(response => response.json())
-        .then(data => {
+    try {
+        $.ajax({
+            type: type,
+            url: requestroute,
+            data: JSON.stringify(itemdata),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (response, textStatus, jqXHR) {
+                var status = `Status Code: ${jqXHR.status}`;
+                var details = `Server responded with status code: ${jqXHR.status} ${textStatus}`;
+                if (response.IsValid) {
 
-            if (data.isValid) {
-                //$("#view-all").html(data.html); 
-                //document.getElementById("view-all").innerHTML = data.html;
-                // Add new item to the view
+                    var message = response.Message || validate.MatchFound;
 
-                const newItemHtml = `
-                    <div class="card">
-                        <div class="card-body">
-                            <h6 class="card-title mb-1 fs-6"><strong>${itemdata.itemname}</strong></h6>
-                            <p class="card-text mb-1"><strong>Code:</strong> ${itemdata.itemcode}</p>
-                            <p class="card-text mb-0"><strong>Status:</strong> ${itemdata.status}</p>
-                        </div>
-                        <div class="card-footer">
-                            <a onclick="ShowModal('@Url.Action("ViewDetails", "Users", new { id = item.id })')"
-                               class="btn btn-primary btn-crud btn-sm form-control">
-                                View
-                            </a>
-                        </div>
-                    </div>
-                `;
+                    let result = jsonResult(
+                        type,
+                        add,
+                        addsuccess,
+                        true,
+                        addfailed,
+                        false,
+                        response.Message,
+                        status,
+                        requestroute,
+                        details,
+                        response.RedirectUrl
+                    );
 
+                    // Log the result for debugging
+                    console.log("API Data: ", JSON.stringify(result, null, 2));
 
+                    if (response.RedirectUrl) {
+                        AddItem(itemdata, response.RedirectUrl);
+                        console.log('Redirect URL:' + response.RedirectUrl);
+                    }
+                    else {
+                        var details = "Route sent by the server missing.";
+                        ShowError(details);
+                    }
+                }
+                else {
+                    let result = jsonResult(
+                        type,
+                        add,
+                        addsuccess,
+                        false,
+                        addfailed,
+                        true,
+                        response.Message,
+                        status,
+                        requestroute,
+                        details,
+                        response.RedirectUrl
+                    );
 
-                $("#view-all").append(newItemHtml); // Append the new item to the list
-                loadItems(currentPage);
-                $("#crud-modal .modal-body").html('');
-                $("#crud-modal").modal('hide');
-                NewItemAdded();
-                $("#message-success").text(validate.AddingSuccess).fadeIn().delay(500).fadeOut();
+                    // Log the result for debugging
+                    console.log("API Data: ", JSON.stringify(result, null, 2));
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                // Parse the response as JSON
+                var response = jqXHR.responseJSON;
 
-                const result = jsonResult(
-                    validate.Post,
-                    validate.Add,
-                    validate.AddingSuccess,
-                    true,
-                    validate.AddingFailed,
+                // Extract the message from the response, or use a default message
+                var message = response.Message;
+
+                // Extract the status message
+                var statusMessage = jqXHR.statusText || 'Unknown Error';
+
+                // Construct the full error message
+                var responsemessage = `Server responded with status code: ${jqXHR.status} ${textStatus}.`;
+                var details = responsemessage;
+
+                // Build the result object (assuming jsonResult is a function that handles this)
+                let result = jsonResult(
+                    type,
+                    add,
+                    addsuccess,
                     false,
-                    data.successsmessage,
-                    itemdata,
-                    validate.PostSuccess,
-                    form.action,
-                    200, // Assuming 200 is the response status for success
-                    `/user-dashboard/${itemdata.userid}`,
-                    browserInfo.name,
-                    browserInfo.version
+                    addfailed,
+                    true,
+                    message,
+                    statusMessage,
+                    getUrl(requestroute),
+                    details,
+                    `/add-item/${itemdata.id}`
                 );
 
-                console.log('API Response', JSON.stringify(result, null, 2));
-            } else {
+                // Log the result for debugging
+                console.log("Request Error: ", JSON.stringify(result, null, 2));
 
-                $("#message-error").text(data.errormessage).fadeIn().delay(500).fadeOut();
-                $("#crud-modal .modal-body").html('');
-                $("#crud-modal").modal('hide');
-                const result = jsonResult(
-                    validate.Post,
-                    validate.Add,
-                    validate.AddingSuccess,
-                    false,
-                    validate.AddingFailed,
-                    true,
-                    data.errormessage,
-                    itemdata,
-                    validate.PostFailed,
-                    form.action,
-                    400, // Assuming 400 is the response status for failure
-                    `/user-dashboard/${itemdata.userid}`,
-                    browserInfo.name,
-                    browserInfo.version
-                );
-
-                console.log('API Response Error', JSON.stringify(result, null, 2));
+                // Display the message using the modal or error message div
+                setTimeout(() => {
+                    $("#error-message").text(message).fadeIn().delay(100).fadeOut();
+                }, 500);
             }
-        })
-        .catch(error => {
-            $("#message-error").text('An error occurred. Please try again.').fadeIn().delay(500).fadeOut();
-            $("#crud-modal .modal-body").html('');
-            $("#crud-modal").modal('hide');
-            const result = jsonResult(
-                validate.Post,
-                validate.Add,
-                validate.AddingSuccess,
-                false,
-                validate.AddingFailed,
-                true,
-                error.message,
-                itemdata,
-                validate.PostError,
-                form.action,
-                error,
-                `/user-dashboard/${itemdata.userid}`,
-                browserInfo.name,
-                browserInfo.version
-            );
 
-            console.log('Request API Error', JSON.stringify(result, null, 2));
+
         });
+    }
+    catch {
+
+    }
 
     return false; // Prevent default form submission
-}
+};
 
+AddItem = (data, url) => {
+    try
+    {
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (response, textStatus, jqXHR) {
+                var status = `Status Code: ${jqXHR.status}`;
+                var details = `Server responded with status code: ${jqXHR.status} ${textStatus}`;
+                if (response.IsValid) {
+                    const newItemHtml = `
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title mb-1 fs-6"><strong>${data.itemname}</strong></h6>
+                                <p class="card-text mb-1"><strong>Code:</strong>${data.itemcode}</p>
+                                <p class="card-text mb-0"><strong>Status:</strong>${data.itemstatus}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a onclick="ModalShow('dashboard/details/${data.id}')"
+                                   class="btn btn-primary btn-crud btn-sm form-control">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    `;
+
+
+
+                    $("#view-all .card-container").append(newItemHtml); // Append the new item to the list
+                    //loadItems(currentPage);
+                    $("#dynamic-modal").modal('hide');
+                    NewItemAdded();
+                    $("#message-success").text(validate.AddingSuccess).fadeIn().delay(500).fadeOut();
+                }
+                else{
+                    console.error('An error occured while adding item:'+ response.Message);
+                    var details = "Failed to add item, try again";
+                    ShowError(details);
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                // Parse the response as JSON
+                var response = jqXHR.responseJSON;
+
+                // Extract the message from the response, or use a default message
+                var message = response.Message;
+
+                // Extract the status message
+                var statusMessage = jqXHR.statusText || 'Unknown Error';
+
+                // Construct the full error message
+                var responsemessage = `Server responded with status code: ${jqXHR.status} ${textStatus}.`;
+                var details = responsemessage;
+
+                // Build the result object (assuming jsonResult is a function that handles this)
+                let result = jsonResult(
+                    method,
+                    login,
+                    loginsuccess,
+                    false,
+                    loginfailed,
+                    true,
+                    message,
+                    statusMessage,
+                    getUrl(url),
+                    details,
+                    `/dashboard/${data.username}`
+                );
+
+                // Log the result for debugging
+                console.log("Request Error: ", JSON.stringify(result, null, 2));
+
+                // Display the message using the modal or error message div
+                setTimeout(() => {
+                    $("#error-message").text(message).fadeIn().delay(100).fadeOut();
+                }, 500);
+            }
+
+
+        });
+    }
+    catch (ex) {
+        var message = response.Message || 'An error occured while trying to send request.';
+        var responsemessage = `Server responded with status code: ${jqXHR.status} ${textStatus}.`;
+        var details = `${validate.LoginFailed}: ${ex}<br>${responsemessage}<br>${message}<br>${ex}`;
+
+        let result = jsonResult(
+            method,
+            login,
+            loginsuccess,
+            false,
+            loginfailed,
+            true,
+            message,
+            textStatus,
+            getUrl(url),
+            responsemessage,
+            `/dashboard/${data.username}`
+        );
+
+        console.log("Execption Data", JSON.stringify(result, null, 2));
+        ShowError(details);
+    }
+
+    return false;
+};
 
 RequestUpdate = (form) => {
 

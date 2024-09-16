@@ -9,56 +9,105 @@
     $(document).on('hidden.bs.modal', '.container #dynamic-modal', function (e) {
         $(this).remove();
     });
+
+    $(document).ready(function () {
+        var text = [
+            "Updated", //0
+            "Not Updated", //1
+            "N/A", //2
+            "Complete", //3
+            "Incomplete(Usable)", //4
+            "Incomplete(Unusable)"  //5         
+        ];
+        ChangeTextColor('#firmware-status', text[0], text[1], text[2], null);
+        ChangeTextColor('#item-status', text[3], text[5], null, text[4]);
+    });
+
 </script>
 
 <div class="">
-    <h5><strong>User Details</strong></h5>
-    <hr />
-    <div class="row">
+    <h5><strong>Item Details</strong></h5>
+    
+    <div class="row mt-0">
         <dl>
+         
+            <div class="d-flex" style="font-size: 0.9rem;">
+                <dt class="d-flex col-sm-2 w-50">
+                    @Html.DisplayNameFor(model => model.ItemCode)
+                </dt>
+                
+                <dt class="d-flex col-sm-2 w-50 border-start ps-2">
+                    @Html.DisplayNameFor(model => model.ItemName)
+                </dt>
+                
+           </div>
 
-            <dt class="col-sm-2 w-auto">
-                @Html.DisplayNameFor(model => model.ItemCode)
-            </dt>
-            <dd class="col-sm-10 text-break">
-                @Html.DisplayFor(model => model.ItemCode)
-            </dd>
-            <dt class="col-sm-2 w-auto">
-                @Html.DisplayNameFor(model => model.ItemName)
-            </dt>
-            <dd class="col-sm-10 text-break">
-                @Html.DisplayFor(model => model.ItemName)
-            </dd>
-            <dt class="col-sm-2 w-auto">
-                @Html.DisplayNameFor(model => model.ItemDescription)
-            </dt>
-            <dd class="col-sm-10 text-break">
-                @Html.DisplayFor(model => model.ItemDescription)
-            </dd>
-            <dt class="col-sm-2 w-auto">
-                @Html.DisplayNameFor(model => model.Status)
-            </dt>
-            <dd class="col-sm-10 text-break">
-                @Html.DisplayFor(model => model.Status)
-            </dd>
-            <dt class="col-sm-2 w-auto">
-                @Html.DisplayNameFor(model => model.FirmwareUpdated)
-            </dt>
-            <dd class="col-sm-10 text-break">
-                @Html.DisplayFor(model => model.FirmwareUpdated)
-            </dd>
-            <dt class="col-sm-2 w-auto">
-                @Html.DisplayNameFor(model => model.ItemDateUpdated)
-            </dt>
-            <dd class="col-sm-10 text-break">
-                @Html.DisplayFor(model => model.ItemDateUpdated)
-            </dd>
+            <div class="d-flex" style="font-size: 0.9rem;">
+                <dd class="d-flex col-sm-10 text-break w-50">
+                    @Html.DisplayFor(model => model.ItemCode)
+                </dd>
+                <dd class="d-flex col-sm-10 text-break w-50 border-start ps-2">
+                    @Html.DisplayFor(model => model.ItemName)
+                </dd>
+           </div>
+
+      
+
+            <div style="font-size: 0.9rem;">
+                <dt class="col-sm-2 w-auto">
+                    @Html.DisplayNameFor(model => model.ItemDescription)
+                </dt>
+                <dd class="col-sm-10 text-break border w-auto p-2" style="font-size: 0.8rem;">
+                    @Html.DisplayFor(model => model.ItemDescription)
+                </dd>
+           </div>
+         
+            <div class="d-flex" style="font-size: 0.9rem;">
+                <dt class="col-sm-2 w-50 mb-0">
+                    @Html.DisplayNameFor(model => model.Status)
+                </dt>
+                <dt class="col-sm-2 w-50 border-start ps-2">
+                    @Html.DisplayNameFor(model => model.FirmwareUpdated)
+                </dt>
+            </div>
+
+            <div class="d-flex" style="font-size: 0.8rem;">
+                <dd id="item-status" class="col-sm-10 text-break w-50">
+                    @Html.DisplayFor(model => model.Status)
+                </dd>
+
+                <dd id="firmware-status" class="col-sm-10 text-break w-50 border-start ps-2">
+                    @Html.DisplayFor(model => model.FirmwareUpdated)
+                </dd>
+            </div>
+
+            <div class="d-flex " style="font-size: 0.9rem;">
+                <dt class="col-sm-2 me-0 pe-0 w-50">
+                    @Html.DisplayNameFor(model => model.ItemDateAdded)
+                </dt>
+                <dt class="col-sm-2 border-start ps-2 w-50">
+                    @Html.DisplayNameFor(model => model.ItemDateUpdated)
+                </dt>
+            </div>
+
+            <div class="d-flex " style="font-size: 0.8rem;">
+
+                <dd class="col-sm-10 text-break w-50">
+                    @Html.DisplayFor(model => model.ItemDateAdded)
+                </dd>
+
+                <dd class="col-sm-10 text-break border-start ps-2 w-50">
+                    @Html.DisplayFor(model => model.ItemDateUpdated)
+                </dd>
+            </div>
+            
+            
         </dl>
 
     </div>
 
 </div>
-<div class="form-group m-0">
-    <a onclick="ModalShow('dashboard/update/@Model.ItemId')" class="btn btn-success form-control">Update Details</a>
-    <input type="button" value="Cancel" class="btn btn-outline-secondary form-control mt-3 close-modalBtn" data-bs-dismiss="modal" />
+<div class="form-group m-0 d-flex">
+    <a onclick="ModalShow('dashboard/update/@Model.ItemId')" class="btn btn-success ms-auto">Modify</a>
+    <input type="button" value="Cancel" class="ms-2 btn btn-outline-secondary form-controlclose-modalBtn" data-bs-dismiss="modal" />
 </div>

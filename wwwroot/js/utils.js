@@ -224,9 +224,6 @@ function jsonResult( method, _action, _actionMessage1, boolvalue1, _actionMessag
     };
 };
 
-    
-
-
 //Function for input-error class
 function RemoveClass(element) {
     element.classList.remove('input-error');
@@ -330,7 +327,7 @@ function DisplaySuccessAndError() {
     }
 }
 
-const newModal = `
+let newModal = `
                     <div class="modal fade" id="display-modal" tabindex="-1" role="dialog" aria-labelledby="displaymodal" data-bs-backdrop="static" data-bs-keyboard="false">
                             <div class="modal-dialog modal-dialog-centered">                               
                                 <div class="modal-content">         
@@ -350,7 +347,7 @@ const newModal = `
                     </div>
                 `;
 
-const DynamicModal = `
+let DynamicModal = `
                          <div id="dynamic-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                                   <div class="modal-content">
@@ -385,8 +382,6 @@ function ShowPassword(input, main, icon) {
     });
 }
 
-
-
 function ValidateSignUpForm() {
     var password = document.getElementById('signup-password');
     var confirm = document.getElementById('signup-retypepassword');
@@ -408,6 +403,32 @@ function ValidateSignUpForm() {
 
     password.addEventListener('input', checkPasswordMatch);
     confirm.addEventListener('input', checkPasswordMatch);
+}
+
+function ChangeTextColor(element, text1, text2, text3, optionaltext) {
+    var container = $(element);
+
+    if (container.length) {
+        var textcontent = container.text().trim(); // Get the text and trim any whitespace
+
+        switch (textcontent) {
+            case text1:
+                container.css('color', 'green'); // Set text color to green
+                break;
+            case text2:
+                container.css('color', 'red'); // Set text color to red
+                break;
+            case text3:
+                container.css('color', 'gray'); // Set text color to gray
+                break;
+            case optionaltext:
+                container.css('color', 'blue'); // Set text color to blue
+                break;
+            default:
+                container.css('color', 'black'); // Default text color
+                break;
+        }
+    }
 }
 
 //initialize Validation Function

@@ -1,25 +1,22 @@
 ﻿@using InventorySystem.Models.DataEntities
 @model Item
 @{
-    ViewData["Title"] = "Add new item";
+    ViewData["Title"] = "Add Item";
     Layout = null;
 }
 
 <script>
-
+    var itemid = '@Html.Raw(Model.ItemId)';
     $(document).ready(function () {
-
         getStatuses();
         getOptions();
-
     });
-
 </script>
 
 
 <h5 class="text-break"><strong>Add new item</strong></h5>
 <hr />
-<form asp-controller="ServicesApi" asp-action="AddItem" id="add-item" method="post" class="forms" asp-route-id="@Model.ItemId">
+<form asp-controller="ValidateApi" asp-action="AddItem" id="add-item" method="post" class="forms" onsubmit="return AddRequest(this, itemid);">
 
     <div class="form-group">
         <label asp-for="ItemCode" for="itemCode" class="control-label"></label>

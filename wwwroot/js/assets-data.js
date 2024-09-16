@@ -54,6 +54,22 @@ getOptions = function () {
     });
 };
 
+loadContent = function (url) {
+    $('#view-all').html(spinner + 'Loading...');
 
+    $.ajax({
+        url: url,
+        type: 'GET',
+        success: function (response) {
+            // Replace the content of #view-all based on the view url
+            $('#view-all').html(response);
+            $('#sidebar .nav-link').removeClass('disabled').find('.spinner').hide();
+        },
+        error: function () {
+            $('#view-all').html('<div class="alert alert-danger">Error loading content. Please try again.</div>');
+            $('#sidebar .nav-link').removeClass('disabled').find('.spinner').hide();
+        }
+    });
+};
 
 

@@ -84,16 +84,9 @@ body {
 
 /* Main content area */
 #main-content {
-    margin-left: 220px;
+    margin-left: 110px;
     padding: 15px;
     overflow: auto;
-}
-
-#view-all {
-    border-left: 0;
-    border-right: 0;
-    border-bottom: 0;
-    border-top: 1px solid gray;
 }
 
 #top-bar {
@@ -112,7 +105,32 @@ body {
     height: 3rem;
 }
 
+#user-logout {
+    cursor: pointer;
+    
+}
 
+.tabs .nav-link {
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.tabs .nav-link:hover {
+    background-color: white !important;
+    
+    color: black !important;
+}
+
+.spinner {
+    margin-left: 0.5rem; /* Space between text and spinner */
+    font-size: 1rem; /* Adjust size if needed */
+    color: white; /* Customize color if needed */
+}
+
+.nav-link.disabled {
+    pointer-events: none; /* Disable clicking */
+    opacity: 0.6; /* Visual indication that link is disabled */
+}
 
 #username-container {
     overflow: clip;
@@ -205,6 +223,12 @@ body {
         margin-left: 19%;
         margin-right: 0;
     }
+
+    #main-content {
+        margin-left: 140px;
+        padding: 15px;
+        overflow: auto;
+    }
 }
 
 @media (max-width: 1369px) {
@@ -224,7 +248,15 @@ body {
         grid-template-columns: repeat(4, 1fr); /* Adjust to 4 items per row on medium screens */
     }
 
+    #sidebar {
+        display: none;
+        margin: 0;
+        padding: 0;
+    }
 
+    #main-content{
+        margin: 0;
+    }
     .pagination {
         font-size: 1.3rem;
         margin-right: 0;
@@ -269,11 +301,7 @@ body {
         margin-left: 0rem;
     }
 
-    #sidebar {
-        display: none;
-        margin: 0;
-        padding: 0;
-    }
+  
 
     .card {
         max-width: 100%;

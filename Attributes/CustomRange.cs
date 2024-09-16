@@ -1,5 +1,6 @@
 ﻿using InventorySystem.Utilities.Api;
 using System.ComponentModel.DataAnnotations;
+
 namespace InventorySystem.Attributes
 {
     /// <summary>
@@ -45,13 +46,13 @@ namespace InventorySystem.Attributes
             var validator = new Validation();
             if (value is int number)
             {
-                var result = validator.IsValidNUmberRange(number, MinValue, MaxValue);
-                if (result)
+                var result = validator.IsValidNumberRange(number, MinValue, MaxValue);
+                if (!result)
                     return new ValidationResult($"{validationContext.DisplayName} must be between {MinValue} and {MaxValue}");
 
                 return ValidationResult.Success;
             }
-            return new ValidationResult("Invalid Input");
+            return new ValidationResult("Invalid input, expected a numeric value.");
         }
     }
 }

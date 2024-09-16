@@ -91,6 +91,17 @@ namespace InventorySystem.Controllers.main
         }
 
 
+        [Route("dashboard/requests")]
+        [HttpGet]
+        public IActionResult Requests(string username)
+        {
+            ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
+            ViewData["title"] = "Requests";
+            ViewBag.Username = username;
+            return PartialView();
+        }
+
+
         [Route("dashboard/item-view")]
         [HttpGet]
         public async Task<IActionResult> ItemView(string username, int page = 1)
@@ -120,7 +131,7 @@ namespace InventorySystem.Controllers.main
                 TotalPages = totalPages
             };
             ViewBag.Username = username;
-            ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
+
             ViewData["title"] = "Item View";
             return PartialView(model);
         }
@@ -166,7 +177,7 @@ namespace InventorySystem.Controllers.main
 
 
         // GET: Admin/Create
-        [Route("dashboard/add-item")]
+        [Route("dashboard/add-item/")]
         [HttpGet]
 
         public IActionResult AddItem(string username)
@@ -174,7 +185,8 @@ namespace InventorySystem.Controllers.main
             /*addItemModel.Users = await _context.Users.ToListAsync()
             addItemModel.Items_ = await _context.Items.ToListAsync();*/
             var item = new Item();
-
+            var route = Url.Action("AddItem", "Users");
+            Console.WriteLine(route);
             return PartialView(item);
         }
 

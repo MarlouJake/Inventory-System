@@ -122,9 +122,10 @@ namespace InventorySystem.Utilities.Api
         /// <param name="minvalue">The minimum allowed value.</param>
         /// <param name="maxvalue">The maximum allowed value.</param>
         /// <returns>True if the number is within the range; otherwise, false.</returns>
-        public bool IsValidNUmberRange(int value, int minvalue, int maxvalue)
+        public bool IsValidNumberRange(int value, int minValue, int maxValue)
         {
-            return value >= minvalue && value <= maxvalue;
+            return value >= minValue && value <= maxValue;
         }
+
     }
 }

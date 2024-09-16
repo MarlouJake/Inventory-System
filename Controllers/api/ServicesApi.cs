@@ -4,6 +4,7 @@ using InventorySystem.Utilities;
 using InventorySystem.Utilities.Api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Security.Claims;
 
@@ -16,75 +17,83 @@ namespace InventorySystem.Controllers.api
         private readonly ApplicationDbContext _context = context;
 
         [HttpPost("add-item")]
-        public async Task<IActionResult> AddItem([FromBody][Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,ItemDateAdded,ItemDateUpdated,FirmwareUpdated,UserId")] Item model)
+        public async Task<IActionResult> AppendItem([FromBody][Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,ItemDateAdded,ItemDateUpdated,FirmwareUpdated,UserId")] Item model)
         {
-            var errors = ModelState.Values.SelectMany(v => v.Errors)
-                                              .Select(e => e.ErrorMessage)
-                                              .ToList();
-            var url = Url.Action("AddItem", "ServicesApi");
-            Messages.PrintUrl(url);
-            Console.WriteLine($"Received data: {JsonConvert.SerializeObject(model)}");
-
-            if (model == null)
+            try
             {
-                var message = $"{model} is {null}";
-                var response = ApiResponseUtils.CustomResponse(false, message, model);
-                return StatusCode(StatusCodes.Status404NotFound, response);
-            }
+                var url = Url.Action("AppendItem", "ServicesApi");
+                Messages.PrintUrl(url);
+                Console.WriteLine($"Received data: {JsonConvert.SerializeObject(model)}");
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { IsValid = false, errors });
-            }
+                if (model == null)
+                {
+                    var message = $"{model} is {null}";
+                    var response = ApiResponseUtils.CustomResponse(false, message, model);
+                    return StatusCode(StatusCodes.Status404NotFound, response);
+                }
 
-            if (ModelState.IsValid)
-            {
                 var existingCode = await _context.Items.AnyAsync(i => i.ItemCode == model.ItemCode);
 
                 if (existingCode)
                 {
-                    return Ok(new
-                    {
-                        IsValid = false,
-                        errormessage = Messages.ItemCodeExists
-                    });
+                    var message = $"{model} is {null}";
+                    var response = ApiResponseUtils.CustomResponse(false, message, model);
+                    return StatusCode(StatusCodes.Status409Conflict, response);
                 }
 
                 var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-                Console.WriteLine($"User ID Claim: {userIdClaim}");
 
                 if (userIdClaim != null && int.TryParse(userIdClaim, out var userId))
                 {
                     model.UserId = userId;
 
-                    try
-                    {
-                        _context.Items.Add(model);
-                        await _context.SaveChangesAsync();
-                        var items = await _context.Items
-                            .Where(i => i.UserId == userId)
-                            .ToListAsync();
+                    _context.Items.Add(model);
+                    await _context.SaveChangesAsync();
+                    var items = await _context.Items
+                        .Where(i => i.UserId == userId)
+                        .ToListAsync();
 
-                        return StatusCode(201, new
-                        {
-                            IsValid = true,
-                            message = "Item added successfully",
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        return StatusCode(500, new { IsValid = false, message = ex.Message });
-                    }
+                    var message = "Item added successfully";
+                    var response = ApiResponseUtils.CustomResponse(false, message, model);
+                    return StatusCode(StatusCodes.Status200OK, response);
                 }
                 else
                 {
-                    return StatusCode(404, new { IsValid = false, message = "User ID not found" });
+                    var message = "User ID not doesn't exist";
+                    var response = ApiResponseUtils.CustomResponse(false, message, model);
+                    return StatusCode(StatusCodes.Status404NotFound, response);
 
                 }
-            }
 
-            return BadRequest(new { IsValid = false, errors });
+            }
+            catch (MySqlException sqlEx)
+            {
+                var errorMessage = "An error occurred while connecting to the MySQL database.";
+
+                #region --Console Logger--
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Error.WriteLine($"\nMySQL Exception Caught: {sqlEx}\n");
+                Console.ResetColor();
+                #endregion
+
+                var response = ApiResponseUtils.CustomResponse(false, errorMessage, null);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "An unknown error occurred.";
+
+                #region --Console Logger--
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Error.WriteLine($"\nException Caught: {ex}\n");
+                Console.ResetColor();
+                #endregion
+
+                var response = ApiResponseUtils.CustomResponse(false, errorMessage, null);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
         }
 
     }

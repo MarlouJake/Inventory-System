@@ -1,4 +1,5 @@
 ﻿using InventorySystem.Models.Accounts;
+using InventorySystem.Models.DataEntities;
 using InventorySystem.Utilities;
 using InventorySystem.Utilities.Api;
 using Microsoft.AspNetCore.Authentication;
@@ -44,6 +45,44 @@ namespace InventorySystem.Controllers.api
             }
         }
 
+        [Authorize]
+        [HttpPost("add/{id?}")]
+        public async Task<IActionResult> AddItem([FromBody] Item model, int? id)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Extracts error messages from ModelState
+                var errors = ModelState.Values
+                  .SelectMany(v => v.Errors)
+                  .Select(e => e.ErrorMessage)
+                  .ToList();
+
+                // Combines the error messages into a single message string
+                var message = string.Join("; ", errors);
+
+                var response = ApiResponseUtils.ErrorResponse(null!, message);
+
+                #region --Console Logger--
+                Console.Clear();
+                Console.WriteLine(response);
+                #endregion
+
+                return await Task.FromResult(StatusCode(StatusCodes.Status400BadRequest, response));
+            }
+            else
+            {
+                var redirectUrl = Url.Action("AppendItem", "ServicesApi");
+                var message = "Validation Successful. Redirecting...";
+
+                #region --Console Logger--
+                Console.Clear();
+                Console.WriteLine(Messages.PrintUrl(redirectUrl));
+                #endregion
+
+                var responseSuccess = ApiResponseUtils.SuccessResponse(model.ItemName!, message, redirectUrl!);
+                return await Task.FromResult(StatusCode(StatusCodes.Status202Accepted, responseSuccess));
+            }
+        }
 
         [Authorize]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
