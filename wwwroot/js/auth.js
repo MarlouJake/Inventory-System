@@ -1,8 +1,4 @@
-﻿
-
-
-
-// Login API
+﻿// Login API
 UserRequest = (form) => {
     const method = validate.Post;
     const login = validate.Login;
@@ -17,9 +13,9 @@ UserRequest = (form) => {
         password: formData.get("password"),
     };
 
-    // Perform validation before making the API call
-    if (!ValidateForm(form, data)) {
-        return false; // Stop form submission if validation fails
+
+    if (!ValidateForm(data)) {
+        return false;
     }
 
     

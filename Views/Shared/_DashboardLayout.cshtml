@@ -29,10 +29,10 @@
 <body id="dashboard-layout">
 
     <div class="container">
-        <div id="message-success" class="alert alert-success fixed-top popup-message" style="display: none; z-index: 2000;">
+        <div id="message-success" class="alert alert-success" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px; background-color: #7eca8f; color: white; border-radius: 5px;">
             <!-- Success message content -->
         </div>
-        <div id="message-error" class="alert alert-danger fixed-top popup-message" style="display: none; z-index: 2000;">
+        <div id="message-error" class="alert alert-danger" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px; background-color: #7eca8f; color: white; border-radius: 5px;">
             <!-- Error message content -->
         </div>  
 
@@ -45,7 +45,7 @@
             <nav id="sidebar" class="bg-dark" style="z-index: 1900;">
                 <div class="d-flex justify-content-between">
                      <div class="d-flex fs-1">
-                        <h4 class="text-success">Dashboard</h4>
+                        <h4 class="text-orange">IMS</h4>
                      </div>
 
 
@@ -58,14 +58,14 @@
                 </div>
 
                 <div>
-                    <h5 href="#" class="text-decoration-none text-light text-start text-uppercase" id="username-container"></h5>
+                    <h6 href="#" class="text-decoration-none text-light text-start text-uppercase" id="username-container"></h6>
                 </div>
 
                 <hr class="text-white"/>
                              
-                <ul class="nav flex-column tabs">
+                <ul class="nav flex-column tabs text-light">
                     <li class="nav-item m-0 p-0">
-                        <a class="nav-link" id="items-link" data-url="dashboard/item-view">Home</a>
+                        <a class="nav-link" id="items-link" data-url="dashboard/item-view">Dashboard</a>
                         <i class="fa fa-spinner fa-spin spinner" style="display: none;"></i>
                     </li>
                     <li class="nav-item m-0 p-0">

@@ -1,11 +1,10 @@
 ﻿getStatuses = function () {
+    var $statusDropdown = $('#statusDropdown');
+    var $updatestatus = $('#updatestatus');
     $.ajax({
         url: '/api/values/get-statuses',
         type: 'GET',
-        success: function (data) {
-            var $statusDropdown = $('#statusDropdown');
-           //$statusDropdown.empty(); // Clear existing options
-
+        success: function (data) {          
             $.each(data, function (index, item) {
                 var $option = $('<option></option>').val(item.Value).text(item.Text);
 
@@ -18,6 +17,7 @@
                 }
 
                 $statusDropdown.append($option);
+                $updatestatus.append($option);
             });
         },
         error: function (xhr, status, error) {
@@ -27,11 +27,14 @@
 };
 
 getOptions = function () {
+    var $updateDropdown = $('#updateDropdown');
+    var $updatefirmware = $('#updatefirmware');
+
     $.ajax({
         url: '/api/values/get-options',
         type: 'GET',
         success: function (data) {
-            var $updateDropdown = $('#updateDropdown');
+            
             //$updateDropdown.empty(); // Clear existing options
 
             $.each(data, function (index, item) {
@@ -39,13 +42,14 @@ getOptions = function () {
 
                 if (item.Value === "N/A") {
                     $option.addClass('text-secondary'); // Apply gray color
-                } else if (item.Value === "Yes") {
+                } else if (item.Value === "Updated") {
                     $option.addClass('text-success'); // Apply green color
-                } else if (item.Value === "No") {
+                } else if (item.Value === "Not Updated") {
                     $option.addClass('text-danger'); // Apply red color
                 }
 
                 $updateDropdown.append($option);
+                $updatefirmware.append($option);
             });
         },
         error: function (xhr, status, error) {
@@ -64,6 +68,8 @@ loadContent = function (url) {
             // Replace the content of #view-all based on the view url
             $('#view-all').html(response);
             $('#sidebar .nav-link').removeClass('disabled').find('.spinner').hide();
+            $('#sidebar .nav-link').removeClass('active bgc-orange'); // Remove active from all links
+            $('#sidebar .nav-link[data-url="' + url + '"]').addClass('active bgc-orange');
         },
         error: function () {
             $('#view-all').html('<div class="alert alert-danger">Error loading content. Please try again.</div>');

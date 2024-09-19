@@ -3,14 +3,13 @@ using InventorySystem.Utilities;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace InventorySystem.Models.DataEntities
+namespace InventorySystem.Models.Services
 {
-    public class Item
+    public class UpdateItem
     {
         [DisplayName(DisplayNames.ItemId)]
         [Key]
         public int ItemId { get; set; }
-
 
         [ValidateField]
         [NoSpaces]
@@ -35,6 +34,7 @@ namespace InventorySystem.Models.DataEntities
         [ValidateValue("itemstatus")]
         public string? Status { get; set; }
 
+
         [ValidateField]
         [DisplayName(DisplayNames.FirmwareStatus)]
         [DataType(DataType.Text)]
@@ -42,21 +42,18 @@ namespace InventorySystem.Models.DataEntities
         public string? FirmwareUpdated { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:MMMM dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
-        [DisplayName("Date Added")]
-        [DataType(DataType.DateTime)]
-        public DateTime ItemDateAdded { get; set; }
-
-        [DisplayFormat(DataFormatString = "{0:MMMM dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
         [DisplayName("Last Modified")]
         [DataType(DataType.DateTime)]
         public DateTime ItemDateUpdated { get; set; }
 
+
         [DisplayName(DisplayNames.UserId)]
         public int? UserId { get; set; }
-        public Item()
+
+        public UpdateItem()
         {
-            ItemDateAdded = DateTime.Now;
             ItemDateUpdated = DateTime.Now;
         }
+
     }
 }

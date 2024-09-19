@@ -1,4 +1,4 @@
-﻿AddRequest = (form, id)  => {
+﻿AddRequest = (form) => {
     var type = 'POST';
     var add = validate.Add;
     var addsuccess = validate.AddingSuccess;
@@ -7,8 +7,6 @@
     //const user = sessionStorage.getItem('storedUsername');
     const formData = new FormData(form);
     const itemdata = {
-        //username: user,
-        itemid: id,
         itemcode: formData.get('itemCode'),
         itemname: formData.get('itemName'),
         itemdescription: formData.get('itemDescription'),
@@ -16,6 +14,11 @@
         firmwareupdated: formData.get('updateDropdown'),
         datecreated: new Date().toLocaleString('en-US', DateFormatOptions)
     };
+
+    if (!ValidateInput(itemdata)) {
+        
+        return false;
+    }
 
     try {
         $.ajax({
@@ -45,12 +48,10 @@
                         response.RedirectUrl
                     );
 
-                    // Log the result for debugging
                     console.log("API Data: ", JSON.stringify(result, null, 2));
 
                     if (response.RedirectUrl) {
                         AddItem(itemdata, response.RedirectUrl);
-                        console.log('Redirect URL:' + response.RedirectUrl);
                     }
                     else {
                         var details = "Route sent by the server missing.";
@@ -71,8 +72,8 @@
                         details,
                         response.RedirectUrl
                     );
+                    ShowError(details);
 
-                    // Log the result for debugging
                     console.log("API Data: ", JSON.stringify(result, null, 2));
                 }
             },
@@ -102,13 +103,13 @@
                     statusMessage,
                     getUrl(requestroute),
                     details,
-                    `/add-item/${itemdata.id}`
+                    `/add/${itemdata.id}`
                 );
 
                 // Log the result for debugging
                 console.log("Request Error: ", JSON.stringify(result, null, 2));
-
-                // Display the message using the modal or error message div
+                ShowError(details);
+ 
                 setTimeout(() => {
                     $("#error-message").text(message).fadeIn().delay(100).fadeOut();
                 }, 500);
@@ -117,18 +118,25 @@
 
         });
     }
-    catch {
-
+    catch (ex){
+        ShowError(ex);
     }
 
     return false; // Prevent default form submission
 };
 
 AddItem = (data, url) => {
+    $('#itemCode-error').text('');
+    $('.form-control').removeClass('input-error').addClass('input-success');
+
+    var type = 'POST';
+    var add = validate.Add;
+    var addsuccess = validate.AddingSuccess;
+    var addfailed = validate.AddingFailed;
     try
     {
         $.ajax({
-            type: 'POST',
+            type: type,
             url: url,
             data: JSON.stringify(data),
             contentType: 'application/json',
@@ -137,29 +145,14 @@ AddItem = (data, url) => {
                 var status = `Status Code: ${jqXHR.status}`;
                 var details = `Server responded with status code: ${jqXHR.status} ${textStatus}`;
                 if (response.IsValid) {
-                    const newItemHtml = `
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-title mb-1 fs-6"><strong>${data.itemname}</strong></h6>
-                                <p class="card-text mb-1"><strong>Code:</strong>${data.itemcode}</p>
-                                <p class="card-text mb-0"><strong>Status:</strong>${data.itemstatus}</p>
-                            </div>
-                            <div class="card-footer">
-                                <a onclick="ModalShow('dashboard/details/${data.id}')"
-                                   class="btn btn-primary btn-crud btn-sm form-control">
-                                    View
-                                </a>
-                            </div>
-                        </div>
-                    `;
 
-
-
-                    $("#view-all .card-container").append(newItemHtml); // Append the new item to the list
-                    //loadItems(currentPage);
                     $("#dynamic-modal").modal('hide');
-                    NewItemAdded();
                     $("#message-success").text(validate.AddingSuccess).fadeIn().delay(500).fadeOut();
+                    if ($('#searchbar').val()) {
+                        $('#searchbar').val('');
+                    }
+                    loadPage(currentPage);   
+
                 }
                 else{
                     console.error('An error occured while adding item:'+ response.Message);
@@ -183,26 +176,32 @@ AddItem = (data, url) => {
 
                 // Build the result object (assuming jsonResult is a function that handles this)
                 let result = jsonResult(
-                    method,
-                    login,
-                    loginsuccess,
+                    type,
+                    add,
+                    addsuccess,
                     false,
-                    loginfailed,
+                    addfailed,
                     true,
                     message,
                     statusMessage,
                     getUrl(url),
                     details,
-                    `/dashboard/${data.username}`
+                    `/dashboard/${data.itemid}`
                 );
 
                 // Log the result for debugging
                 console.log("Request Error: ", JSON.stringify(result, null, 2));
+                //ShowError(details);
 
-                // Display the message using the modal or error message div
-                setTimeout(() => {
-                    $("#error-message").text(message).fadeIn().delay(100).fadeOut();
-                }, 500);
+                if (message === "Item code already in use") {
+                    $('#itemCode-error').text(message);
+                    $('#itemCode').addClass('input-error');
+                } else {
+                    setTimeout(() => {
+                        $("#message-error").text(message).fadeIn().delay(100).fadeOut();
+                    }, 500);
+                }
+                
             }
 
 
@@ -215,10 +214,10 @@ AddItem = (data, url) => {
 
         let result = jsonResult(
             method,
-            login,
-            loginsuccess,
+            add,
+            addsuccess,
             false,
-            loginfailed,
+            addfailed,
             true,
             message,
             textStatus,
@@ -234,193 +233,414 @@ AddItem = (data, url) => {
     return false;
 };
 
-RequestUpdate = (form) => {
+function loadItemView(url) {
+    try {
+        $.ajax({
+            type: 'GET',
+            url: url,
+            contentType: 'application/text',
+            dataType: 'text',
+            success: function (response) {
+               
+             
+            },
+            error: function (jqXHR, textStatus) {
+                // Parse the response as JSON
+                //var response = jqXHR.responseJSON;
 
-    const apiUrl = form.action;
+                // Extract the message from the response, or use a default message
+                //var message = response;
+
+                // Extract the status message
+                //var statusMessage = jqXHR.statusText || 'Unknown Error';
+
+                // Construct the full error message
+                //var responsemessage = `Server responded with status code: ${jqXHR.status} ${textStatus}.`;
+                //var details = responsemessage;
+                console.error('Error fetching item view:', jqXHR);
+                ShowError(jqXHR);
+            }
+        });
+    }
+    catch (ex){
+        console.error('An error occured while requesting the view: ', ex);
+        ShowError(ex);
+    }
+    
+}
+
+function ValidateInput(data) {
+    $('#itemCode-error').text('');
+    $('#itemName-error').text('');
+    $('#statusDropdown-error').text('');
+    $('#updateDropdown-error').text('');
+    $('.form-control').removeClass('input-error').addClass('input-success');
+
+    let isValid = true;
+
+    if (!data.itemcode || data.itemcode.trim() === '') {
+        $('#itemCode').addClass('input-error');
+        $('#itemCode-error').text('Item code is required');
+        isValid = false;
+    } else if(data.itemcode.length < 3){
+        $('#itemCode').addClass('input-error');
+        $('#itemCode-error').text('Item code is should be atleast 3 characters');
+        isValid = false;
+    } else if (data.itemcode.length > 20) {
+        $('#itemCode').addClass('input-error');
+        $('#itemCode-error').text('Item code should not exceed 20 characters');
+        isValid = false;
+    }
+
+    if (!data.itemname || data.itemname.trim() === '') {
+        $('#itemName').addClass('input-error');
+        $('#itemName-error').text('Item name is required');
+        isValid = false;
+    } else if (data.itemname.length < 3) {
+        $('#itemName').addClass('input-error');
+        $('#itemName-error').text('Item name is should be atleast 3 characters');
+        isValid = false;
+    } else if (data.itemname.length > 20) {
+        $('#itemName').addClass('input-error');
+        $('#itemName-error').text('Item name should not exceed characters');
+        isValid = false;
+    }
+
+    if (!data.status || data.status.includes('--Select Status--')) {
+        $('#statusDropdown').addClass('input-error');
+        $('#statusDropdown-error').text(validate.StatusRequired);
+        isValid = false;
+    }
+
+    if (!data.firmwareupdated || data.firmwareupdated.includes('--Select Status--')) {
+        $('#updateDropdown').addClass('input-error');
+        $('#updateDropdown-error').text(validate.FirmwareUpdateRequired);
+        isValid = false;
+    }
+
+    if (!isValid) {
+        console.log('Validation errors');
+    }
+
+    return isValid;
+}
+
+UpdateRequest = (form) => {
     const formData = new FormData(form);
-    const data = {
-        username: sessionStorage.getItem('storedUsername'),
-        itemcode: formData.get("itemcode"),
-        itemname: formData.get("itemname"),
-        itemdescription: formData.get("itemdesc"),
-        itemstatus: formData.get("itemstatus"),
-        iteminfo: formData.get("iteminfo"),
-        firmwareupdated: formData.get("itemfirmware"),
-        role: 'standard'
+    const itemdata = {
+        itemid: parseInt(formData.get('dataid')),
+        itemcode: formData.get('updatecode'),
+        itemname: formData.get('updatename'),
+        itemdescription: formData.get('updatedesc'),
+        status: formData.get('updatestatus'),
+        firmwareupdated: formData.get('updatefirmware')
     };
+    var dataid = $('#dataid').val();
 
-    $('#itemcode-error').text('');
-    $('#itemname-error').text('');
-    $('#status-error').text('');
-    $('#firmwareupdated-error').text('');
-    $('.form-control').removeClass('input-error');
-
-    if (!$(form).valid()) {
-
-        if (!data.itemcode || data.itemcode.trim() === '') {
-            $('#itemcode').addClass('input-error');
-            $('#itemcode-error').text(validate.UsernameEmpty);
-
-        } else if (data.itemcode.includes(' ')) {
-            $('#itemcode').addClass('input-error');
-            $('#itemcode-error').text(validate.UsernameEmpty);
-        } else if (data.itemcode.length < 3) {
-            $('#itemstatus').addClass('input-error');
-            $('#status-error').text(validate.UsernameLength);
-
-        }
-
-        if (!data.itemname || data.itemname.trim() === '') {
-            $('#itemname').addClass('input-error');
-            $('#itemname-error').text(validate.UsernameEmpty);
-
-        } else if (data.itemname.length < 3) {
-            $('#itemstatus').addClass('input-error');
-            $('#status-error').text(validate.UsernameLength);
-
-        }
-
-
-        if (!data.itemstatus || data.itemstatus.trim() === '--Select Status--') {
-            $('#itemstatus').addClass('input-error');
-            $('#status-error').text(validate.UsernameEmpty);
-
-        } else if (data.itemstatus.length < 3) {
-            $('#itemstatus').addClass('input-error');
-            $('#status-error').text(validate.UsernameLength);
-
-        }
-
-
-        if (!data.password || data.password.trim() === '') {
-            $('#itemfirmware').addClass('input-error');
-            $('#firmwareupdated-error').text(validate.PasswordEmpty);
-
-        } else if (data.password.length < 8) {
-            $('#itemfirmware').addClass('input-error');
-            $('#firmwareupdated-error').text(validate.PasswordLegth);
-
-        }
-
-        return false; // Prevent form submission if invalid
+    if (!ValidateUpdate(itemdata)) {
+        return false;
     }
 
     try {
-        loading(validate.PleaseWait);
         $.ajax({
-            type: validate.Put,
-            url: apiUrl,
+            method: 'POST',
+            url: form.action,
+            data: JSON.stringify(itemdata),
+            accepts: 'application/json',
+            contentType: 'application/json',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.setRequestHeader('Accept', 'application/json');
+            },
+            success: function (response) {
+                          
+                if (response.IsValid) {
+                    if (response.RedirectUrl) {
+                        ModifyItem(itemdata, response.RedirectUrl, dataid);
+                    }
+                    else {
+                        var details = "Route sent by the server missing.";
+                        ShowError(details);
+                    }
+                }
+                else {
+                    console.log("Response Invalid: ", response);
+                    ShowError("Response invalid");
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Error: ", jqXHR.status, textStatus, errorThrown);
+                ShowError(jqXHR.status);
+            },
+            fail: function (jqXHR) {
+                console.error("Error: ", jqXHR.status);
+                ShowError(jqXHR.status);
+            }
+        });
+    }
+    catch (ex) {
+        console.error("Error: ", ex);
+        ShowError(ex);
+
+    }
+    return false; 
+};
+
+ModifyItem = (data, url, dataid) => {
+    $('#updatecode-error').text('');
+    $('.form-control').removeClass('input-error').addClass('input-success');
+    try {
+        $.ajax({
+            method: 'PUT',
+            url: url,
             data: JSON.stringify(data),
             contentType: 'application/json',
             dataType: 'json',
-            success: function (res) {
+            success: function (response, textStatus, jqXHR) {
+                var status = `Status Code: ${jqXHR.status}`;
+                var details = `Server responded with status code: ${jqXHR.status} ${textStatus}`;
+                if (response.IsValid) {
+ 
+                    $("#dynamic-modal").modal('hide');
 
-                if (res.isValid) {
-                    const result = jsonResult(
-                        validate.Put,
-                        validate.Update,
-                        validate.UpdateSuccess,
-                        true,
-                        validate.UpdateFailed,
-                        false,
-                        validate.UpdatedSuccessfully,
-                        data,
-                        validate.PutSuccess,
-                        apiUrl,
-                        validate.ResponseValid,
-                        res.redirectUrl,
-                        browserInfo.name,
-                        browserInfo.version
-                    );
+                    $("#message-success").text(response.Message).fadeIn().delay(500).fadeOut();
+                    loadPage(currentPage);
 
-                    console.log("API Data", JSON.stringify(result, null, 2));
-
-                    //setTimeout(() => $('#loading-modal').modal('hide'), 1000);
-                    setTimeout(() => {
-                        $("#emessage-success").text(validate.UpdatedSuccessfully).fadeIn().delay(1000).fadeOut();
-                    }, 500);
-                    window.location.href = res.redirectUrl;
-
-                } else {
-
-                    setTimeout(() => $('#loading-modal').modal('hide'), 500);
-                    setTimeout(() => {
-                        $("#message-error").text(validate.FillRequiredFields).fadeIn().delay(1000).fadeOut();
-                    }, 500);
-
-                    const result = jsonResult(
-                        validate.Put,
-                        validate.Update,
-                        validate.UpdateSuccess,
-                        false,
-                        validate.UpdateFailed,
-                        true,
-                        validate.FailedToUpdate,
-                        data,
-                        validate.PutFailed,
-                        apiUrl,
-                        validate.ResponseInvalid,
-                        `/dashboard/${data.username}`,
-                        browserInfo.name,
-                        browserInfo.version
-                    );
-
-                    console.log("API Data", JSON.stringify(result, null, 2));
                 }
-
+                else {
+                    console.error('An error occured while updating item:' + response.Message);
+                    var details = response.Message ?? "Failed to update item.";
+                    ShowError(details);
+                }
             },
-            error: function (err) {
+            error: function (jqXHR, textStatus) {
+                // Parse the response as JSON
+                var response = jqXHR.responseJSON;
 
-                const result = jsonResult(
-                    validate.Put,
-                    validate.Update,
-                    validate.UpdateSuccess,
+                // Extract the message from the response, or use a default message
+                var message =  "An error occured";
+
+                // Extract the status message
+                var statusMessage = jqXHR.statusText || 'Unknown Error';
+
+                // Construct the full error message
+                var responsemessage = `Server responded with status code: ${jqXHR.status} ${textStatus}.`;
+                var details = responsemessage;
+
+                // Build the result object (assuming jsonResult is a function that handles this)
+                let result = jsonResult(
+                    'PUT',
+                    'update',
+                    'updatesuccess',
                     false,
-                    validate.UpdateFailed,
+                    'updatefailed',
                     true,
-                    validate.FailedToUpdate,
-                    data,
-                    validate.PutFailed,
-                    apiUrl,
-                    validate.ResponseInvalid,
-                    `/dashboard/${data.username}`,
-                    browserInfo.name,
-                    browserInfo.version
+                    message,
+                    statusMessage,
+                    getUrl(url),
+                    details,
+                    `/modify/${dataid}`
                 );
 
-                console.log("Submission Error Data", JSON.stringify(result, null, 2));
-                setTimeout(() => $('#loading-modal').modal('hide'), 500);
-                $("#message-error").text(validate.FillRequiredFields).fadeIn().delay(500).fadeOut();
-            }
-        });
+                // Log the result for debugging
+                console.log("Request Error: ", JSON.stringify(result, null, 2));
+                
 
+                if (message === "Item code already in use") {
+                    $('#updatecode').addClass('input-error');
+                    $('#updatecode-error').text(message);
+                } else {
+                    setTimeout(() => {
+                        $("#message-error").text(message).fadeIn().delay(100).fadeOut();
+                    }, 500);
+                    ShowError(details);
+                }
+            }
+            
+        });
     }
     catch (ex) {
-
-
-        const result = jsonResult(
-            validate.Put,
-            validate.Update,
-            validate.UpdateSuccess,
-            false,
-            validate.UpdateFailed,
-            true,
-            validate.FailedToUpdate,
-            data,
-            validate.PutFailed + "\n" + ex,
-            data,
-            validate.PutError,
-            apiUrl,
-            validate.ResponseInvalid,
-            `/dashboard/${data.username}`,
-            browserInfo.name,
-            browserInfo.version
-        );
-
-        console.log("Submission Failure Data", JSON.stringify(result, null, 2));
-        setTimeout(() => $('#loading-modal').modal('hide'), 500);
-        $("#message-error").text(validate.InvalidInput).fadeIn().delay(500).fadeOut();
+        ShowError(ex);
+        console.log('Error: ', ex);
     }
-    setTimeout(() => $('#loading-modal').modal('hide'), 500);
+    return false;
+}
+
+function ValidateUpdate(data) {
+    $('#updatecode-error').text('');
+    $('#updatename-error').text('');
+    $('#updatedesc-error').text('');
+    $('#updatestatus-error').text('');
+    $('#updatefirmware-error').text('');
+    $('.form-control').removeClass('input-error').addClass('input-success');
+
+    let isValid = true;
+
+    if(!data.itemcode || data.itemcode.trim() === '') {
+        $('#updatecode').addClass('input-error');
+        $('#updatecode-error').text('Item code is required');
+        isValid = false;
+        console.error('code empty');
+    } else if(data.itemcode.length < 3) {
+        $('#updatecode').addClass('input-error');
+        $('#updatecode-error').text('Item code is should be atleast 3 characters');
+        isValid = false;
+        console.error('code short');
+    } else if(data.itemcode.length > 20) {
+        $('#updatecode').addClass('input-error');
+        $('#updatecode-error').text('Item code is should not exceed 20 characters');
+        isValid = false;
+        console.error('code exceed length');
+    }
+
+    if (!data.itemname || data.itemname.trim() === '') {
+        $('#updatename').addClass('input-error');
+        $('#updatename-error').text('Item name is required');
+        isValid = false;
+        console.error('name empty');
+    } else if(data.itemname.length < 3) {
+        $('#updatename').addClass('input-error');
+        $('#updatename-error').text('Item name is should be atleast 3 characters');
+        isValid = false;
+        console.error('name short');
+    } else if(data.itemname.length > 20) {
+        $('#updatename').addClass('input-error');
+        $('#updatename-error').text('Item name should not exceed 20 characters');
+        isValid = false;
+        console.error('name exceed length');
+    }
+
+    if (data.itemdescription.length > 5000) { 
+        $('#updatedesc').addClass('input-error');
+        $('#updatedesc-error').text('Item description should not exceed 5000 characters');
+        console.error('description exceed length');
+    }
+
+    if(!data.status || data.status.includes('--Select Status--')) {
+        $('#updatestatus').addClass('input-error');
+        $('#updatestatus-error').text(validate.StatusRequired);
+        isValid = false;
+        console.error('status not selected');
+    }
+
+    if(!data.firmwareupdated || data.firmwareupdated.includes('--Select Status--')) {
+        $('#updatefirmware').addClass('input-error');
+        $('#updatefirmware-error').text(validate.FirmwareUpdateRequired);
+        isValid = false;
+        console.error('firmwareupdated not selected');
+    }
+
+    if(!isValid) {
+        console.error('Validation errors');
+    }
+
+    return isValid;
+}
+
+
+DeleteRequest = (form) => {
+    var deleteid = parseInt($('#delete-id').val(), 10);
+
+    if (isNaN(deleteid)) {
+        ShowError('No item id retrieve');
+        return false;
+    }
+
+    try {
+        $.ajax({
+            method: 'POST',
+            url: form.action,
+            contentType: 'application/json',
+            data: JSON.stringify(deleteid),        
+            success: function (response) {
+
+                if (response.IsValid) {
+                    if (response.RedirectUrl) {
+                        RemoveItem(response.RedirectUrl);
+                    }
+                    else {
+                        var details = "Route sent by the server missing.";
+                        ShowError(details);
+                    }
+                }
+                else {
+                    console.log("Response Invalid: ", response);
+                    ShowError("Response invalid");
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Error: ", jqXHR.status, textStatus, errorThrown);
+                ShowError(jqXHR.status);
+            },
+            fail: function (jqXHR) {
+                console.error("Error: ", jqXHR.status);
+                ShowError(jqXHR.status);
+            }
+        });
+    }
+    catch (ex) {
+        console.error("Error: ", ex);
+        ShowError(ex);
+    }
+    return false;
+};
+
+RemoveItem = (url) => {
+    const id = $('#delete-id').val();  // or form['delete-id'].value;
+
+    try {
+        $.ajax({
+            type: 'DELETE',
+            url: url,
+            success: function (response, textStatus, jqXHR) {
+                var status = `Status Code: ${jqXHR.status}`;
+                var details = `Server responded with status code: ${jqXHR.status} ${textStatus}`;
+
+                let result = jsonResult(
+                    'DELETE',
+                    'delete',
+                    'deletesuccess',
+                    true,
+                    'deletefailed',
+                    false,
+                    response.Message,
+                    status,
+                    url,
+                    details,
+                    'dashboard/item-view'
+                );
+
+                console.log("API Data: ", JSON.stringify(result, null, 2));
+
+                if (response.IsValid) {
+
+                    
+
+                    $("#dynamic-modal").modal('hide');
+
+                    $("#message-success").text(response.Message).fadeIn().delay(500).fadeOut();
+                    loadPage(currentPage);
+
+                }
+                else {
+                    console.error('An error occured while removing item:' + response.Message);
+                    var details = "Failed to remove item, try again";
+                    ShowError(details);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Error: ", jqXHR.status, textStatus, errorThrown);
+                ShowError(jqXHR.status);
+            },
+            fail: function (jqXHR) {
+                console.error("Error: ", jqXHR.status);
+                ShowError(jqXHR.status);
+            }
+        });
+    }
+    catch (ex) {
+        ShowError(ex);
+        console.log('Error: ', ex);
+    }
     return false;
 };

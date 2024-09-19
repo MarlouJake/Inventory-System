@@ -4,7 +4,7 @@
     });
     $('#dynamic-modal').remove();
     setTimeout(() => {
-        $('.container').append(DynamicModal);
+        $('#dashboard-layout').append(DynamicModal);
         GetData(url);
     },100);
 };
@@ -18,7 +18,7 @@ function GetData(url) {
             $('#dynamic-modal').modal('show');
         },
         error: function (jqXHR, status) {
-            $('#dynamic-modal').modal('show');
+            $('#dynamic-modal').modal('hide');
             console.error("Error details: ", jqXHR.responseText);
             alert("An error occurred while loading the form: " + jqXHR.status + " " + status);
         }
@@ -64,5 +64,4 @@ function checkSession() {
 
 // Check session validity periodically
 //setInterval(checkSession, 60000); // Check every minute
-
 

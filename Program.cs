@@ -1,5 +1,4 @@
 using InventorySystem.Data;
-using InventorySystem.Utilities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,12 +27,12 @@ internal class Program
         // Add HTTP Client
         services.AddHttpClient();
         services.AddControllersWithViews();
-        services.AddTransient<Render>();
         // Add Controllers with JSON options
         services.AddControllers()
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = null;
+
             });
 
         // Add CORS policy
@@ -128,7 +127,6 @@ internal class Program
         app.UseEndpoints(endpoints =>
         {
             // Default MVC route
-            // Default MVC route
             _ = endpoints.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -147,9 +145,25 @@ internal class Program
                 defaults: new { controller = "ValidateApi", action = "Login" });
 
             _ = endpoints.MapControllerRoute(
+                name: "api-validate-add",
+                pattern: "api/u/validate/add/{id?}",
+                defaults: new { controller = "ValidateApi", action = "AddItem" });
+
+            _ = endpoints.MapControllerRoute(
+                name: "api-validate-update",
+                pattern: "api/u/validate/modify/{id?}",
+                defaults: new { controller = "ValidateApi", action = "UpdateItem" });
+
+            _ = endpoints.MapControllerRoute(
+                name: "api-validate-delete",
+                pattern: "api/u/validate/remove/{id?}",
+                defaults: new { controller = "ValidateApi", action = "DeleteItem" });
+
+            _ = endpoints.MapControllerRoute(
                 name: "api-authenticate-authorize",
                 pattern: "api/u/redirect",
                 defaults: new { controller = "AuthApi", action = "GetUser" });
+
 
             // Standard dashboard route
             _ = endpoints.MapControllerRoute(

@@ -24,6 +24,59 @@ html {
     }
 }
 
+.hide-con {
+    display: none !important;
+}
+
+.show-con {
+    display: flex !important;
+}
+
+
+.text-orange {
+    color: #fd7e14 !important;
+}
+.bgc-lsg{
+     background-color  : lightslategray !important;
+     color:white !important;
+}
+
+    .bgc-lsg:hover {
+        background-color: #6A7B8A !important;
+    }
+
+a.navbar-brand {
+    color: #fd7e14 !important;
+}
+
+.index-navbar a.nav-link {
+    font-size: 12px;
+    color: white;
+    border-radius: 12px;
+}
+
+    .index-navbar a.nav-link.active {
+        color: white;
+        background-color: #fd7e14 !important;
+    }
+
+.index-navbar a.nav-link:hover {
+    background-color: lightslategray !important;
+    color: black !important;
+    
+}
+
+#loginbutton:active {
+    background-color: lightslategray !important;
+}
+
+#loginbutton:hover {
+    background-color: #e06c12 !important;
+}
+
+.bgc-orange {
+    background-color: #fd7e14;
+}
 /* General body styles */
 body {
     font-family: 'Poppins', sans-serif;
@@ -49,17 +102,14 @@ body {
     flex-wrap: wrap;
 }
 
-/* Ensures that the modal is vertically and horizontally centered */
-.modal-dialog-centered {
-    display: flex;
-    align-items: center;
-    min-height: calc(100vh - 1rem); /* Ensure vertical centering */
+.btn-crud {
+    background-color: lightslategray;
 }
 
-.modal-content {
-    border-radius: 0.5rem; /* Optional: For rounded corners */
-}
-
+    .btn-crud:hover {
+        background-color: #fd7e14;
+        color: white;
+    }
 
 /* Sidebar styles */
 #sidebar {
@@ -116,9 +166,7 @@ body {
 }
 
 .tabs .nav-link:hover {
-    background-color: white !important;
-    
-    color: black !important;
+    background-color: lightslategray!important;
 }
 
 .spinner {
@@ -131,6 +179,11 @@ body {
     pointer-events: none; /* Disable clicking */
     opacity: 0.6; /* Visual indication that link is disabled */
 }
+
+.nav-link.active {
+    color: #fd7e14;
+}
+
 
 #username-container {
     overflow: clip;

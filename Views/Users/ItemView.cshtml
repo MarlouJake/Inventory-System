@@ -14,120 +14,94 @@
     var pageSize = ViewBag.PageSize;
     var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
     var storedClaim = int.Parse(userIdClaim!);
+
+    <!--Page Number Button -->
+    // Define range for the pagination buttons to display around the current page
+    int startPage = Math.Max(1, Model.CurrentPage - 2); // Start 2 pages before current page
+    int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2); // End 2 pages after current page
+
+    // Ensure 5 page buttons at most
+    if (endPage - startPage + 1 < 5)
+    {
+        // Adjust startPage or endPage to maintain 5 buttons, as long as we're within bounds
+        if (startPage > 1)
+            startPage = Math.Max(1, endPage - 4);
+        else if (endPage < Model.TotalPages)
+            endPage = Math.Min(Model.TotalPages, startPage + 4);
+    }
 }
 
 <script>
 
-    $(document).ready(function () {
-        var pagesize = '@Html.Raw(pageSize)'
-        $('#add-item').on('submit', function (e) {
-            e.preventDefault();
+    var pagesize = '@Html.Raw(pageSize)';
+    var currentPage = '@Html.Raw(currentPage)';
+    var totalPages = '@Html.Raw(totalPages)';  
+    var pageItem = $('.pagination .page-item');
 
-            $.ajax({
-                type: 'POST',
-                url: '@Url.Action("AddItem", "Users", new { username = ViewBag.Username })',
-                data: $(this).serialize(),
-                success: function (response) {
-                    if (response.success) {
-                        var newItem = $(response.itemViewHtml);
-                        var itemContainer = $('#view-all .card-container');
-                        var itemCount = itemContainer.children().length; // Get the current number of items displayed
-
-                        if (itemCount < pagesize) {
-                            // Append the new item if there is space
-                            itemContainer.append(newItem.hide().fadeIn(1000));
-                        } else {
-                            // Handle item overflow (move to the next page)
-                            handlePaginationUpdate();
-                        }
-
-                        // Scroll and show success message
-                        newItem.hide().fadeIn(1000);
-                        $('html, body').animate({
-                            scrollTop: newItem.offset().top
-                        }, 1000);
-                        showSuccessMessage('Item added successfully!');
-
-                        // Close the modal
-                        $('#crud-modal').modal('hide');
-                        $('#add-item')[0].reset();
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                error: function () {
-                    alert('An error occurred while adding the item.');
-                }
-            });
-        });
-
-        function handlePaginationUpdate() {
-            // Logic to handle item overflow due to pagination
-            // Reload the item list for the current page to include the new item
-            $.ajax({
-                type: 'GET',
-                url: '@Url.Action("ItemView", "Users", new { username = ViewBag.Username, page = currentPage + 1 })', // Load the next page
-                success: function (response) {
-                    $('#view-all .card-container').html(response); // Update the current items with new data
-                    currentPage += 1; // Increment the page number
-                    showSuccessMessage('New page loaded with added item.');
-                }
-            });
-        }
-
-        function showSuccessMessage(message) {
-            var successMessage = $('<div class="alert alert-success" role="alert"></div>').text(message);
-            $('body').prepend(successMessage);
-            successMessage.hide().fadeIn(500).delay(2000).fadeOut(500, function () {
-                $(this).remove();
-            });
-        }
-    });
-
-    function loadPage(page) {
+    function handlePaginationUpdate() {
+        // handles item overflow due to pagination
+        // Reload the item list for the current page to include the new item
         $.ajax({
-            url: '@Url.Action("ItemView", "Users", new { username = ViewBag.Username })' + '?page=' + page,
             type: 'GET',
+            url: '@Url.Action("ItemView", "Users", new { username = ViewBag.Username, page = currentPage + 1 })', // Load the next page
             success: function (response) {
-                $('#view-all').html(response);
+                $('#view-all .card-container').html(response); // Update the current items with new data
+                currentPage += 1; // Increment the page number
+                showSuccessMessage('New page loaded with added item.');
             }
         });
     }
+
+
+    function showSuccessMessage(message) {
+        var successMessage = $('<div class="alert alert-success" role="alert"></div>').text(message);
+        $('body').prepend(successMessage);
+        successMessage.hide().fadeIn(500).delay(2000).fadeOut(500, function () {
+            $(this).remove();
+        });
+    }
+
+    function loadPage(pageNumber) {
+        var itemcode = $('#searchbar').val();
+        $.ajax({
+            //url: 'Url.Action("ItemView", "Users", new { username = ViewBag.Username })' + '?page=' + pageNumber,
+            url: 'dashboard/item-view',
+            type: 'GET',
+            data: {page: pageNumber },
+            success: function (response) {
+                $('#view-all').html(response);  
+                updatePaginationControls(response);
+            },
+            error: function (error) {
+                console.log("Error loading page: ", error);
+            }
+        });
+    }
+
+    //$('#items-page').text('Items Page: ' + currentPage);
+
+   
 </script>
 
-<div class="d-flex justify-content-between mt-1  p-0 position-relative container-fluid ">
 
-    <div class="ms-0 mt-2">
-        <h4 class="d-flex">ITEMS</h4>
-    </div>
-
-    <div id="top-bar" class="d-flex justify-content-between bg-dark text-white fixed-top ">
-        <div class="ms-5 ps-4">
-            <!--For Seacrhbar-->
-        </div>
-    </div>
-
-    <div id="screensizer">
-    </div>
-
-    <div class="d-flex align-items-center m-0">
-        <button class="btn btn-success" onclick="ModalShow('dashboard/add-item')">Add Item</button>
-    </div>
-
-</div>
-
-<div class="card-container mt-4 mb-4">
+<div class="card-container mt-3 mb-4 border-top border-warning p-2">
     @if (Model.Items == null || !Model.Items.Any())
     {
+        <script>
+            $('.card-container').addClass('d-flex justify-content-center align-items-center h-auto');
+        </script>
         <div class="no-items text-center">
             <p class="text-center">No items found.</p>
         </div>
     }
     else
     {
+        <script>
+            $('.card-container').removeClass('d-flex justify-content-center align-items-center h-auto');
+        </script>
         @foreach (var item in Model.Items)
         {
-            if (count >= 24) break; // Stop rendering cards after 12 items
+            if (count >= 24) break; // Stop rendering cards after # items
             @await Html.PartialAsync("ItemCard", item)
 
             count++; // Increment the counter after rendering each item
@@ -137,33 +111,88 @@
 
 </div>
 
-@if(Model.Items != null || Model.Items!.Any())
-{
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center pt-3">
-            @if (Model.CurrentPage > 1)
+<nav aria-label="Page navigation" class="mt-5">
+   
+    
+        <ul class="pagination ms-auto  pt-3 pagination-sm">
+        @if (Model.Items != null && Model.Items.Any())
+        {
+            <!-- First and Previous Page Button -->
+            @if (Model.CurrentPage == 1)
+            {
+                <li class="page-item disabled text-muted">
+                    <a class="page-link">First</a>
+                </li>
+
+                <li class="page-item disabled text-muted">
+                    <a class="page-link">Previous</a>
+                </li>
+            }
+            else
             {
                 <li class="page-item">
-                    <a class="page-link" href="javascript:void(0);" onclick="loadPage(@(Model.CurrentPage - 1))">Previous</a>
+                    <a class="page-link bgc-lsg" href="javascript:void(0);" onclick="loadPage(1)">First</a>
+                </li>
+
+                <li class="page-item">
+                    <a class="page-link bgc-lsg" href="javascript:void(0);" onclick="loadPage(@(Model.CurrentPage - 1))">Previous</a>
                 </li>
             }
 
-            @for (var i = 1; i <= Model.TotalPages; i++)
+            <!-- Previous Set of Pages Button -->
+            @if (startPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="javascript:void(0);" onclick="loadPage(@(startPage - 1))">...</a>
+                </li>
+            }
+
+            @for (var i = startPage; i <= endPage; i++)
             {
                 <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
                     <a class="page-link" href="javascript:void(0);" onclick="loadPage(@i)">@i</a>
                 </li>
             }
 
+            <!-- Next Set of Pages Button -->
+            @if (endPage < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="javascript:void(0);" onclick="loadPage(@(endPage + 1))">...</a>
+                </li>
+            }
+
+            <!-- Next Page Button -->
             @if (Model.CurrentPage < Model.TotalPages)
             {
                 <li class="page-item">
-                    <a class="page-link" href="javascript:void(0);" onclick="loadPage(@(Model.CurrentPage + 1))">Next</a>
+                    <a class="page-link bgc-lsg" href="javascript:void(0);" onclick="loadPage(@(Model.CurrentPage + 1))">Next</a>
                 </li>
             }
+            else
+            {
+                <li class="page-item disabled text-muted">
+                    <span class="page-link">Next</span>
+                </li>
+            }
+
+            <!-- Last Page Button -->
+            @if (Model.CurrentPage == Model.TotalPages)
+            {
+                <li class="ms-1 page-item disabled text-muted">
+                    <a class="page-link">Last</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link bgc-lsg" href="javascript:void(0);" onclick="loadPage(@Model.TotalPages)">Last</a>
+                </li>
+            }
+        }
         </ul>
-    </nav>
-}
+    
+</nav>
 
 
 

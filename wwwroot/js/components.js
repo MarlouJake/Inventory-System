@@ -4,6 +4,39 @@ let spinner = `
     </span>
 `;
 
+let newModal = `
+                    <div class="modal fade" id="display-modal" tabindex="-1" role="dialog" aria-labelledby="displaymodal" data-bs-backdrop="static" data-bs-keyboard="false">
+                            <div class="modal-dialog modal-dialog-centered">                               
+                                <div class="modal-content">         
+                                    <div class="modal-body">
+                                        <!-- Content loaded dynamically -->
+                                        <h5 class="modal-title"></h5>
+                                        <p class="details-title"></p>
+                                        <span class="modal-details h6 fs-6"></span>
+                                        <div id="btn-footer" class="text-end">
+                                            <button class="btn btn-primary mt-1" data-bs-dismiss="modal">
+                                                Okay
+                                            </button>
+                                        </div>                                    
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                `;
+
+let DynamicModal = `
+                         <div id="dynamic-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"  style="z-index: 2000;" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                  <div class="modal-content">
+                                        <div class="modal-body">
+ 
+                                        </div>
+                                  </div>
+                           </div>
+                        </div>
+                `;
+
+
 function ShowError(details) {
     var errormessage = "An Error Occurred";
     $('.modal').each(function () {
@@ -11,7 +44,17 @@ function ShowError(details) {
     });
 
     $('#error-message').text(errormessage).fadeIn().delay(300).fadeOut();
-    $('#container-main').append(newModal);
+
+    var loginpage = $('#container-main');
+    var userdashboard = $('#dashboard-main');
+
+    if(loginpage) {
+        loginpage.append(newModal);
+    }
+    if(userdashboard) {
+        userdashboard.append(newModal);
+    }
+    
     $('#display-modal .details-title').text('Error Detials:').addClass("mt-1 mb-0");
     $('#display-modal .modal-details').html(details).addClass('text-danger mt-0 mb-1 p-0 text-center');
     $('#display-modal .modal-title').text(errormessage);
@@ -33,7 +76,7 @@ function hideModal() {
     }
 };
 
-function ValidateForm(form, data) {
+function ValidateForm(data) {
     // Reset error messages and input styles
     $('#username-error').text('');
     $('#password-error').text('');

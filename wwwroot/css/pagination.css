@@ -1,21 +1,18 @@
-﻿
-/* Pagination styles */
-.pagination-button {
-    background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent background */
-    backdrop-filter: blur(60%); /* Applies blur effect to the background behind the element */
-    -webkit-backdrop-filter: blur(60%); /* For better compatibility with Safari */
-    border-radius: 10px; /* Optional: for rounded corners */
-}
-
-.pagination {
+﻿.pagination {
     display: flex;
     justify-content: center;
-    margin-top: 0.2rem;
-    margin-bottom: 0.2rem;
-    background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent background */
+    position: fixed; /* Fixed at the bottom */
+    bottom: 0; /* Stick to the bottom of the page */
+    left: 0;
+    right: 0;
+    z-index: 1000; /* Ensure it's above other elements */
+    background-color: rgba(52,58,64, 0.7); /* Semi-transparent background */
     backdrop-filter: blur(60%); /* Applies blur effect to the background behind the element */
     -webkit-backdrop-filter: blur(60%); /* For better compatibility with Safari */
-    border-radius: 10px; /* Optional: for rounded corners */
+
+    padding: 0.5rem 0;
+    margin: 0; /* Remove default margin */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional: shadow effect to distinguish it */
 }
 
     .pagination a {
@@ -24,13 +21,20 @@
         border: 1px solid #dee2e6;
         border-radius: 0.25rem;
         text-decoration: none;
-        color: #007bff;
+        color: lightslategray; /* Set font color for all buttons */
         margin: 0 5px;
+        transition: background-color 0.3s, color 0.3s; /* Smooth transition */
     }
 
-        .pagination a.active {
-            background-color: #007bff;
-            color: white;
+        .pagination a:hover {
+            background-color: lightslategray; /* Hover background effect */
+            color: black; /* Hover text color */
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #fd7e14 !important; /* Ensure the color change applies */
+            border-color: #fd7e14 !important; /* Ensure the border color matches */
+            color: white !important; /* Ensure the text color changes */
         }
 
         .pagination a.disabled {

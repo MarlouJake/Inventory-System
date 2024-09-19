@@ -1,6 +1,8 @@
 ﻿using InventorySystem.Data;
 using InventorySystem.Models.DataEntities;
 using InventorySystem.Models.Pagination;
+using InventorySystem.Models.Responses;
+using InventorySystem.Utilities.Api;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -137,9 +139,6 @@ namespace InventorySystem.Controllers.main
         }
 
 
-
-
-
         // GET: Admin/Details/id?
         [Route("dashboard/details/{id?}")]
         [HttpGet]
@@ -167,43 +166,34 @@ namespace InventorySystem.Controllers.main
             }
             ViewBag.Username = username;
             ViewBag.RoleName = roleName;
-            Console.WriteLine(username);
-            //user.Password = user.Password != null ? HashHelper.HashPassword(user.Password) : string.Empty;
             return PartialView(item);
         }
         #endregion
 
 
-
-
         // GET: Admin/Create
         [Route("dashboard/add-item/")]
         [HttpGet]
-
         public IActionResult AddItem(string username)
         {
-            /*addItemModel.Users = await _context.Users.ToListAsync()
-            addItemModel.Items_ = await _context.Items.ToListAsync();*/
             var item = new Item();
-            var route = Url.Action("AddItem", "Users");
-            Console.WriteLine(route);
             return PartialView(item);
         }
 
 
 
         #region --Previous Update Method--
+        [Route("dashboard/modify/{id?}")]
         [HttpGet]
-        [Route("dashboard/update/{id?}")]
         public async Task<IActionResult> Update(int? id, string username)
         {
-
             if (id == null)
             {
                 return NotFound();
             }
 
-            var item = await _context.Items.FindAsync(id); // logic to get the user data
+            var item = await _context.Items
+                .FindAsync(id);
 
             if (item == null)
 
@@ -218,88 +208,9 @@ namespace InventorySystem.Controllers.main
         #endregion
 
 
-
-
-
-        // POST: Admin/Update/id?
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(int id, [Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,AdditionalInfo,ItemDateUpdated,FirmwareUpdated")] Item model)
-        {
-
-            if (id != model.ItemId)
-            {
-                return NotFound();
-            }
-
-            var existingItem = await _context.Items.FindAsync(id);
-            if (existingItem == null)
-            {
-                return NotFound();
-            }
-
-
-
-            if (ModelState.IsValid)
-            {
-                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                Console.WriteLine($"User ID Claim: {userIdClaim}");
-
-                if (userIdClaim != null && int.TryParse(userIdClaim, out var userId))
-                {
-
-                    try
-                    {
-                        //_context.Entry(existingUser).CurrentValues.SetValues(user);
-                        existingItem.ItemCode = model.ItemCode;
-                        existingItem.ItemDateUpdated = DateTime.Now;
-
-                        //_context.Update(user);
-
-                        await _context.SaveChangesAsync();
-                        //return RedirectToAction(nameof("UserTable"));
-                        TempData["SuccessMessage"] = "Update Successful!";
-
-                        var items = await _context.Items
-                            .Where(i => i.UserId == userId)
-                            .ToListAsync();
-
-                        return Json(new
-                        {
-                            isValid = true,
-
-                            successMessage = "Update successful!"
-
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        return StatusCode(500, new { success = false, message = ex.Message });
-                    }
-                }
-
-            }
-
-            //return PartialView(user);     
-            return Json(new
-            {
-                isValid = false,
-
-                failedMessage = "Update failed!"
-            });
-        }
-
-
-
-
-
-
-        // GET: Admin/Delete/id?
         #region --Previous Delete Method--
         [HttpGet]
-        [Route("dashboard/delete-item")]
+        [Route("dashboard/remove/{id}")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -309,24 +220,19 @@ namespace InventorySystem.Controllers.main
 
             var item = await _context.Items
                 .FirstOrDefaultAsync(m => m.ItemId == id);
+
             if (item == null)
             {
                 return NotFound();
             }
 
-            /*
-            return Json(new
-            {
-                isValid = true,
-                html = Helper.RenderRazorViewToString(this, "Delete", await _context.Users.ToListAsync())
-            }); */
 
             return PartialView(item);
         }
 
         #endregion
 
-
+        /*
         #region --Previous DeleteConfirmed Method--
 
         // POST: Admin/Delete/id?
@@ -372,5 +278,65 @@ namespace InventorySystem.Controllers.main
         }
 
         #endregion
+        */
+
+
+        [Route("dashboard/search/")]
+        [HttpGet]
+        public async Task<IActionResult> Search(string itemcode, int page = 1)
+        {
+            int pageSize = 24;
+            ApiResponse response = null!;
+            string message = "";
+            var redirectUrl = "";
+
+
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+            {
+                return RedirectToAction("AccessDenied", "Home");
+            }
+
+            var items = _context.Items
+                               .Where(i => i.UserId == userId); // Filter by userId
+
+
+            if (!string.IsNullOrEmpty(itemcode))
+            {
+                items = items.Where(i => i.ItemCode!.StartsWith(itemcode)); // Filters items by code
+            }
+
+            // Get the total number of filtered items
+            int totalItems = await items.CountAsync();
+
+            // Calculate total pages
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            // Skips items to implement pagination, and take the number of items per page
+            var paginatedItems = await items
+                .OrderBy(i => i.ItemName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var model = new ItemListViewModel
+            {
+                Items = paginatedItems,
+                CurrentPage = page,
+                TotalPages = totalPages
+            };
+
+            if (!model.Items.Any())
+            {
+                redirectUrl = Url.Action("Search", "Users");
+                message = "No item(s) found";
+                response = ApiResponseUtils.SuccessResponse(model.Items!, message, redirectUrl!);
+                return StatusCode(StatusCodes.Status404NotFound, response);
+            }
+
+            redirectUrl = Url.Action("Search", "Users");
+            return PartialView("ItemView", model);
+        }
     }
 }

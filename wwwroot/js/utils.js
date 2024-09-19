@@ -327,39 +327,6 @@ function DisplaySuccessAndError() {
     }
 }
 
-let newModal = `
-                    <div class="modal fade" id="display-modal" tabindex="-1" role="dialog" aria-labelledby="displaymodal" data-bs-backdrop="static" data-bs-keyboard="false">
-                            <div class="modal-dialog modal-dialog-centered">                               
-                                <div class="modal-content">         
-                                    <div class="modal-body">
-                                        <!-- Content loaded dynamically -->
-                                        <h5 class="modal-title"></h5>
-                                        <p class="details-title"></p>
-                                        <span class="modal-details h6 fs-6"></span>
-                                        <div id="btn-footer" class="text-end">
-                                            <button class="btn btn-primary mt-1" data-bs-dismiss="modal">
-                                                Okay
-                                            </button>
-                                        </div>                                    
-                                    </div>
-                                </div>
-                            </div>
-                    </div>
-                `;
-
-let DynamicModal = `
-                         <div id="dynamic-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                  <div class="modal-content">
-                                        <div class="modal-body">
- 
-                                        </div>
-                                  </div>
-                           </div>
-                        </div>
-                `;
-
-
 function ShowPassword(input, main, icon) {
     main.on('mousedown', function () {
         holdTimeout = setTimeout(() => {

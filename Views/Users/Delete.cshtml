@@ -6,32 +6,94 @@
     Layout = null;
 }
 
+<script>
+        $(document).ready(function () {
+        var text = [
+            "Updated", //0
+            "Not Updated", //1
+            "N/A", //2
+            "Complete", //3
+            "Incomplete(Usable)", //4
+            "Incomplete(Unusable)"  //5
+        ];
+        ChangeTextColor('#firmware-status', text[0], text[1], text[2], null);
+        ChangeTextColor('#item-status', text[3], text[5], null, text[4]);
+    });
+</script>
+
 <div>
-    <h5 class="text-break"><strong>Are you sure you want to delete this item?</strong></h5>
+    <h5 class="text-break text-danger"><strong>Are you sure you want to delete this item?</strong></h5>
+
+
     <hr />
-    <div class="row">
-        <dl>
-            <dt class="col-sm-2 w-auto">
+
+
+    <dl>
+        <div class="d-flex" style="font-size: 0.9rem;">
+            <dt class="d-flex col-sm-2 w-50">
                 @Html.DisplayNameFor(model => model.ItemCode)
             </dt>
-            <dd class="col-sm-10 text-break">
-                @Html.DisplayFor(model => model.ItemCode)
-            </dd>
-            <dt class="col-sm-2 w-auto">
+
+            <dt class="d-flex col-sm-2 w-50 border-start ps-2">
                 @Html.DisplayNameFor(model => model.ItemName)
             </dt>
-            <dd class="col-sm-10 text-break">
+
+        </div>
+
+        <div class="d-flex" style="font-size: 0.9rem;">
+            <dd class="d-flex col-sm-10 text-break w-50">
+                @Html.DisplayFor(model => model.ItemCode)
+            </dd>
+            <dd class="d-flex col-sm-10 text-break w-50 border-start ps-2">
                 @Html.DisplayFor(model => model.ItemName)
-            </dd>          
-        </dl>
+            </dd>
+        </div>
 
-    </div>
 
-    <hr class="mt-0"/>
-    <form asp-action="delete" method="post" class="mt-4" id="delete-form" onsubmit="return jQueryAjaxPost(this);">
-        <input type="hidden"  asp-route-id="@Model.ItemId"/>
-        <input type="submit" value="Delete Item" class="btn btn-danger form-control" />
-        <input type="button" value="Cancel" class="btn btn-outline-secondary form-control mt-3 close-modalBtn" data-bs-dismiss="modal" />
+
+        <div style="font-size: 0.9rem;">
+            <dt class="col-sm-2 w-auto">
+                @Html.DisplayNameFor(model => model.ItemDescription)
+            </dt>
+            @if (!String.IsNullOrEmpty(Model.ItemDescription))
+            {
+                <dd class="col-sm-10 text-break border w-auto p-2" style="font-size: 0.8rem;">
+                    @Html.DisplayFor(model => model.ItemDescription)
+                </dd>
+            }
+            else
+            {
+                <dd class="col-sm-10 text-break border w-auto p-2" style="font-size: 0.8rem;">
+                    No Description
+                </dd>
+            }
+        </div>
+
+
+        <div class="d-flex" style="font-size: 0.9rem;">
+            <dt class="col-sm-2 w-50 mb-0">
+                @Html.DisplayNameFor(model => model.Status)
+            </dt>
+            <dt class="col-sm-2 w-50 border-start ps-2">
+                @Html.DisplayNameFor(model => model.FirmwareUpdated)
+            </dt>
+        </div>
+
+        <div class="d-flex" style="font-size: 0.8rem;">
+            <dd id="item-status" class="col-sm-10 text-break w-50">
+                @Html.DisplayFor(model => model.Status)
+            </dd>
+
+            <dd id="firmware-status" class="col-sm-10 text-break w-50 border-start ps-2">
+                @Html.DisplayFor(model => model.FirmwareUpdated)
+            </dd>
+        </div>
+    </dl>
+    
+    <form asp-controller="ValidateApi" asp-action="DeleteItem" asp-route-id="@Model.ItemId" method="post" class="mt-4 d-flex" id="delete-form" onsubmit="return DeleteRequest(this);">
+        <input type="hidden"  asp-for="@Model.ItemId" id="delete-id" name="delete-id"/>
+        <input type="submit" value="Confirm" class="ms-auto btn btn-danger" />
+        <input type="button" value="Cancel" class="btn btn-outline-secondary ms-1 close-modalBtn" data-bs-dismiss="modal" />
     </form>
 </div>
 
