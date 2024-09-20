@@ -1,7 +1,6 @@
 ﻿using InventorySystem.Data;
 using InventorySystem.Models.Accounts;
 using InventorySystem.Models.DataEntities;
-using InventorySystem.Models.Services;
 using InventorySystem.Utilities;
 using InventorySystem.Utilities.Api;
 using Microsoft.AspNetCore.Authentication;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InventorySystem.Controllers.api
 {
+    [Authorize]
     [Route("api/u/validate/")]
     [ApiController]
     public class ValidateApi(ILogger<ValidateApi> logger, ApplicationDbContext context) : ControllerBase
@@ -18,6 +18,7 @@ namespace InventorySystem.Controllers.api
         private readonly ILogger<ValidateApi> _logger = logger;
         private readonly ApplicationDbContext _context = context;
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
@@ -50,7 +51,7 @@ namespace InventorySystem.Controllers.api
             }
         }
 
-        [Authorize]
+
         [HttpPost("add/{id?}")]
         public async Task<IActionResult> AddItem([FromBody] Item model, int? id)
         {
@@ -87,7 +88,7 @@ namespace InventorySystem.Controllers.api
             }
         }
 
-        [Authorize]
+
         [HttpPost("modify/{id?}")]
         public async Task<IActionResult> UpdateItem([FromBody] Item model, int? id)
         {
@@ -126,7 +127,6 @@ namespace InventorySystem.Controllers.api
             }
         }
 
-        [Authorize]
         [HttpPost("remove/{id}")]
         public async Task<IActionResult> DeleteItem([FromBody] int? id)
         {
@@ -151,7 +151,6 @@ namespace InventorySystem.Controllers.api
             }
         }
 
-        [Authorize]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()

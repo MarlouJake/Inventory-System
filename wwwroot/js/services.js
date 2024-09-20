@@ -306,18 +306,6 @@ function ValidateInput(data) {
         isValid = false;
     }
 
-    if (!data.status || data.status.includes('--Select Status--')) {
-        $('#statusDropdown').addClass('input-error');
-        $('#statusDropdown-error').text(validate.StatusRequired);
-        isValid = false;
-    }
-
-    if (!data.firmwareupdated || data.firmwareupdated.includes('--Select Status--')) {
-        $('#updateDropdown').addClass('input-error');
-        $('#updateDropdown-error').text(validate.FirmwareUpdateRequired);
-        isValid = false;
-    }
-
     if (!isValid) {
         console.log('Validation errors');
     }
@@ -418,7 +406,7 @@ ModifyItem = (data, url, dataid) => {
                 var response = jqXHR.responseJSON;
 
                 // Extract the message from the response, or use a default message
-                var message =  "An error occured";
+                var message =  response.Message || "An error occured";
 
                 // Extract the status message
                 var statusMessage = jqXHR.statusText || 'Unknown Error';
@@ -510,25 +498,6 @@ function ValidateUpdate(data) {
         console.error('name exceed length');
     }
 
-    if (data.itemdescription.length > 5000) { 
-        $('#updatedesc').addClass('input-error');
-        $('#updatedesc-error').text('Item description should not exceed 5000 characters');
-        console.error('description exceed length');
-    }
-
-    if(!data.status || data.status.includes('--Select Status--')) {
-        $('#updatestatus').addClass('input-error');
-        $('#updatestatus-error').text(validate.StatusRequired);
-        isValid = false;
-        console.error('status not selected');
-    }
-
-    if(!data.firmwareupdated || data.firmwareupdated.includes('--Select Status--')) {
-        $('#updatefirmware').addClass('input-error');
-        $('#updatefirmware-error').text(validate.FirmwareUpdateRequired);
-        isValid = false;
-        console.error('firmwareupdated not selected');
-    }
 
     if(!isValid) {
         console.error('Validation errors');

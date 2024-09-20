@@ -74,8 +74,30 @@ a.navbar-brand {
     background-color: #e06c12 !important;
 }
 
-.bgc-orange {
-    background-color: #fd7e14;
+.bgc-orange, .ctg-selected, .ctg-notselected:hover {
+    color: white !important;
+    background-color: #fd7e14 !important;
+    transition: ease 0.1s;
+}
+
+
+
+
+
+.outline-orange{
+    border: 1px solid #fd7e14;
+}
+
+.bgc-orange:hover, .ctg-selected:hover {
+    background-color: #e06c12 !important;
+    border: 1px solid white !important;
+}
+  
+.ctg-notselected {
+    border: 1px solid #fd7e14;
+    color: gray;
+    background-color: white;
+}
 }
 /* General body styles */
 body {
@@ -111,7 +133,7 @@ body {
         color: white;
     }
 
-/* Sidebar styles */
+/* Sidebar */
 #sidebar {
     width: 220px;
     height: 100vh;
@@ -120,6 +142,7 @@ body {
     left: 0;
     padding: 15px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #343a40;
     z-index: 1060;
 }
 
@@ -132,12 +155,18 @@ body {
         margin: 5px 0;
     }
 
-/* Main content area */
-#main-content {
-    margin-left: 110px;
-    padding: 15px;
-    overflow: auto;
+/* Main content */
+#main-content{
+    margin-left: 109px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 15px; /* adjust as needed */
+    overflow-x: hidden; /* hides horizontal overflow */
 }
+
+
+
+
 
 #top-bar {
     background-color: #343a40;
@@ -155,10 +184,6 @@ body {
     height: 3rem;
 }
 
-#user-logout {
-    cursor: pointer;
-    
-}
 
 .tabs .nav-link {
     border-radius: 8px;
@@ -169,11 +194,6 @@ body {
     background-color: lightslategray!important;
 }
 
-.spinner {
-    margin-left: 0.5rem; /* Space between text and spinner */
-    font-size: 1rem; /* Adjust size if needed */
-    color: white; /* Customize color if needed */
-}
 
 .nav-link.disabled {
     pointer-events: none; /* Disable clicking */
@@ -188,6 +208,17 @@ body {
 #username-container {
     overflow: clip;
     z-index: 1051;
+}
+
+#user-logout {
+    cursor: pointer;
+}
+
+
+.spinner {
+    margin-left: 0.5rem; /* Space between text and spinner */
+    font-size: 1rem; /* Adjust size if needed */
+    color: white; /* Customize color if needed */
 }
 
 /* Card styles */
@@ -227,6 +258,12 @@ body {
 }
 
 
+.form-control {
+    border-color: none; /* Green border when focused */
+    outline: none; /* Remove the default outline */
+    box-shadow: 0; /* Add a green shadow */
+}
+
 
 .no-items {
     display: flex;
@@ -236,17 +273,20 @@ body {
     text-align: center;
 }
 
+
+
 .input-error {
     border: 1px solid red;
 }
 
-
-.form-control {
-    border-color: none; /* Green border when focused */
-    outline: none; /* Remove the default outline */
-    box-shadow: 0; /* Add a green shadow */
+.input-blur {
+    border: 1px solid lightgrey;
 }
 
+.input-focus {
+    border: 1px solid blue;
+}
+  
 
 .input-success:focus {
     border-color: #4CAF50; /* Green border when focused */
@@ -261,20 +301,34 @@ body {
     caret-color: red; /* Change the text cursor (caret) color to red */
 }
 
+
+
+#modal-button-orange {
+    box-shadow: none;
+}
+
+    #modal-button-orange:hover {
+        background-color: #e06c12 !important;
+    }
+
+    #modal-button-orange:focus {
+        background-color: #e06c12 !important;
+        outline: #fd7e14 !important;
+        border-color: #fd7e14 !important;
+    }
+
+    #modal-button-orange:focus-within, #modal-button-orange:focus, #modal-button-orange:active {
+        box-shadow: #fd7e14 !important;
+        outline: #fd7e14 !important;
+        border-color: #fd7e14 !important;
+    }
+
+
 /* Responsive styles */
 
 @media (max-width: 1469px) {
     .card-container {
         grid-template-columns: repeat(7, 1fr); /* Adjust to 7 items per row on medium screens */
-    }
-
-    .pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        margin-left: 19%;
-        margin-right: 0;
     }
 
     #main-content {
@@ -301,40 +355,63 @@ body {
         grid-template-columns: repeat(4, 1fr); /* Adjust to 4 items per row on medium screens */
     }
 
+   
+
+   
+}
+
+@media (min-width: 891px) {
     #sidebar {
+        display: block; /* Show the sidebar */
+    }
+
+    .navbar-toggler {
+        display: none; /* Hide the hamburger button */
+    }
+}
+
+@media (max-width: 890px) {
+    #sidebar {
+        display: none; /* Hide the sidebar */
+    }
+
+    #sidebar-content{
         display: none;
-        margin: 0;
-        padding: 0;
     }
 
-    #main-content{
-        margin: 0;
+    .navbar-toggler {
+        display: block; /* Show the hamburger button */
     }
+
+    #main-content {
+        margin: 0; /* Reset left margin */
+    }
+
     .pagination {
-        font-size: 1.3rem;
-        margin-right: 0;
-        margin-left: 24.3%;
-        bottom: 10%;
-        position: fixed;
+        display: flex;
+        justify-content: center;
+        width: 100%; /* Ensure it spans the entire width */
+        margin-left: 0; /* Remove the left margin completely */
+        left: 0; /* Align the pagination with the start of the page */
+        right: 0; /* Ensure it's still centered */
     }
 }
 
-@media (max-width: 890) {
 
 
-    .pagination {
-        margin-right: 0;
-        margin-left: 24.3%;
-        bottom: 5%;
-        position: fixed;
+
+@media (max-width: 821) {
+
+    #main-content {
+        margin: 0;
     }
-}
 
+
+}
 
 @media (max-width: 725px) {
 
     #main-content {
-        margin: 0;
         padding: 0;
     }
 
@@ -347,14 +424,6 @@ body {
         grid-template-columns: repeat(3, 1fr); /* Adjust to 3 items per row */
     }
 
-    .pagination {
-        font-size: 0.9rem;
-        display: flex;
-        margin-right: 18%;
-        margin-left: 0rem;
-    }
-
-  
 
     .card {
         max-width: 100%;
@@ -374,3 +443,35 @@ body {
         align-items: center;
     }
 }
+
+
+
+.navbar-toggler-custom {
+    border-color: transparent; /* Optional: remove border */
+}
+
+.navbar-toggler-custom .navbar-toggler-icon {
+    background-image: none; /* Remove default icon */
+}
+
+    .navbar-toggler-custom .navbar-toggler-icon::before {
+        content: '';
+        display: block;
+        width: 30px; /* Width of your icon */
+        height: 3px; /* Height of your icon */
+        background-color: orange; /* Change to your desired color */
+        position: relative;
+        transition: all 0.3s; /* Optional: add some transition */
+    }
+
+    .navbar-toggler-custom .navbar-toggler-icon::after {
+        content: '';
+        display: block;
+        width: 30px; /* Width of your icon */
+        height: 3px; /* Height of your icon */
+        background-color: orange; /* Change to your desired color */
+        position: relative;
+        transition: all 0.3s; /* Optional: add some transition */
+    }
+
+

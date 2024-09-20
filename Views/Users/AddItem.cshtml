@@ -10,72 +10,165 @@
     $(document).ready(function () {
         getStatuses();
         getOptions();
+
+        var firmwarecheckbox = $('#include-firmwarestatus');
+        var updatedropdown = $('#updateDropdown');
+        var labelupdate = $('#firmwareCheckboxLabel');
+
+        toggleDropdown(firmwarecheckbox, updatedropdown, labelupdate);
+
+
+        firmwarecheckbox.on('change', function () {
+            toggleDropdown(firmwarecheckbox, updatedropdown, labelupdate);
+        });
     });
+
+    function toggleDropdown(checkbox, dropdown, label) {
+        if (checkbox.prop('checked')) {
+            dropdown.prop("disabled", false);
+            label.text("");
+        } else {       
+            dropdown.prop("disabled", true); 
+            label.text("Include");
+        }
+    }
 </script>
+
+<style>
+
+    .user-input, .errors {
+        font-size: 0.7rem;
+    }
+    #firmwareCheckboxLabel{
+        font-size: 0.7rem; 
+    }
+
+    .control-label {
+        font-size: 0.7rem;
+    }
+
+    .w-30{
+        width:8rem;
+    }
+
+    .user-input:focus {
+        outline: none;
+        border-color: none;
+        box-shadow: none;
+            outline: #fd7e14 !important;
+            border-color: #fd7e14 !important;
+    }
+
+    /* Hide the default checkbox */
+    #include-firmwarestatus {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 0.9rem;
+        height: 0.9rem;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        display: inline-block;
+        position: relative;
+        margin-top:0.4rem;
+    }
+
+        /* Create custom checked appearance */
+        #include-firmwarestatus:checked {
+            background-color: #28a745; /* Green color */
+            border-color: #28a745;
+        }
+
+            /* Add a checkmark when checked */
+            #include-firmwarestatus:checked::after {
+                content: "\2713"; /* Unicode for checkmark */
+                color: white;
+                font-size: 0.7rem;
+                position: absolute;
+                top: -2px;
+                left: 2px;
+            }
+</style>
+
+
 
 <h5 class="text-break"><strong>Add new item</strong></h5>
 <hr />
 <form asp-controller="ValidateApi" asp-action="AddItem"  id="add-item" method="post" class="forms" onsubmit="return AddRequest(this);">
 
-    <div class="form-group" style="font-size: 0.9rem;">
-        <label asp-for="ItemCode" for="itemCode" class="control-label"></label>
-        <input asp-for="ItemCode" id="itemCode" type="text" class="form-control form-control-sm w-50 user-input" name="itemCode"
-               autocomplete="off"
-               required
-               placeholder="Item Code"
-               data-val="true"
-               data-val-required="Item code is required!"
-               data-val-minlength="Item code must be at least 3 characters long."
-               data-val-minlength-min="3"
-               maxlength="20"
-               pattern="\S+" onkeydown="if(['Space'].includes(arguments[0].code)){return false;}" />
+    <div class="form-group d-flex" style="font-size: 0.9rem;">
+        <div class="w-50">
+            <label asp-for="ItemCode" for="itemCode" class="control-label"></label>
+            <input asp-for="ItemCode" id="itemCode" type="text" class="form-control form-control-sm w-50 user-input" name="itemCode"
+                   autocomplete="off"
+                   required
+                   placeholder="Item Code"
+                   data-val="true"
+                   data-val-required="Item code is required!"
+                   data-val-minlength="Item code must be at least 3 characters long."
+                   data-val-minlength-min="3"
+                   maxlength="20"
+                   pattern="\S+" onkeydown="if(['Space'].includes(arguments[0].code)){return false;}" />
 
-        <span asp-validation-for="ItemCode" id="itemCode-error" class="text-danger"></span>
+            <span asp-validation-for="ItemCode" id="itemCode-error" class="text-danger errors"></span>
+        </div>
+
+        <div class="w-50">
+            <label asp-for="ItemName" for="itemName" class="control-label"></label>
+            <input asp-for="ItemName" id="itemName" class="form-control form-control-sm w-50 user-input" name="itemName"
+                   autocomplete="off"
+                   required
+                   placeholder="Item Name"
+                   data-val="true"
+                   data-val-required="Item name is required!"
+                   data-val-minlength="Item name must be at least 3 characters long."
+                   maxlength="20" />
+            <span asp-validation-for="ItemName" id="itemName-error" class="text-danger errors"></span>
+        </div>
     </div>
 
-    <div class="form-group mt-2">
-        <label asp-for="ItemName" for="itemName" class="control-label"></label>
-        <input asp-for="ItemName" id="itemName" class="form-control form-control-sm w-50  user-input" name="itemName"
-               autocomplete="off"
-               required
-               placeholder="Item Name"
-               data-val="true"
-               data-val-required="Item name is required!"
-               data-val-minlength="Item name must be at least 3 characters long." 
-               maxlength="20" />
-        <span asp-validation-for="ItemName" id="itemName-error" class="text-danger"></span>
-    </div>
+    
 
-    <div class="form-group mt-2">
+    <div class="form-group">
         <label asp-for="ItemDescription" for="itemDescription" class="control-label"></label>
-        <textarea asp-for="ItemDescription" id="itemDescription" type="text" class="form-control form-control-sm w-50  user-input" name="itemDescription"
+        <textarea asp-for="ItemDescription" id="itemDescription" type="text" class="form-control form-control-sm user-input" name="itemDescription"
                   autocomplete="off"
                   placeholder="Description"></textarea>
         <span asp-validation-for="ItemDescription" class="text-danger"></span>
     </div>
 
-    <div class="form-group mt-2">
-        <label asp-for="Status" for="statusDropdown" class="control-label"></label>
-        <select asp-for="Status" id="statusDropdown" class="form-control form-control-sm w-50 " required name="statusDropdown">
-            <option id="statusvalue" value="" class="text-muted">--Select Status--</option>
-        </select>
+    <div class="form-group d-flex">
+        
+        <div class="w-50">  
+            <label asp-for="Status" for="statusDropdown" class="control-label">Status</label>
+            <select asp-for="Status" id="statusDropdown" class="form-control form-control-sm w-30 user-input" required name="statusDropdown">
+                <option id="statusvalue" value="" class="text-muted text-center">--Select Status--</option>
+            </select>
 
-        <span asp-validation-for="Status" id="statusDropdown-error" class="text-danger"></span>
+            <span asp-validation-for="Status" id="statusDropdown-error" class="text-danger errors"></span>
+        </div>
+
+        <div>
+            <label asp-for="FirmwareUpdated" for="updateDropdown" class="control-label"></label>
+            <div class="d-flex gap-1">
+                <select asp-for="FirmwareUpdated" id="updateDropdown" class="form-control form-control-sm w-30 user-input" name="updateDropdown">
+                    <option id="updatevalue" value="" class="text-muted text-center">--Select Option--</option>
+                </select>
+                <span asp-validation-for="FirmwareUpdated" itemid="updateDropdown-error errors" class="text-danger"></span>
+                <div class="d-flex gap-1">
+                    <input type="checkbox" id="include-firmwarestatus" />
+                    <span id="firmwareCheckboxLabel" class="mt-1 text-muted"></span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="form-group mt-2">
-        <label asp-for="FirmwareUpdated" for="updateDropdown" class="control-label"></label>
-        <select asp-for="FirmwareUpdated" id="updateDropdown" class="form-control form-control-sm w-50 " required name="updateDropdown">
-            <option id="updatevalue" value="" class="text-muted">--Select Option--</option>
-        </select>
-        <span asp-validation-for="FirmwareUpdated" itemid="updateDropdown-error" class="text-danger"></span>
-    </div>
 
     <hr class="mt-4" />
 
     <div class="form-group m-0 d-flex">
-        <input type="submit" value="Add Item" class="ms-auto btn btn-success"/>
-        <input type="button" value="Cancel" class="btn btn-outline-secondary ms-3" data-bs-dismiss="modal" />
+        <input type="submit" value="Add" class="ms-auto btn btn-sm btn-success w-30"/>
+        <input type="button" value="Cancel" class="btn btn-sm btn-outline-secondary ms-3 w-25" data-bs-dismiss="modal" />
     </div>
 </form>
 

@@ -1,28 +1,25 @@
 ﻿.pagination {
     display: flex;
     justify-content: center;
-    position: fixed; /* Fixed at the bottom */
-    bottom: 0; /* Stick to the bottom of the page */
+    width: 100%; /* Make sure the container is full width */
+    position: fixed;
+    bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1000; /* Ensure it's above other elements */
-    background-color: rgba(52,58,64, 0.7); /* Semi-transparent background */
-    backdrop-filter: blur(60%); /* Applies blur effect to the background behind the element */
-    -webkit-backdrop-filter: blur(60%); /* For better compatibility with Safari */
-
-    padding: 0.5rem 0;
-    margin: 0; /* Remove default margin */
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional: shadow effect to distinguish it */
+    padding-bottom: 0.8rem;
+    margin-bottom: 0;
+    z-index: 1000;
+    background-color: rgba(52, 58, 64, 0.7);
+    backdrop-filter: blur(60%);
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
+
 
     .pagination a {
         display: block;
-        padding: 0.5rem 1rem;
         border: 1px solid #dee2e6;
-        border-radius: 0.25rem;
         text-decoration: none;
         color: lightslategray; /* Set font color for all buttons */
-        margin: 0 5px;
         transition: background-color 0.3s, color 0.3s; /* Smooth transition */
     }
 
@@ -31,15 +28,22 @@
             color: black; /* Hover text color */
         }
 
-        .pagination .page-item.active .page-link {
-            background-color: #fd7e14 !important; /* Ensure the color change applies */
-            border-color: #fd7e14 !important; /* Ensure the border color matches */
-            color: white !important; /* Ensure the text color changes */
-        }
+    .pagination .page-item.active .page-link {
+        background-color: #fd7e14 !important; /* Ensure the color change applies */
+        border-color: #fd7e14 !important; /* Ensure the border color matches */
+        color: white !important; /* Ensure the text color changes */
+    }
 
-        .pagination a.disabled {
-            color: #6c757d;
-            cursor: not-allowed;
-            pointer-events: none;
-            background-color: #f8f9fa;
-        }
+    .pagination a.disabled {
+        color: #6c757d;
+        cursor: not-allowed;
+        pointer-events: none;
+        background-color: #f8f9fa;
+    }
+
+
+@media (min-width: 891px) {
+    .pagination {
+        margin-left: 6rem; /* Space for the sidebar */
+    }
+}

@@ -31,15 +31,15 @@ namespace InventorySystem.Models.DataEntities
 
         [DisplayName(DisplayNames.ItemStatus)]
         [DataType(DataType.Text)]
-        [ValidateField]
-        [ValidateValue("itemstatus")]
         public string? Status { get; set; }
 
-        [ValidateField]
-        [DisplayName(DisplayNames.FirmwareStatus)]
+        [DisplayName("Board Status")]
         [DataType(DataType.Text)]
-        [ValidateValue("firmwarestatus")]
         public string? FirmwareUpdated { get; set; }
+
+        [DisplayName("Category")]
+        [DataType(DataType.Text)]
+        public Category Category { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:MMMM dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
         [DisplayName("Date Added")]
@@ -53,6 +53,7 @@ namespace InventorySystem.Models.DataEntities
 
         [DisplayName(DisplayNames.UserId)]
         public int? UserId { get; set; }
+
         public Item()
         {
             ItemDateAdded = DateTime.Now;

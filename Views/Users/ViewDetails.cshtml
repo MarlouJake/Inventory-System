@@ -52,7 +52,7 @@
 
         </div>
 
-        <div class="d-flex" style="font-size: 0.9rem;">
+        <div class="d-flex" style="font-size: 0.8rem;">
             <dd class="d-flex col-sm-10 text-break w-50">
                 @Html.DisplayFor(model => model.ItemCode)
             </dd>
@@ -79,6 +79,10 @@
                     No Description
                 </dd>
             }
+
+            <dt>
+                @Html.DisplayNameFor(model => model.ItemCategories)
+            </dt>
         </div>
 
 
@@ -86,9 +90,11 @@
             <dt class="col-sm-2 w-50 mb-0">
                 @Html.DisplayNameFor(model => model.Status)
             </dt>
+
             <dt class="col-sm-2 w-50 border-start ps-2">
                 @Html.DisplayNameFor(model => model.FirmwareUpdated)
             </dt>
+           
         </div>
 
         <div class="d-flex" style="font-size: 0.8rem;">
@@ -96,9 +102,18 @@
                 @Html.DisplayFor(model => model.Status)
             </dd>
 
-            <dd id="firmware-status" class="col-sm-10 text-break w-50 border-start ps-2">
-                @Html.DisplayFor(model => model.FirmwareUpdated)
-            </dd>
+            @if (!String.IsNullOrEmpty(Model.FirmwareUpdated))
+            {
+                <dd id="firmware-status" class="col-sm-10 text-break w-50 border-start ps-2">
+                    @Html.DisplayFor(model => model.FirmwareUpdated)
+                </dd>
+            }
+            else
+            {
+                <dd id="firmware-status" class="col-sm-10 text-break w-50 border-start ps-2 text-muted">
+                    Not Applicable
+                </dd>
+            }
         </div>
 
         <div class="d-flex " style="font-size: 0.9rem;">
@@ -126,6 +141,6 @@
 
 </div>
 <div class="form-group m-0 d-flex">
-    <a onclick="ModalShow(`dashboard/modify/@Model.ItemId`)" class="btn btn-success ms-auto">Modify</a>
-    <input type="button" value="Cancel" class="ms-2 btn btn-outline-secondary" data-bs-dismiss="modal" />
+    <a onclick="ModalShow(`dashboard/modify/@Model.ItemId`)" class="btn btn-sm w-25 btn-success ms-auto">Modify</a>
+    <input type="button" value="Cancel" class="ms-2 btn btn-sm w-25 btn-outline-secondary" data-bs-dismiss="modal" />
 </div>

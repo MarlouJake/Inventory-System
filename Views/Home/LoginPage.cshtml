@@ -37,6 +37,14 @@
     .icons-container{
         height: 2.2rem;
     }
+
+    .user-input:focus {
+        outline: none;
+        border-color: none;
+        box-shadow: none;
+        outline: #fd7e14 !important;
+        border-color: #fd7e14 !important;
+    }
 </style>
 
 <h6 class="text-center">User Login</h6>
@@ -45,7 +53,7 @@
 
     <form asp-controller="ValidateApi" asp-action="Login" id="user-login" method="post" class="forms" onsubmit="return UserRequest(this);" autocomplete="off">
         <div class="form-group">
-            <label asp-for="Username" class="control-label mt-2"></label>
+            <label asp-for="Username" for="username" class="control-label mt-2"></label>
             <div class="input-group ">
                 <div class="input-group-prepend icons-container">
                     <div class="input-group-text icons-container">
@@ -66,7 +74,7 @@
         </div>
 
         <div class="form-group">
-            <label asp-for="Password" class="control-label mt-2"></label>
+            <label asp-for="Password" for="password" class="control-label mt-2"></label>
             <div class="input-group">
                 <div class="input-group-prepend icons-container">
                     <div class="input-group-text icons-container">

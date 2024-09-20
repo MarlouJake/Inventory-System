@@ -20,9 +20,20 @@
         getStatuses();
         getOptions();
         checkcodechanges();
+        setSelectedValues();
+
 
         $('#updatecode').on('input', function () {
             checkcodechanges();
+        });
+
+
+        $('#updatecode').on('focus', function () {
+            $('#code-container').addClass('input-focus').removeClass('input-blur')
+        });
+
+        $('#updatecode').on('blur', function () {
+            $('#code-container').removeClass('input-focus').addClass('input-blur');
         });
     });
 
@@ -38,22 +49,58 @@
         }
     }
 
+    function setSelectedValues() {
+   
+        var selectedStatus = '@Html.Raw(Model.Status)';
+        var selectedFirmware = '@Html.Raw(Model.FirmwareUpdated)';
+
+        $('#updatestatus').val(selectedStatus);
+        $('#updatefirmware').val(selectedFirmware);
+    }
+
 </script>
 
 <style>
-    .update{
+    .update, .errors {
+        font-size: 0.7rem;
+
+    }
+
+    .update:focus {
+        outline: none;
+        border-color: none;
+        box-shadow: none;
+            outline: #fd7e14 !important;
+            border-color: #fd7e14 !important;
+    }
+
+    .user-input {
         font-size: 0.7rem;
     }
+
+    .control-label {
+        font-size: 0.7rem;
+    }
+
+    .code-container{
+        border-radius: 4px;
+    }
+    
+
 </style>
 
 <h5><strong>Modify Details</strong></h5>
 <hr />
 <form asp-controller="ValidateApi" asp-action="UpdateItem" asp-route-id="@Model.ItemId" id="update-form" class="forms" method="post" onsubmit="return UpdateRequest(this);">
     <input hidden asp-for="@Model.ItemId" id="dataid" name="dataid"/>
-    <div class="form-group">
-        <label asp-for="ItemCode" class="control-label"></label>
-        <div class="input-group">
-            <input asp-for="ItemCode" type="text" class="form-control user-input update" autocomplete="off"
+    <div class="form-group d-flex justify-content-between gap-4">
+        <div class="d-block w-50">
+            <div>
+                <label asp-for="ItemCode" class="control-label"></label>
+                <span asp-validation-for="ItemCode" id="updatecode-error" class="text-danger ms-4 mb-5 errors"></span>
+            </div>
+            
+            <input asp-for="ItemCode" type="text" class="form-control user-input update mb-0" autocomplete="off"
                    name="updatecode"
                    id="updatecode"
                    required
@@ -62,31 +109,27 @@
                    data-val-minlength="Item code must be at least 3 characters long."
                    data-val-minlength-min="3"
                    maxlength="20" pattern="\S+" onkeydown="if(['Space'].includes(arguments[0].code)){return false;}" />
-            <div class="input-group-append">
-                <div class="input-group-text previous-id text-muted update">
-
-                </div>
-            </div>
-
+            <span class="previous-id text-muted update mb-0" style="display: flex; margin-top: -1px"></span>
+            
         </div>
-        <span asp-validation-for="ItemCode" id="updatecode-error" class="text-danger"></span>
+        
+        <div class="d-block w-50">
+            <label asp-for="ItemName" class="control-label"></label>
+            <input asp-for="ItemName" type="text" class="form-control user-input update" autocomplete="off"
+                   name="updatename"
+                   id="updatename"
+                   required
+                   data-val="true"
+                   data-val-required="Item name is required!"
+                   data-val-minlength="Item name must be at least 3 characters long."
+                   data-val-minlength-min="3"
+                   maxlength="20" />
+            <span asp-validation-for="ItemName" id="updatename-error" class="text-danger"></span>
+        </div>
     </div>
 
-    <div class="form-group mt-2">
-        <label asp-for="ItemName" class="control-label"></label>
-        <input asp-for="ItemName" type="text" class="form-control user-input update" autocomplete="off"
-               name="updatename" 
-               id="updatename"
-               required
-               data-val="true"
-               data-val-required="Item name is required!"
-               data-val-minlength="Item name must be at least 3 characters long."
-               data-val-minlength-min="3"
-               maxlength="20" />
-        <span asp-validation-for="ItemName" id="updatename-error" class="text-danger"></span>
-    </div>
 
-    <div class="form-group mt-2">
+    <div class="form-group mt-1">
         <label asp-for="ItemDescription" class="control-label"></label>
         <textarea asp-for="ItemDescription" type="text" class="form-control user-input update" autocomplete="off"
                name="updatedesc" 
@@ -96,28 +139,31 @@
         <span asp-validation-for="ItemDescription" id="updatedesc-error" class="text-danger"></span>
     </div>
 
-    <div class="form-group mt-2">
-        <label asp-for="Status" class="control-label"></label>
-        <select asp-for="Status" id="updatestatus" class="form-control update" required name="updatestatus">
-            <option value="" class="text-muted">--Select Status--</option>
-        </select>
+    <div class="form-group mt-2 d-flex justify-content-between gap-4">
+        <div class="w-50">
+            <label asp-for="Status" class="control-label"></label>
+            <select asp-for="Status" id="updatestatus" class="form-control update" required name="updatestatus">
+                <option value="" class="text-muted">--Select Status--</option>
+            </select>
 
-        <span asp-validation-for="Status" id="updatestatus-errror" class="text-danger"></span>
+            <span asp-validation-for="Status" id="updatestatus-errror" class="text-danger"></span>
+        </div>
+
+        <div class="w-50">
+            <label asp-for="FirmwareUpdated" class="control-label"></label>
+            <select asp-for="FirmwareUpdated" id="updatefirmware" class="form-control update" name="updatefirmware">
+                <option value="" class="text-muted">--Select Option--</option>
+            </select>
+
+            <span asp-validation-for="FirmwareUpdated" id="updatefirmware-error" class="text-danger"></span>
+        </div>
     </div>
 
-    <div class="form-group mt-2">
-        <label asp-for="FirmwareUpdated" class="control-label"></label>
-        <select asp-for="FirmwareUpdated" id="updatefirmware" class="form-control update" required name="updatefirmware">
-            <option value="" class="text-muted">--Select Option--</option>
-        </select>
+    <hr class="mt-4" />
 
-        <span asp-validation-for="FirmwareUpdated" id="updatefirmware-error" class="text-danger"></span>
-    </div>
-
-
-    <div class="form-group mt-3">
-        <input type="submit" value="Save Changes" class="btn btn-primary form-control" />
-        <input type="button" value="Cancel" class="btn btn-outline-secondary form-control mt-3 close-modalBtn" data-bs-dismiss="modal" />
+    <div class="form-group m-0 d-flex">
+        <input type="submit" value="Save" class="btn bgc-orange w-25 btn-sm text-light ms-auto modal-button-orange" />
+        <input type="button" value="Cancel" class="btn btn-outline-secondary w-25 btn-sm close-modalBtn ms-3" data-bs-dismiss="modal" />
     </div>
 </form>
 

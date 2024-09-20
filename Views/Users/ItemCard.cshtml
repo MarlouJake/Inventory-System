@@ -13,7 +13,9 @@
     <div class="card-body">
         <h6 class="card-title mb-1 fs-6"><strong>@Model.ItemName</strong></h6>
         <p class="card-text mb-1"><strong>Code:</strong> @Model.ItemCode</p>
-        <p class="card-text mb-0"><strong>Status:</strong> @Model.Status</p>
+        <p class="card-text mb-0"><strong>Status:</strong> 
+            @Model.Status
+        </p>
     </div>
     <div class="card-footer">
         <a onclick="ModalShow('dashboard/details/@Model.ItemId')"

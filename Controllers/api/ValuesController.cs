@@ -36,5 +36,20 @@ namespace InventorySystem.Controllers.api
 
             return new JsonResult(options);
         }
+
+        [Route("get-categories")]
+        [HttpGet]
+        public JsonResult GetCategories()
+        {
+            var options = new List<SelectListItem>
+            {
+                //new() { Value = "--Select Status--", Text = "--Select Status--" },             
+                new() { Value = "Bookks", Text = "Books" },
+                new() { Value = "Kits", Text = "Kits" },
+                new() { Value = "Materials", Text = "Materials" }
+            };
+
+            return new JsonResult(options);
+        }
     }
 }
