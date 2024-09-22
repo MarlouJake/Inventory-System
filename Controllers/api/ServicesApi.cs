@@ -2,6 +2,7 @@
 using InventorySystem.Models.DataEntities;
 using InventorySystem.Utilities;
 using InventorySystem.Utilities.Api;
+using InventorySystem.Utilities.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
@@ -15,6 +16,32 @@ namespace InventorySystem.Controllers.api
     public class ServicesApi(ApplicationDbContext context) : ControllerBase
     {
         private readonly ApplicationDbContext _context = context;
+
+        [HttpPost("create/user")]
+        public async Task<IActionResult> CreateNewAccount([FromBody] User model)
+        {
+            var newUser = new User
+            {
+                Username = model.Username,
+                Email = model.Email,
+                Password = HashHelper.HashPassword(model.Password!),
+            };
+
+            var seedrole = new SeedUserRole(_context);
+            var (isSuccess, message, statuscode) = await seedrole.AddUserRole(newUser, "User");
+
+            if (isSuccess)
+            {
+                var redirectTo = "home/login";
+                var response = ApiResponseUtils.SuccessResponse(null!, message, redirectTo);
+                return StatusCode(statuscode, response);
+            }
+            else
+            {
+                var response = ApiResponseUtils.CustomResponse(isSuccess, message, null);
+                return StatusCode(statuscode, response);
+            }
+        }
 
         [HttpPost("add")]
         public async Task<IActionResult> AppendItem([FromBody][Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,ItemDateAdded,ItemDateUpdated,FirmwareUpdated,UserId")] Item model)

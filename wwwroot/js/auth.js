@@ -1,9 +1,12 @@
 ﻿// Login API
 UserRequest = (form) => {
-    const method = validate.Post;
-    const login = validate.Login;
-    const loginsuccess = validate.LoginSuccess;
-    const loginfailed = validate.LoginFailed;
+    const method = validationMessages.Post;
+    const login = validationMessages.Login;
+    const loginsuccess = validationMessages.LoginSuccess;
+    const loginfailed = validationMessages.LoginFailed;
+    const fillRequiredFields = validationMessages.FillRequiredFields;
+    const credentialsIncorrect = validationMessages.UsernamePasswordIncorrect;
+    var found = validationMessages.MatchFound;
     var loginbutton = $('#user-login .form-group #loginbutton');
     var info = $('#layoutbody #success-message');
     const requestroute = form.action;
@@ -36,7 +39,7 @@ UserRequest = (form) => {
                 var status = `Status Code: ${jqXHR.status}`;        
                 var details = `Server responded with status code: ${jqXHR.status} ${textStatus}`;
                 if (response.IsValid) {
-                    var message = response.Message || validate.MatchFound;
+                    var message = response.Message || found;
 
                     let result = jsonResult(
                         method,
@@ -63,7 +66,7 @@ UserRequest = (form) => {
                     
                 }
                 else {
-                    var message = response.Message || validate.UsernamePasswordIncorrect;
+                    var message = response.Message || credentialsIncorrect;
 
                     setTimeout(() => {
                         $("#error-message").text(message).fadeIn().delay(100).fadeOut();
@@ -104,7 +107,7 @@ UserRequest = (form) => {
                     }
                 } else {
                     // Fallback message if no errors are present in the response
-                    message = validate.FillRequiredFields || 'An unknown error occurred.';
+                    message = fillRequiredFields || 'An unknown error occurred.';
                 }
 
                 var statusMessage = jqXHR.statusText || 'Unknown Error';
@@ -167,13 +170,11 @@ UserRequest = (form) => {
 };
 
 
-
-
 AuthRequest = (data, url) => {
-    const method = validate.Post;
-    const login = validate.Login;
-    const loginsuccess = validate.LoginSuccess;
-    const loginfailed = validate.LoginFailed;
+    const method = validationMessages.Post;
+    const login = validationMessages.Login;
+    const loginsuccess = validationMessages.LoginSuccess;
+    const loginfailed = validationMessages.LoginFailed;
     try {
         $.ajax({
             type: method,
@@ -239,7 +240,7 @@ AuthRequest = (data, url) => {
     catch (ex) {
         var message = response.Message || 'An error occured while trying to send request.';
         var responsemessage = `Server responded with status code: ${jqXHR.status} ${textStatus}.`;
-        var details = `${validate.LoginFailed}: ${ex}<br>${responsemessage}<br>${message}<br>${ex}`;
+        var details = `${loginfailed}: ${ex}<br>${responsemessage}<br>${message}<br>${ex}`;
 
         let result = jsonResult(
             method,
@@ -262,9 +263,13 @@ AuthRequest = (data, url) => {
 };
 
 
-
 //Logout API 
 LogoutRequest = (url) => {
+    var logout = validationMessages.Logout;
+    var logoutSuccess = validationMessages.LogoutRequest;
+    var logoutFailed = validationMessages.LogoutFailed;
+    var logoutError = validationMessages.LogoutError;
+
     const method = validate.Post;
     var info = $('#layoutbody #message-success');
     var logout = $('#user-logout');
@@ -285,10 +290,10 @@ LogoutRequest = (url) => {
 
                     let result = jsonResult(
                         method,
-                        validate.Logout,
-                        validate.LogoutSuccess,
+                        logout,
+                        logoutSuccess,
                         true,
-                        validate.LogoutSuccess,
+                        logoutFailed,
                         false,
                         message,
                         status,
@@ -300,16 +305,16 @@ LogoutRequest = (url) => {
 
                     window.location.href = response.redirectUrl;
 
-                    $("#success-message").text(validate.LogoutSuccess).fadeIn().delay(3000).fadeOut();
+                    $("#success-message").text(logoutSuccess).fadeIn().delay(3000).fadeOut();
                 }
                 else {
 
                     let result = jsonResult(
                         method,
-                        validate.Logout,
-                        validate.LogoutSuccess,
+                        logout,
+                        logoutSuccess,
                         false,
-                        validate.LogoutSuccess,
+                        logoutFailed,
                         true,
                         message,
                         status,
@@ -320,7 +325,7 @@ LogoutRequest = (url) => {
 
                     console.log("API Data", JSON.stringify(result, null, 2));
 
-                    $("#error-message").text(validate.LogoutFailed).fadeIn().delay(500).fadeOut();
+                    $("#error-message").text(logoutFailed).fadeIn().delay(500).fadeOut();
 
                 }
 
@@ -336,10 +341,10 @@ LogoutRequest = (url) => {
 
                 let result = jsonResult(
                     method,
-                    validate.Logout,
-                    validate.LogoutSuccess,
+                    logout,
+                    logoutSuccess,
                     false,
-                    validate.LogoutSuccess,
+                    logoutFailed,
                     true,
                     message,
                     statusMessage,
@@ -359,13 +364,13 @@ LogoutRequest = (url) => {
     catch (ex) {
         var message = response.Message || 'An error occured while trying to send request.';
         var responsemessage = `Server responded with status code: ${jqXHR.status} ${textStatus}.`;
-        var details = `${validate.LogoutError}: ${ex}<br>${responsemessage}<br>${message}`;
+        var details = `${logoutError}: ${ex}<br>${responsemessage}<br>${message}`;
         let result = jsonResult(
             method,
-            validate.Logout,
-            validate.LogoutSuccess,
+            logout,
+            logoutSuccess,
             false,
-            validate.LogoutSuccess,
+            logoutFailed,
             true,
             message,
             responsemessage,
@@ -385,7 +390,41 @@ LogoutRequest = (url) => {
 
 
 
+CreateRequest = (form) => {
+    const formData = new FormData(form);
+    const data = {
+        username: formData.get('signup-username'),
+        email: formData.get('signup-email'),
+        password: formData.get('signup-password'),
+        confirmpassword: formData.get('signup-retypepassword')
+    };
 
+    if (!ValidateSignup(data)) {
+        return false;
+    }
+    console.log('to ajax');
+    $.ajax({
+        method: 'POST',
+        url: form.action,
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify(data),
+        success: function (response) {
+            console.log(JSON.stringify(response));
+        },
+        error: function (jqXHR, textStatus) {
+            var response = jqXHR.responseJSON;
+
+            console.error('failed: ', response.Message);
+        }
+
+    });
+    return false;
+}
+
+CreateAccount = (data, url) => {
+
+}
 
 
 

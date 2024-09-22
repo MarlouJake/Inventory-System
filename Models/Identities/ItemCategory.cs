@@ -7,6 +7,7 @@ namespace InventorySystem.Models.Identities
     {
         [Key]
         public int ItemCategoryId { get; set; }
+
         public int ItemId { get; set; }
         public Item? Item { get; set; }
 

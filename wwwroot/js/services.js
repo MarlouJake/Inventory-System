@@ -1,8 +1,8 @@
 ﻿AddRequest = (form) => {
     var type = 'POST';
-    var add = validate.Add;
-    var addsuccess = validate.AddingSuccess;
-    var addfailed = validate.AddingFailed;
+    var add = validationMessages.Add;
+    var addsuccess = validationMessages.AddingSuccess;
+    var addfailed = validationMessages.AddingFailed;
     const requestroute = form.action;
     //const user = sessionStorage.getItem('storedUsername');
     const formData = new FormData(form);
@@ -130,9 +130,9 @@ AddItem = (data, url) => {
     $('.form-control').removeClass('input-error').addClass('input-success');
 
     var type = 'POST';
-    var add = validate.Add;
-    var addsuccess = validate.AddingSuccess;
-    var addfailed = validate.AddingFailed;
+    var add = validationMessages.Add;
+    var addsuccess = validationMessages.AddingSuccess;
+    var addfailed = validationMessages.AddingFailed;
     try
     {
         $.ajax({

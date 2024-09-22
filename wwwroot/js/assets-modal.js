@@ -1,10 +1,18 @@
 ﻿function ModalShow(url) {
+    var dashboard = $('#dashboard-layout');
+    var home = $('#layoutbody');
     $('.modal').each(function () {
         $(this).modal('hide');
     });
     $('#dynamic-modal').remove();
+
     setTimeout(() => {
-        $('#dashboard-layout').append(DynamicModal);
+        if (dashboard) {
+            dashboard.append(DynamicModal);
+        }
+        if (home) {
+            home.append(DynamicModal);
+        }       
         GetData(url);
     },100);
 };

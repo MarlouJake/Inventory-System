@@ -1,7 +1,6 @@
-﻿using InventorySystem.Models.Identities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace InventorySystem.Models.DataEntities
+namespace InventorySystem.Models.Identities
 {
     public class Category
     {

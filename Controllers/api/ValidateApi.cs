@@ -51,6 +51,36 @@ namespace InventorySystem.Controllers.api
             }
         }
 
+        [AllowAnonymous]
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] RegisterModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                  .SelectMany(v => v.Errors)
+                  .Select(e => e.ErrorMessage)
+                  .ToList();
+
+                var message = string.Join("; ", errors);
+                Console.WriteLine(message);
+                var response = ApiResponseUtils.ErrorResponse(null!, message);
+                return await Task.FromResult(StatusCode(StatusCodes.Status400BadRequest, response));
+            }
+            else
+            {
+                var redirectUrl = Url.Action("CreateNewAccount", "ServicesApi");
+                var message = "Validation Successful. Redirecting...";
+
+                #region --Console Logger--
+                Console.Clear();
+                Console.WriteLine(Messages.PrintUrl(redirectUrl));
+                #endregion
+                Console.WriteLine(message);
+                var responseSuccess = ApiResponseUtils.SuccessResponse(model.Username!, message, redirectUrl!);
+                return await Task.FromResult(StatusCode(StatusCodes.Status202Accepted, responseSuccess));
+            }
+        }
 
         [HttpPost("add/{id?}")]
         public async Task<IActionResult> AddItem([FromBody] Item model, int? id)

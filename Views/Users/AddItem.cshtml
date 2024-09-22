@@ -45,6 +45,7 @@
 
     .control-label {
         font-size: 0.7rem;
+        font-weight: bold;
     }
 
     .w-30{
@@ -97,9 +98,9 @@
 <form asp-controller="ValidateApi" asp-action="AddItem"  id="add-item" method="post" class="forms" onsubmit="return AddRequest(this);">
 
     <div class="form-group d-flex" style="font-size: 0.9rem;">
-        <div class="w-50">
+        <div class="w-50 col-sm-2">
             <label asp-for="ItemCode" for="itemCode" class="control-label"></label>
-            <input asp-for="ItemCode" id="itemCode" type="text" class="form-control form-control-sm w-50 user-input" name="itemCode"
+            <input asp-for="ItemCode" id="itemCode" type="text" class="form-control form-control-sm user-input" name="itemCode"
                    autocomplete="off"
                    required
                    placeholder="Item Code"
@@ -113,9 +114,9 @@
             <span asp-validation-for="ItemCode" id="itemCode-error" class="text-danger errors"></span>
         </div>
 
-        <div class="w-50">
+        <div class="w-50 col-sm-2">
             <label asp-for="ItemName" for="itemName" class="control-label"></label>
-            <input asp-for="ItemName" id="itemName" class="form-control form-control-sm w-50 user-input" name="itemName"
+            <input asp-for="ItemName" id="itemName" class="form-control form-control-sm user-input" name="itemName"
                    autocomplete="off"
                    required
                    placeholder="Item Name"
@@ -130,22 +131,34 @@
     
 
     <div class="form-group">
-        <label asp-for="ItemDescription" for="itemDescription" class="control-label"></label>
-        <textarea asp-for="ItemDescription" id="itemDescription" type="text" class="form-control form-control-sm user-input" name="itemDescription"
-                  autocomplete="off"
-                  placeholder="Description"></textarea>
-        <span asp-validation-for="ItemDescription" class="text-danger"></span>
+        <div>
+            <label asp-for="ItemDescription" for="itemDescription" class="control-label"></label>
+            <textarea asp-for="ItemDescription" id="itemDescription" type="text" class="form-control form-control-sm user-input" name="itemDescription"
+                      autocomplete="off"
+                      placeholder="Description"></textarea>
+            <span asp-validation-for="ItemDescription" class="text-danger"></span>
+        </div>
     </div>
 
     <div class="form-group d-flex">
         
-        <div class="w-50">  
+        <div>  
             <label asp-for="Status" for="statusDropdown" class="control-label">Status</label>
             <select asp-for="Status" id="statusDropdown" class="form-control form-control-sm w-30 user-input" required name="statusDropdown">
                 <option id="statusvalue" value="" class="text-muted text-center">--Select Status--</option>
             </select>
 
             <span asp-validation-for="Status" id="statusDropdown-error" class="text-danger errors"></span>
+        </div>
+
+        <div>
+            <label asp-for="Category" for="categoryDropdown" class="control-label">Category</label>
+            <div class="d-flex gap-1">
+                <select asp-for="Category" id="categoryDropdown" class="form-control form-control-sm w-30 user-input" name="categoryDropdown">
+                    <option id="categoryValue" value="" class="text-muted text-center">--Select Option--</option>
+                </select>
+                <span asp-validation-for="Category" itemid="categoryDropdown-error errors" class="text-danger"></span>
+            </div>
         </div>
 
         <div>

@@ -66,7 +66,7 @@ internal class Program
         {
             // Add policies if needed, e.g., for roles
             options.AddPolicy("RequireAdministratorRole", policy =>
-                policy.RequireRole("Admin"));
+                policy.RequireRole("Administrator"));
             options.AddPolicy("RequireUserRole", policy =>
                 policy.RequireRole("User"));
         });

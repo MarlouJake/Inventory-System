@@ -39,7 +39,7 @@ namespace InventorySystem.Models.DataEntities
 
         [DisplayName("Category")]
         [DataType(DataType.Text)]
-        public Category Category { get; set; }
+        public string? Category { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:MMMM dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
         [DisplayName("Date Added")]

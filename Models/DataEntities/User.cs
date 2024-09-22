@@ -3,7 +3,6 @@ using InventorySystem.Models.Identities;
 using InventorySystem.Utilities;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InventorySystem.Models.DataEntities
 {
@@ -13,10 +12,6 @@ namespace InventorySystem.Models.DataEntities
         [DisplayName(DisplayNames.UserId)]
         [Key]
         public int UserId { get; set; }
-
-        [ForeignKey("AdminId")]
-        [DisplayName(DisplayNames.AdminId)]
-        public int AdminId { get; set; }
 
         [DisplayName(DisplayNames.Username)]
         [ValidateField]
@@ -44,6 +39,10 @@ namespace InventorySystem.Models.DataEntities
         [DataType(DataType.DateTime)]
         public DateTime DateCreated { get; set; }
 
+        [DisplayName(DisplayNames.DateModified)]
+        [DisplayFormat(DataFormatString = "{0:MMMM dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
+        [DataType(DataType.DateTime)]
+        public DateTime DateModified { get; set; }
         // Navigation property to access roles associaed with this user
         [DisplayName(DisplayNames.UserRole)]
         public ICollection<UserRole>? UserRoles { get; set; }
@@ -51,6 +50,7 @@ namespace InventorySystem.Models.DataEntities
         public User()
         {
             DateCreated = DateTime.Now;
+            DateModified = DateTime.Now;
         }
 
     }

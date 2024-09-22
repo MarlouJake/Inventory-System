@@ -1,27 +1,51 @@
-@using InventorySystem.Models.DataEntities;
-@model User
+@using InventorySystem.Models.Accounts;
+@model RegisterModel
 
 
 @{
 }
 
-<script src="~/js/utils.js" asp-append-version="true" defer></script>
 <script>
     $(document).ready(function () {
         var signupbutton = $('#signup-button');
         signupbutton.html('Sign Up');
-
+        var passwordinput = $('#signup-retypepassword');
+        var iconcontainer = $('.retype-pass');
+        var showcontainer = $('.retype-iconpass');
+        var holdTimeout;
+        
         var password$ = $('#signup-password');
         var container$ = $('.icons-container .show-pass');
         var show$ = $('.show-icon');
+
         ValidateSignUpForm();
         ShowPassword(password$, show$, container$);
+        ShowPassword(passwordinput, showcontainer, iconcontainer);
     });
 </script>
 
+<style>
+    .validation-lists-item, .signup-errors {
+        font-size: 0.7rem;
+        margin-top: 0;
+    }
+
+
+    .validation-lists-item p{
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    #validation-lists{
+        columns: 2;
+        -webkit-columns: 2;
+        -moz-columns: 2;
+    }
+
+</style>
 <h5 class="text-break"><strong>Sign Up</strong></h5>
 
-<form action="/" method="post" class="forms">
+<form asp-controller="ValidateApi" asp-action="Create" method="post" class="forms" onsubmit="return CreateRequest(this);">
     <div class="form-group">
         <label asp-for="Username" class="control-label mt-2"></label>
         <input asp-for="Username" type="text" class="form-control user-input" id="signup-username" name="signup-username"
@@ -30,10 +54,11 @@
                placeholder="Username"
                maxlength="64"
                data-val="true"
-               data-val-required="Username is required!" />
-        <span asp-validation-for="Username" id="usernameSignup-error" class="text-danger"></span>
+               data-val-required="Username is required!"
+               pattern="\S+" onkeydown="if(['Space'].includes(arguments[0].code)){return false;}" />
+        <span asp-validation-for="Username" id="usernameSignup-error" class="text-danger signup-errors"></span>
     </div>
-
+     
     <div class="form-group">
         <label asp-for="Email" class="control-label mt-2"></label>
         <input asp-for="Email" type="email" class="form-control user-input" id="signup-email" name="signup-email"
@@ -42,8 +67,9 @@
                placeholder="Email"
                maxlength="64"
                data-val="true"
-               data-val-required="Email is required!" />
-        <span asp-validation-for="Email" id="emailSignup-error" class="text-danger"></span>
+               data-val-required="Email is required!"
+               pattern="\S+" onkeydown="if(['Space'].includes(arguments[0].code)){return false;}" />
+        <span asp-validation-for="Email" id="emailSignup-error" class="text-danger signup-errors"></span>
     </div>
 
     <div class="form-group">
@@ -62,14 +88,36 @@
                 </div>
             </div>
         </div>
-        <span asp-validation-for="Password" id="signupPass-error" class="text-danger"></span>
+
+        <div class="validations" id="password-validations">
+            <ul id="validation-lists">
+                <li id="hasSpaces" class="validation-lists-item">
+                    <p>Should not contain spaces</p>
+                </li>
+                <li id="passwordLength" class="validation-lists-item">
+                    <p>Must be between 8 and 128 characters</p>
+                </li>
+                <li id="specialChar" class="validation-lists-item">
+                    <p>Atleast one special character</p>
+                </li>
+                <li id="hasNumber" class="validation-lists-item">
+                    <p>Atleast one number</p>
+                </li>
+                <li id="upperCaseChar" class="validation-lists-item">
+                    <p>Atleast one uppercased character</p>
+                </li>
+                <li id="lowerCaseChar" class="validation-lists-item">
+                    <p>Atleast one lowercased character</p>
+                </li>
+            </ul>
+        </div>
     </div>
     
     <div class="form-group">
         <label for="signup-retypepassword" class="control-label mt-2">Confirm Password</label>
         <div class="input-group">
 
-            <input asp-for="Password" type="password" class="form-control user-input" id="signup-retypepassword" name="signup-retypepassword"
+            <input asp-for="ConfirmPassword" type="password" class="form-control user-input" id="signup-retypepassword" name="signup-retypepassword"
                    autocomplete="off"
                    required
                    placeholder="Confirm Password"
@@ -80,17 +128,9 @@
                 <div class="input-group-text icons-container">
                     <i class="fa-regular fa-eye icons-size retype-pass"></i>
                 </div>
-                <script>
-                    var passwordinput = $('#signup-retypepassword');
-                    var iconcontainer = $('.retype-pass');
-                    var showcontainer= $('.retype-iconpass');
-                    var holdTimeout;
-
-                    ShowPassword(passwordinput, showcontainer, iconcontainer);
-                </script>
             </div>
         </div>
-        <span asp-validation-for="Password" id="signupPass-confirmError" class="text-danger"></span>
+        <span asp-validation-for="ConfirmPassword" id="signupPass-confirmError" class="text-danger signup-errors"></span>
     </div>
    
     <div class="d-flex mt-3 form-group">

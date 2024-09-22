@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function getScreenSize() {
     var width = window.innerWidth;
     var height = window.innerHeight;
-    console.log("Width: " + width + ", Height: " + height);
+    //console.log("Width: " + width + ", Height: " + height);
 
     // Update the element with ID 'screensizer' with the screen size information
     $('#screensizer').text("Width: " + width + ", Height: " + height);

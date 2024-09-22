@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventorySystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240920032509_AddCategory")]
-    partial class AddCategory
+    [Migration("20240922024705_AddDatabase")]
+    partial class AddDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,25 +25,6 @@ namespace InventorySystem.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("InventorySystem.Models.DataEntities.Category", b =>
-                {
-                    b.Property<int>("CategoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CategoryId"));
-
-                    b.Property<string>("CategoryName")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("CategoryId");
-
-                    b.ToTable("Categories");
-                });
-
             modelBuilder.Entity("InventorySystem.Models.DataEntities.Item", b =>
                 {
                     b.Property<int>("ItemId")
@@ -51,6 +32,9 @@ namespace InventorySystem.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ItemId"));
+
+                    b.Property<string>("Category")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("FirmwareUpdated")
                         .HasColumnType("longtext");
@@ -93,9 +77,6 @@ namespace InventorySystem.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("UserId"));
 
-                    b.Property<int>("AdminId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime(6)");
 
@@ -117,6 +98,25 @@ namespace InventorySystem.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("InventorySystem.Models.Identities.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CategoryId"));
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("InventorySystem.Models.Identities.ItemCategory", b =>
@@ -159,6 +159,18 @@ namespace InventorySystem.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Role");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1,
+                            Name = "Administrator"
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            Name = "User"
+                        });
                 });
 
             modelBuilder.Entity("InventorySystem.Models.Identities.UserRole", b =>
@@ -180,14 +192,14 @@ namespace InventorySystem.Migrations
 
             modelBuilder.Entity("InventorySystem.Models.Identities.ItemCategory", b =>
                 {
-                    b.HasOne("InventorySystem.Models.DataEntities.Category", "Category")
+                    b.HasOne("InventorySystem.Models.Identities.Category", "Category")
                         .WithMany("ItemCategories")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("InventorySystem.Models.DataEntities.Item", "Item")
-                        .WithMany("ItemCategories")
+                        .WithMany()
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -216,19 +228,14 @@ namespace InventorySystem.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("InventorySystem.Models.DataEntities.Category", b =>
-                {
-                    b.Navigation("ItemCategories");
-                });
-
-            modelBuilder.Entity("InventorySystem.Models.DataEntities.Item", b =>
-                {
-                    b.Navigation("ItemCategories");
-                });
-
             modelBuilder.Entity("InventorySystem.Models.DataEntities.User", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("InventorySystem.Models.Identities.Category", b =>
+                {
+                    b.Navigation("ItemCategories");
                 });
 
             modelBuilder.Entity("InventorySystem.Models.Identities.Role", b =>

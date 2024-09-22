@@ -8,7 +8,7 @@ namespace InventorySystem.Data
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Item> Items { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<Role> Roles { get; set; }
         public DbSet<ItemCategory> ItemCategories { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
 
@@ -23,7 +23,6 @@ namespace InventorySystem.Data
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
-
 
             modelBuilder.Entity<Item>()
                 .HasIndex(i => i.ItemCode)
@@ -41,6 +40,19 @@ namespace InventorySystem.Data
                 .HasOne(ur => ur.Role)
                 .WithMany(r => r.UserRoles)
                 .HasForeignKey(ur => ur.RoleId);
+
+            modelBuilder.Entity<Role>().HasData(
+                new Role
+                {
+                    RoleId = 1,
+                    Name = "Administrator"
+                },
+                new Role
+                {
+                    RoleId = 2,
+                    Name = "User"
+                }
+             );
         }
     }
 }

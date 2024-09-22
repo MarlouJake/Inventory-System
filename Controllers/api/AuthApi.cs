@@ -44,7 +44,7 @@ namespace InventorySystem.Controllers.api
                     new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 };
 
-                // Add role-based claims
+                // search for role and add it
                 var roles = await _context.UserRoles
                     .Where(ur => ur.UserId == user.UserId)
                     .Select(ur => ur.Role!.Name)
@@ -89,7 +89,7 @@ namespace InventorySystem.Controllers.api
             }
             catch (Exception ex)
             {
-                var errorMessage = "An unknown error occurred.";
+                var errorMessage = "Username or Password incorrect";
 
                 #region --Console Logger--
                 Console.Clear();

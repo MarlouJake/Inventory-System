@@ -44,7 +44,7 @@ namespace InventorySystem.Controllers.api
             var options = new List<SelectListItem>
             {
                 //new() { Value = "--Select Status--", Text = "--Select Status--" },             
-                new() { Value = "Bookks", Text = "Books" },
+                new() { Value = "Books", Text = "Books" },
                 new() { Value = "Kits", Text = "Kits" },
                 new() { Value = "Materials", Text = "Materials" }
             };

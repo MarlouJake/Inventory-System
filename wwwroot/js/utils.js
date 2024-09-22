@@ -240,11 +240,8 @@ function UserLoginValidateField() {
         username.addEventListener('input', function () {
             usernameError.textContent = '';
             RemoveClass(username);
-            if (username.value.length < 3) {
-                usernameError.textContent = "Username or Email should be atleast 3 characters";
-                
-            }
-            else if (username.value.length >= 64) {
+
+            if (username.value.length >= 64) {
                 usernameError.textContent = "Username or Email reached maximum limit of 64 characters";
             } else {
                 usernameError.textContent = '';
@@ -255,10 +252,7 @@ function UserLoginValidateField() {
             passwordError.textContent = '';
             RemoveClass(password);
 
-            if (password.value.length < 3) {
-                passwordError.textContent = "Password should be atleast 8 characters";
-            }
-            else if (password.value.length >= 128) {
+            if (password.value.length >= 128) {
                 passwordError.textContent = "Password reached maximum limit of 128 characters";
             } else {
                 passwordError.textContent = '';
@@ -349,28 +343,7 @@ function ShowPassword(input, main, icon) {
     });
 }
 
-function ValidateSignUpForm() {
-    var password = document.getElementById('signup-password');
-    var confirm = document.getElementById('signup-retypepassword');
 
-    function checkPasswordMatch() {
-        if (password.value.length === 0) {
-            $('#signupPass-error').text('');
-            $('#signupPass-confirmError').text('');
-        } else if (confirm.value.length === 0) {
-            $('#signupPass-confirmError').text('Retype your password');
-        } else if (confirm.value !== password.value) {
-            $('#signupPass-error').text('Passwords do not match');
-            $('#signupPass-confirmError').text('Passwords do not match');
-        } else {
-            $('#signupPass-error').text('');
-            $('#signupPass-confirmError').text('');
-        }
-    }
-
-    password.addEventListener('input', checkPasswordMatch);
-    confirm.addEventListener('input', checkPasswordMatch);
-}
 
 function ChangeTextColor(element, text1, text2, text3, optionaltext) {
     var container = $(element);
@@ -399,6 +372,6 @@ function ChangeTextColor(element, text1, text2, text3, optionaltext) {
 }
 
 //initialize Validation Function
-const validate = Validations();
+const validationMessages = Validations();
 const browserInfo = getBrowserInfo();
 const process = ProcessRequest();
