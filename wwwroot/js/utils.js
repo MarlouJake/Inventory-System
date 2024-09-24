@@ -1,8 +1,4 @@
-﻿
-
-
-
-// Format timestamp as "MMMM dd, yyyy hh:mm:ss tt"
+﻿/* Format timestamp as "MMMM dd, yyyy hh:mm:ss tt"*/
 function DateFormatOptions() {
     return options = {
         year: 'numeric', month: 'long', day: '2-digit',
@@ -14,7 +10,7 @@ function DateFormatOptions() {
 
 
 
-//Function for changing text color depending on text
+/*Function for changing text color depending on text*/
 function NewItemAdded() {
     const statusDisplays = document.getElementsByClassName('status-container');
     const firmwareUpdateDisplay = document.getElementsByClassName('firmware-update');
@@ -44,7 +40,7 @@ function NewItemAdded() {
 }
 
 
-//Returns full url
+/*Returns full url*/
 function getUrl(url) {
 
     const fullUrl = `${window.location.origin}${url}`;
@@ -54,14 +50,13 @@ function getUrl(url) {
 };
 
 
-//Returns Browser info
+/*Returns Browser info*/
 function getBrowserInfo() {
     const userAgent = navigator.userAgent;
 
     let browserName = "Unknown Browser";
     let browserVersion = "Unknown Version";
 
-    // Check for various browsers
     if (userAgent.indexOf("Firefox") > -1) {
         browserName = "Firefox";
         browserVersion = userAgent.substring(userAgent.indexOf("Firefox") + 8);
@@ -88,7 +83,7 @@ function getBrowserInfo() {
 
     return {
         name: browserName,
-        version: browserVersion.split(" ")[0] // Remove additional info if any
+        version: browserVersion.split(" ")[0] 
     };
 };
 
@@ -262,44 +257,6 @@ function UserLoginValidateField() {
 
     }
 }
-
-function AdminLoginValidateField() {
-    const user = document.getElementById('user');
-    const userError = document.getElementById('user-error');
-    const pwd = document.getElementById('pwd');
-    const pwdError = document.getElementById('pwd-error');
-
-    //Admin Login Form input fields client-side validation
-    if (user || pwd) {
-        user.addEventListener('input', function () {
-            userError.textContent = '';
-            RemoveClass(user);
-            /*
-            if (user.value.trim() == '') {
-                userError.textContent = validate.UsernameEmpty;
-            } else if (user.value.length < 3) {
-                userError.textContent = validate.UsernameLength;
-            } else {
-                userError.textContent = '';
-                RemoveClass(user);
-            }*/
-        });
-        pwd.addEventListener('input', function () {
-            pwdError.textContent = '';
-            RemoveClass(pwd);
-            /*
-            if (pwd.value.trim() == '') {
-                pwdError.textContent = validate.PasswordEmpty;
-            } else if (pwd.value.length < 8) {
-                pwdError.textContent = validate.PasswordLegth;
-            } else {
-                pwdError.textContent = '';
-                RemoveClass(pwd);
-            }*/
-        });
-    }
-}
-
 function DisplaySuccessAndError() {
     // Show success message if it exists
     const successMessage = document.getElementById('success-message');
@@ -345,31 +302,6 @@ function ShowPassword(input, main, icon) {
 
 
 
-function ChangeTextColor(element, text1, text2, text3, optionaltext) {
-    var container = $(element);
-
-    if (container.length) {
-        var textcontent = container.text().trim(); // Get the text and trim any whitespace
-
-        switch (textcontent) {
-            case text1:
-                container.css('color', 'green'); // Set text color to green
-                break;
-            case text2:
-                container.css('color', 'red'); // Set text color to red
-                break;
-            case text3:
-                container.css('color', 'gray'); // Set text color to gray
-                break;
-            case optionaltext:
-                container.css('color', 'blue'); // Set text color to blue
-                break;
-            default:
-                container.css('color', 'black'); // Default text color
-                break;
-        }
-    }
-}
 
 //initialize Validation Function
 const validationMessages = Validations();

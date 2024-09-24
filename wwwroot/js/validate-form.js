@@ -1,6 +1,8 @@
 ﻿const valid = "text-success";
 const invalid = "text-danger";
 const defaultColor = "text-muted";
+const getPassword = $('#signupPasswordGroup');
+const getConfirmPassword = $('#confirmPasswordGroup');
 
 function ValidateSignUpForm() {
     const username = document.getElementById('signup-username');
@@ -24,7 +26,7 @@ function ValidateSignUpForm() {
     const checkFunctions = [
         () => validateField(username, username, usernameError, "Username", 3, 64),
         () => validateField(email, email, emailError, "Email", 3, 64),
-        () => validateConfirmPassword(password, confirm, confirmPasswordError),
+        () => validateConfirmPassword(password, confirm, confirmPasswordError, getPassword, getConfirmPassword),
         () => checkPasswordLength(password, validationElements.passwordLength),
         () => checkForNumbers(password, validationElements.hasNumber),
         () => checkSpaces(password, validationElements.hasSpaces),
@@ -33,7 +35,6 @@ function ValidateSignUpForm() {
         () => checkUpperLower(password, validationElements.lowerCaseChar, /[a-z]/, 'lowercase')
     ];
 
-    // Check password and update validations
     function runValidations() {
         let allValid = true;
         checkFunctions.forEach(fn => {
@@ -46,12 +47,16 @@ function ValidateSignUpForm() {
         signUpButton.disabled = !allValid;
     }
 
-    runValidations(); // Initial check
+    runValidations(); 
     username.addEventListener('input', runValidations);
     email.addEventListener('input', runValidations);
     password.addEventListener('input', runValidations);
     confirm.addEventListener('input', () => {
-        validateConfirmPassword(password, confirm, confirmPasswordError);
+        validateConfirmPassword(password, confirm, confirmPasswordError, getPassword, getConfirmPassword);
+        runValidations();
+    });
+    confirm.addEventListener('blur', () => {
+        validateConfirmPassword(password, confirm, confirmPasswordError, getPassword, getConfirmPassword);
         runValidations();
     });
 }
@@ -60,8 +65,6 @@ function ValidateSignup(data) {
     const confirm = document.getElementById('signup-retypepassword');
     const username = document.getElementById('signup-username');
     const email = document.getElementById('signup-email');
-    const passwordJQuery = $('#signup-password');
-    const confirmPassword = $('#signup-retypepassword');
 
     const errors = {
         username: $('#usernameSignup-error'),
@@ -102,9 +105,7 @@ function ValidateSignup(data) {
         isValid = false;
     }
 
-    if (!validateConfirmPassword(password, confirm,  errors.confirmPassword)) {
-        passwordJQuery.addClass('input-error');
-        confirmPassword.addClass('input-error');
+    if (!validateConfirmPassword(password, confirm, errors.confirmPassword, getPassword, getConfirmPassword)) {
         isValid = false;
     }
     return isValid;
@@ -133,7 +134,7 @@ function validateLength(input, minLength, maxLength, errorElement, fieldName) {
     }
     return true;
 }
-function validateConfirmPassword(password, confirmPassword, confirmPasswordErrorElement) {
+function validateConfirmPassword(password, confirmPassword, confirmPasswordErrorElement, passwordElement, confirmPasswordElement) {
 
     if (password.value.length === 0) {
         confirmPasswordErrorElement.text('');
@@ -142,10 +143,14 @@ function validateConfirmPassword(password, confirmPassword, confirmPasswordError
         confirmPasswordErrorElement.text('Retype your password');
         return false;
     } else if (password.value !== confirmPassword.value) {
-        confirmPasswordErrorElement.text('Password do not match');
+        confirmPasswordErrorElement.text('Passwords do not match');
+        passwordElement.addClass('input-error').removeClass('outline-orange');
+        confirmPasswordElement.addClass('input-error').removeClass('outline-orange');
         return false;
     } else {
         confirmPasswordErrorElement.text('');
+        passwordElement.removeClass('input-error').addClass('outline-orange');
+        confirmPasswordElement.removeClass('input-error').addClass('outline-orange');
         return true;
     }
     return true;
@@ -218,4 +223,69 @@ function checkPasswordLength(str, element) {
         element.removeClass(defaultColor).removeClass(invalid).addClass(valid);
         return true;
     }
+}
+
+
+
+/**
+ * Validates the input data and clears any error messages.
+ *
+ * This function takes the provided data and clears the text of error message elements
+ * for the given fields, such as code, name, status, firmware, and category. 
+ *
+ * Sample element id to be passed: '#elementId'
+ * 
+ * @param {Object} data - The input data object to be validated.
+ * 
+ * @param {jQuery} $code - jQuery object for the code input element.
+ * @param {jQuery} $name - jQuery object for the name input element.
+ * 
+ * @param {jQuery} $codeError - jQuery object for the code error message element.
+ * @param {jQuery} $nameError - jQuery object for the name error message element.
+ * 
+ * @returns {boolean} - Returns a boolean value true or false.
+ */
+function ValidateDataInput(data, $code, $name, $codeError, $nameError) {
+    var elementIds = [$codeError, $nameError];
+    elementIds.forEach(function (element) {
+        $(element).text('');
+    });
+
+    $('.form-control').removeClass('input-error').addClass('input-success');
+
+    let isValid = true;
+
+    if (!data.itemcode || data.itemcode.trim() === '') {
+        $($code).addClass('input-error');
+        $($codeError).text('Item code is required');
+        isValid = false;
+    } else if (data.itemcode.length < 3) {
+        $($code).addClass('input-error');
+        $($codeError).text('Item code is should be atleast 3 characters');
+        isValid = false;
+    } else if (data.itemcode.length > 20) {
+        $($code).addClass('input-error');
+        $($codeError).text('Item code should not exceed 20 characters');
+        isValid = false;
+    }
+
+    if (!data.itemname || data.itemname.trim() === '') {
+        $($name).addClass('input-error');
+        $($nameError).text('Item name is required');
+        isValid = false;
+    } else if (data.itemname.length < 3) {
+        $($name).addClass('input-error');
+        $($nameError).text('Item name is should be atleast 3 characters');
+        isValid = false;
+    } else if (data.itemname.length > 20) {
+        $($name).addClass('input-error');
+        $($nameError).text('Item name should not exceed characters');
+        isValid = false;
+    }
+
+    if (!isValid) {
+        console.log('Validation errors');
+    }
+
+    return isValid;
 }

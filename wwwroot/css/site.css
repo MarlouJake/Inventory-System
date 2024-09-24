@@ -23,6 +23,13 @@ html {
         font-size: 16px;
     }
 }
+.w-60 {
+    width: 60%;
+}
+
+.w-40 {
+    width: 40%;
+}
 
 .hide-con {
     display: none !important;
@@ -80,12 +87,8 @@ a.navbar-brand {
     transition: ease 0.1s;
 }
 
-
-
-
-
 .outline-orange{
-    border: 1px solid #fd7e14;
+    border: 1px solid #fd7e14 !important;
 }
 
 .bgc-orange:hover, .ctg-selected:hover {
@@ -240,19 +243,21 @@ body {
 }
 
 .card-text {
-    font-size: 0.75rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: start;
+    font-size: 0.7rem;
+    max-width: 150px; /* Set a maximum width */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add ellipsis */
 }
 
-.card-titlke {
+.display-status{
+    border-radius: 12px;
+}
+
+.card-title {
     font-size: 0.75rem;
 }
 
 .card-footer {
-    padding: 0.5rem;
     border-top: 1px solid #dee2e6;
     background-color: #f8f9fa;
 }
@@ -429,9 +434,7 @@ body {
         max-width: 100%;
     }
 
-    .card-container {
-        grid-template-columns: repeat(4, 1fr); /* Adjust to 3 items per row */
-    }
+
 
     .btn-common {
         font-size: 0.85rem;
@@ -444,6 +447,11 @@ body {
     }
 }
 
+@media (max-width: 400px) {
+    .category-text {
+        font-size: 0.6rem;
+    }
+}
 
 
 .navbar-toggler-custom {

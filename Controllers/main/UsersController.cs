@@ -134,6 +134,7 @@ namespace InventorySystem.Controllers.main
             };
             ViewBag.Username = username;
 
+
             ViewData["title"] = "Item View";
             return PartialView(model);
         }
@@ -166,6 +167,7 @@ namespace InventorySystem.Controllers.main
             }
             ViewBag.Username = username;
             ViewBag.RoleName = roleName;
+            ViewBag.Category = item.Category;
             return PartialView(item);
         }
         #endregion
@@ -232,55 +234,6 @@ namespace InventorySystem.Controllers.main
 
         #endregion
 
-        /*
-        #region --Previous DeleteConfirmed Method--
-
-        // POST: Admin/Delete/id?
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var item = await _context.Items.FindAsync(id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            Console.WriteLine($"User ID Claim: {userIdClaim}");
-
-            if (userIdClaim != null && int.TryParse(userIdClaim, out var userId))
-            {
-                try
-                {
-                    _context.Items.Remove(item);
-                    await _context.SaveChangesAsync();
-                    var items = await _context.Items
-                            .Where(i => i.UserId == userId)
-                            .ToListAsync();
-                    return Json(new
-                    {
-                        isValid = true,
-
-                        successMessage = "Deletion successful!"
-                    });
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, new { success = false, message = ex.Message });
-                }
-            }
-            else
-            {
-                return StatusCode(500, new { success = false, message = "Deletion Failed" });
-            }
-
-        }
-
-        #endregion
-        */
-
-
         [Route("dashboard/search/")]
         [HttpGet]
         public async Task<IActionResult> Search(string itemcode, int page = 1)
@@ -338,5 +291,21 @@ namespace InventorySystem.Controllers.main
             redirectUrl = Url.Action("Search", "Users");
             return PartialView("ItemView", model);
         }
+
+
+        [Route("dashboard/update/partial_view_with_firmwareUpdate")]
+        [HttpGet]
+        public IActionResult HasFirmwareUpdate()
+        {
+            return PartialView("~/Views/Users/components/HasFirmwareUpdate.cshtml");
+        }
+
+        [Route("dashboard/update/partial_view_no_firmwareUpdate")]
+        [HttpGet]
+        public IActionResult NoFirmwareUpdate()
+        {
+            return PartialView("~/Views/Users/components/NoFirmwareUpdate.cshtml");
+        }
+
     }
 }

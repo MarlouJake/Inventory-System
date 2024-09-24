@@ -9,6 +9,7 @@ namespace InventorySystem.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<Category> Categories { get; set; }
         public DbSet<ItemCategory> ItemCategories { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
 
@@ -42,17 +43,49 @@ namespace InventorySystem.Data
                 .HasForeignKey(ur => ur.RoleId);
 
             modelBuilder.Entity<Role>().HasData(
-                new Role
-                {
-                    RoleId = 1,
-                    Name = "Administrator"
-                },
-                new Role
-                {
-                    RoleId = 2,
-                    Name = "User"
-                }
-             );
+                    new Role
+                    {
+                        RoleId = 1,
+                        Name = "Administrator",
+                        RoleDisplayName = "Admin"
+                    },
+                    new Role
+                    {
+                        RoleId = 2,
+                        Name = "User",
+                        RoleDisplayName = "User"
+                    },
+                    new Role
+                    {
+                        RoleId = 3,
+                        Name = "Requester",
+                        RoleDisplayName = "Requester"
+                    }
+
+                );
+
+            modelBuilder.Entity<Category>().HasData(
+                    new Category
+                    {
+                        CategoryId = 1,
+                        Name = "Robots",
+                        CategoryDisplayName = "Robots"
+                    },
+                    new Category
+                    {
+                        CategoryId = 2,
+                        Name = "Books",
+                        CategoryDisplayName = "Books"
+                    },
+                    new Category
+                    {
+                        CategoryId = 3,
+                        Name = "Materials",
+                        CategoryDisplayName = "Materials"
+                    }
+
+
+                );
         }
     }
 }

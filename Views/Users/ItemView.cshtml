@@ -37,7 +37,6 @@
     var currentPage = '@Html.Raw(currentPage)';
     var totalPages = '@Html.Raw(totalPages)';  
     var pageItem = $('.pagination .page-item');
-
     function handlePaginationUpdate() {
         // handles item overflow due to pagination
         // Reload the item list for the current page to include the new item
@@ -47,17 +46,7 @@
             success: function (response) {
                 $('#view-all .card-container').html(response); // Update the current items with new data
                 currentPage += 1; // Increment the page number
-                showSuccessMessage('New page loaded with added item.');
             }
-        });
-    }
-
-
-    function showSuccessMessage(message) {
-        var successMessage = $('<div class="alert alert-success" role="alert"></div>').text(message);
-        $('body').prepend(successMessage);
-        successMessage.hide().fadeIn(500).delay(2000).fadeOut(500, function () {
-            $(this).remove();
         });
     }
 
@@ -79,8 +68,6 @@
     }
 
     //$('#items-page').text('Items Page: ' + currentPage);
-
-   
 </script>
 
 <style>
@@ -99,7 +86,9 @@
     {
         <script>
             $('.card-container').addClass('d-flex justify-content-center align-items-center h-auto');
+            
         </script>
+
         <div class="no-items text-center">
             <p class="text-center">No items found.</p>
         </div>
@@ -108,12 +97,12 @@
     {
         <script>
             $('.card-container').removeClass('d-flex justify-content-center align-items-center h-auto');
+            
         </script>
         @foreach (var item in Model.Items)
         {
             if (count >= 24) break; // Stop rendering cards after # items
             @await Html.PartialAsync("ItemCard", item)
-
             count++; // Increment the counter after rendering each item
         }
         <!-- Pagination Controls -->     

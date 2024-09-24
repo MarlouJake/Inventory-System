@@ -82,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //Client-side input field validation
     UserLoginValidateField();
-    AdminLoginValidateField();
 
     //UserLogoutAction();
     DisplaySuccessAndError();

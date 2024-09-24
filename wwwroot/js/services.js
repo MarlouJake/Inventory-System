@@ -12,10 +12,12 @@
         itemdescription: formData.get('itemDescription'),
         status: formData.get('statusDropdown'),
         firmwareupdated: formData.get('updateDropdown'),
+        category: formData.get('categoryDropdown'),
         datecreated: new Date().toLocaleString('en-US', DateFormatOptions)
     };
 
-    if (!ValidateInput(itemdata)) {
+
+    if (!ValidateDataInput(itemdata, '#itemCode', '#itemName', '#itemCode-error', '#itemName-error')) {
         
         return false;
     }
@@ -147,12 +149,11 @@ AddItem = (data, url) => {
                 if (response.IsValid) {
 
                     $("#dynamic-modal").modal('hide');
-                    $("#message-success").text(validate.AddingSuccess).fadeIn().delay(500).fadeOut();
+                    $("#message-success").text(addsuccess).fadeIn().delay(500).fadeOut();
                     if ($('#searchbar').val()) {
                         $('#searchbar').val('');
                     }
                     loadPage(currentPage);   
-
                 }
                 else{
                     console.error('An error occured while adding item:'+ response.Message);
@@ -321,6 +322,7 @@ UpdateRequest = (form) => {
         itemname: formData.get('updatename'),
         itemdescription: formData.get('updatedesc'),
         status: formData.get('updatestatus'),
+        category: formData.get('categoryDropdown'),
         firmwareupdated: formData.get('updatefirmware')
     };
     var dataid = $('#dataid').val();
@@ -555,7 +557,7 @@ DeleteRequest = (form) => {
 };
 
 RemoveItem = (url) => {
-    const id = $('#delete-id').val();  // or form['delete-id'].value;
+    const id = $('#delete-id').val();  
 
     try {
         $.ajax({
@@ -613,3 +615,4 @@ RemoveItem = (url) => {
     }
     return false;
 };
+

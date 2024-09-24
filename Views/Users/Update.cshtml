@@ -17,10 +17,15 @@
 
 
     $(document).ready(function () {
-        getStatuses();
-        getOptions();
+        var categoryDropdown = $('#categoryDropdown');
+        var dropdownElement = $('#updatefirmware');
+        var dropdownInitOption = $('#updatefirmwareValue');
+
+        getValues('/api/values/get-statuses', 'updatestatus');
+        getValues('/api/values/get-options', 'updatefirmware');
+        getValues('/api/values/get-categories', 'categoryDropdown');
         checkcodechanges();
-        setSelectedValues();
+        //setSelectedValues();
 
 
         $('#updatecode').on('input', function () {
@@ -34,6 +39,12 @@
 
         $('#updatecode').on('blur', function () {
             $('#code-container').removeClass('input-focus').addClass('input-blur');
+        });
+
+        $(document).ready(function () {
+            var categoryFetched = "@Html.Raw(Model.Category)";
+            //changeBgBaseOnCategory(baseOnCategory, firmware, status, category)
+            changeBgBaseOnCategory(categoryFetched, null, null, '#category-text');
         });
     });
 
@@ -66,6 +77,13 @@
 
     }
 
+    .category-text{
+        font-size: 0.8rem;
+        color: white;
+        margin-top: 0.1rem;
+        border-radius: 12px;
+    }
+
     .update:focus {
         outline: none;
         border-color: none;
@@ -79,7 +97,8 @@
     }
 
     .control-label {
-        font-size: 0.7rem;
+        font-size: 0.9rem;
+        font-weight: bold;
     }
 
     .code-container{
@@ -130,33 +149,23 @@
 
 
     <div class="form-group mt-1">
-        <label asp-for="ItemDescription" class="control-label"></label>
-        <textarea asp-for="ItemDescription" type="text" class="form-control user-input update" autocomplete="off"
-               name="updatedesc" 
-               id="updatedesc" 
-               maxlength="5000">
-        </textarea>
-        <span asp-validation-for="ItemDescription" id="updatedesc-error" class="text-danger"></span>
+            <label asp-for="ItemDescription" class="control-label"></label>
+            <textarea asp-for="ItemDescription" type="text" class="form-control user-input update" autocomplete="off"
+                   name="updatedesc" 
+                   id="updatedesc" 
+                   maxlength="5000">
+            </textarea>
+            <span asp-validation-for="ItemDescription" id="updatedesc-error" class="text-danger"></span>              
     </div>
 
-    <div class="form-group mt-2 d-flex justify-content-between gap-4">
-        <div class="w-50">
-            <label asp-for="Status" class="control-label"></label>
-            <select asp-for="Status" id="updatestatus" class="form-control update" required name="updatestatus">
-                <option value="" class="text-muted">--Select Status--</option>
-            </select>
-
-            <span asp-validation-for="Status" id="updatestatus-errror" class="text-danger"></span>
-        </div>
-
-        <div class="w-50">
-            <label asp-for="FirmwareUpdated" class="control-label"></label>
-            <select asp-for="FirmwareUpdated" id="updatefirmware" class="form-control update" name="updatefirmware">
-                <option value="" class="text-muted">--Select Option--</option>
-            </select>
-
-            <span asp-validation-for="FirmwareUpdated" id="updatefirmware-error" class="text-danger"></span>
-        </div>
+    <div id="renderBaseOnCategory">
+        @if(Model.Category == "Robots")
+        {
+            @await Html.PartialAsync("~/Views/Users/components/HasFirmwareUpdate.cshtml")
+        } else
+        {
+            @await Html.PartialAsync("~/Views/Users/components/NoFirmwareUpdate.cshtml")
+        }
     </div>
 
     <hr class="mt-4" />

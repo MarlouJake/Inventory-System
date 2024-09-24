@@ -44,7 +44,7 @@ namespace InventorySystem.Controllers.api
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> AppendItem([FromBody][Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,ItemDateAdded,ItemDateUpdated,FirmwareUpdated,UserId")] Item model)
+        public async Task<IActionResult> AppendItem([FromBody][Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,FirmwareUpdated,Category,ItemDateAdded,ItemDateUpdated,UserId")] Item model)
         {
             try
             {
@@ -130,7 +130,7 @@ namespace InventorySystem.Controllers.api
         }
 
         [HttpPut("modify/{id?}")]
-        public async Task<IActionResult> ModifyItem([FromBody][Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,FirmwareUpdated,ItemDateUpdated,UserId")] Item model, int id)
+        public async Task<IActionResult> ModifyItem([FromBody][Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,FirmwareUpdated,Category,ItemDateUpdated,UserId")] Item model, int id)
         {
             string message = "";
             int Status404 = StatusCodes.Status404NotFound;

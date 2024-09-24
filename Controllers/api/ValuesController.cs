@@ -13,13 +13,35 @@ namespace InventorySystem.Controllers.api
         {
             var statuses = new List<SelectListItem>
             {
-                //new() { Value = "--Select Status--", Text = "--Select Status--" },
+                new() {Value = "", Text = "--Select Option--"},
                 new() { Value = "Complete", Text = "Complete" },
                 new() { Value = "Incomplete(Usable)", Text = "Incomplete(Usable)" },
-                new() { Value = "Incomplete(Unusable)", Text = "Incomplete(Unusable)" }
+                new() { Value = "Incomplete(Unusable)", Text = "Incomplete(Unusable)" },
+                new() {Value = "Damaged", Text = "Damaged"},
+                new() {Value = "Defective", Text = "Defective"},
+                new() {Value = "Missing", Text = "Missing"},
+                new() {Value = "Unknown", Text = "Unknown"}
             };
 
             return new JsonResult(statuses);
+        }
+
+        [Route("get-condition")]
+        [HttpGet]
+        public JsonResult GetCondition()
+        {
+            var status = new List<SelectListItem>
+            {
+                new() {Value = "", Text = "--Select Option--"},
+                new() {Value = "New", Text = "New"},
+                new() {Value = "Good", Text = "Good"},
+                new() {Value = "Poor", Text = "Poor"},
+                new() {Value = "Unknown", Text = "Unknown"},
+                new() {Value = "Damaged", Text = "Damaged"},
+                new() {Value = "Missing", Text = "Missing"}
+            };
+
+            return new JsonResult(status);
         }
 
         [Route("get-options")]
@@ -28,10 +50,10 @@ namespace InventorySystem.Controllers.api
         {
             var options = new List<SelectListItem>
             {
-                //new() { Value = "--Select Status--", Text = "--Select Status--" },
-                new() { Value = "N/A", Text = "N/A" },
+                new() {Value = "", Text = "--Select Option--"},
                 new() { Value = "Updated", Text = "Updated" },
-                new() { Value = "Not Updated", Text = "Not Updated" }
+                new() { Value = "Not Updated", Text = "Not Updated" },
+                new() { Value = "Unknown", Text = "Unknown"}
             };
 
             return new JsonResult(options);
@@ -43,9 +65,9 @@ namespace InventorySystem.Controllers.api
         {
             var options = new List<SelectListItem>
             {
-                //new() { Value = "--Select Status--", Text = "--Select Status--" },             
+                new() {Value = "", Text = "--Select Option--"},
+                new() { Value = "Robots", Text = "Robots" },
                 new() { Value = "Books", Text = "Books" },
-                new() { Value = "Kits", Text = "Kits" },
                 new() { Value = "Materials", Text = "Materials" }
             };
 

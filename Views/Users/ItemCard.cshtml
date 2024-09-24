@@ -1,25 +1,68 @@
 ﻿@using InventorySystem.Models.DataEntities
 @model Item
 
-@{
-    var currentusername = ViewBag.Username as string;
-    var role = ViewBag.RoleName as string;
-}
 <script>
+    
+    $(document).ready(function () {
+        changeBackground(); 
+    });
 
+    function changeBackground() {
+        $('.card-status').each(function () {
+            var $cardStatus = $(this);
+            var status = $cardStatus.text().trim();
+            var $displayStatus = $cardStatus.siblings('.display-status');  
+
+            switch (status) {
+                case 'Unknown':
+                    $displayStatus.css('background-color', 'gray').text(status);
+                    break;
+                case 'Complete':
+                case 'New':
+                    $displayStatus.css('background-color', 'green').text(status);
+                    break;
+                case 'Good':
+                    $displayStatus.css('background-color', 'blue');
+                    break;
+                case 'Damaged':
+                case 'Defective':
+                case 'Missing':
+                    $displayStatus.css('background-color', 'red').text(status);
+                    break;
+                case 'Incomplete(Unusable)':
+                case 'Incomplete(Usable)':
+                    $displayStatus.css({
+                        'background-color': status === 'Incomplete(Usable)' ? 'blue' : 'red'
+                    }).text('Incomplete');
+                    break;
+                default:
+                    $displayStatus.css('background-color', 'black').text(status);  
+                    break;
+            }
+
+ 
+            $displayStatus.css({
+                'color': 'white',
+                'border-radius': '12px'
+            });
+        });
+    }
+
+    
 </script>
 
 <div class="card">
     <div class="card-body">
         <h6 class="card-title mb-1 fs-6"><strong>@Model.ItemName</strong></h6>
         <p class="card-text mb-1"><strong>Code:</strong> @Model.ItemCode</p>
-        <p class="card-text mb-0"><strong>Status:</strong> 
-            @Model.Status
+        <p class="card-text mb-0">
+            <span class="card-status d-none">@Model.Status</span>
+            <span class="display-status ps-2 pe-2 mb-0"></span>
         </p>
     </div>
-    <div class="card-footer">
+    <div class="card-footer mt-0">
         <a onclick="ModalShow('dashboard/details/@Model.ItemId')"
-           class="btn btn-crud btn-sm form-control text-light">
+           class="btn btn-crud btn-sm  mt-0 form-control text-light">
             View
         </a>
     </div>

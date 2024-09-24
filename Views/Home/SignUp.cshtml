@@ -21,7 +21,59 @@
         ValidateSignUpForm();
         ShowPassword(password$, show$, container$);
         ShowPassword(passwordinput, showcontainer, iconcontainer);
+
+        var signupPassword = document.getElementById('signup-password');
+        var passwordGroup = document.getElementById('signupPasswordGroup');
+        const charCountDisplay = document.getElementById('char-count');
+
+        var confirmPassword = document.getElementById('signup-retypepassword');
+        var confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+        const confirmCountDisplay = document.getElementById('confirmCount');
+
+        var username = document.getElementById('signup-username');
+        var usernameGroup = document.getElementById('username-group');
+        const usernameCount = document.getElementById('usernameChar-count');
+
+        var email = document.getElementById('signup-email');
+        var emailGroup = document.getElementById('email-group');
+        const emailCount = document.getElementById('emailChar-count');
+
+        username.addEventListener('input', () => updateCharCount(username, usernameCount));
+        username.addEventListener('focus', () => addBorderClass(usernameGroup));
+        username.addEventListener('blur', () => removeBorderClass(usernameGroup));
+        email.addEventListener('input', () => updateCharCount(email, emailCount));
+        email.addEventListener('focus', () => addBorderClass(emailGroup));
+        email.addEventListener('blur', () => removeBorderClass(emailGroup));
+        signupPassword.addEventListener('input', () => updateCharCount(signupPassword, charCountDisplay));
+        signupPassword.addEventListener('focus', () => addBorderClass(passwordGroup));
+        signupPassword.addEventListener('blur', () => removeBorderClass(passwordGroup));
+        confirmPassword.addEventListener('input', () => updateCharCount(confirmPassword, confirmCountDisplay));
+        confirmPassword.addEventListener('focus', () => addBorderClass(confirmPasswordGroup));
+        confirmPassword.addEventListener('blur', () => removeBorderClass(confirmPasswordGroup));
+        
     });
+
+    function disableSpace(event) {
+
+        if (event && event.code === 'Space') {
+            event.preventDefault();
+            return false;  
+        }
+        return true;
+    };
+
+    function updateCharCount(inputField, outputElement){
+        const currentLength = inputField.value.length;
+        outputElement.textContent = currentLength;
+    }
+
+    function addBorderClass(outputElement){
+        outputElement.classList.add('outline-orange');
+    }
+
+    function removeBorderClass(outputElement) {
+        outputElement.classList.remove('outline-orange');
+    }
 </script>
 
 <style>
@@ -40,50 +92,86 @@
         columns: 2;
         -webkit-columns: 2;
         -moz-columns: 2;
+        margin-bottom: 0;
     }
 
+    #display-passwordCount, #display-confirmCount, #display-usernameCount, #display-emailCount {
+        font-size: 0.5rem;
+        background-color: white;
+        width: 2rem;
+        z-index: 1;
+        margin: 0;
+        padding: 0.1rem;
+    }
+
+    .show-icon, .show-icon div, .retype-iconpass, .retype-iconpass div {
+        background-color: white;
+        z-index: 0;
+    }
+
+    #signup-password, #signup-retypepassword, #signup-username {
+        z-index: 3;
+    }
 </style>
+
 <h5 class="text-break"><strong>Sign Up</strong></h5>
 
 <form asp-controller="ValidateApi" asp-action="Create" method="post" class="forms" onsubmit="return CreateRequest(this);">
     <div class="form-group">
-        <label asp-for="Username" class="control-label mt-2"></label>
-        <input asp-for="Username" type="text" class="form-control user-input" id="signup-username" name="signup-username"
-               autocomplete="off"
-               required
-               placeholder="Username"
-               maxlength="64"
-               data-val="true"
-               data-val-required="Username is required!"
-               pattern="\S+" onkeydown="if(['Space'].includes(arguments[0].code)){return false;}" />
+        <label asp-for="Username" class="control-label"></label>
+        <div class="input-group border border-1 rounded" id="username-group">
+            <input asp-for="Username" type="text" class="form-control user-input border-0 pe-2" id="signup-username" name="signup-username"
+                   autocomplete="off"
+                   required
+                   placeholder="Username"
+                   maxlength="64"
+                   data-val="true"
+                   data-val-required="Username is required!"
+                   pattern="\S+" onkeydown="disableSpace(event)" />
+
+            <div class="input-group-text border-0 text-muted pe-2" id="display-usernameCount">
+                <span id="usernameChar-count" class="pe-0 ms-auto">0</span><span class="pe-0">/64</span>
+            </div>
+        </div>
         <span asp-validation-for="Username" id="usernameSignup-error" class="text-danger signup-errors"></span>
     </div>
      
-    <div class="form-group">
-        <label asp-for="Email" class="control-label mt-2"></label>
-        <input asp-for="Email" type="email" class="form-control user-input" id="signup-email" name="signup-email"
-               autocomplete="off"
-               required
-               placeholder="Email"
-               maxlength="64"
-               data-val="true"
-               data-val-required="Email is required!"
-               pattern="\S+" onkeydown="if(['Space'].includes(arguments[0].code)){return false;}" />
+    <div class="form-group mt-1">
+        <label asp-for="Email" class="control-label"></label>
+        <div class="input-group border border-1 rounded" id="email-group">
+            <input asp-for="Email" type="email" class="form-control user-input border-0 pe-2" id="signup-email" name="signup-email"
+                   autocomplete="off"
+                   required
+                   placeholder="Email"
+                   maxlength="64"
+                   data-val="true"
+                   data-val-required="Email is required!"
+                   pattern="\S+" onkeydown="disableSpace(event)" />
+            <div class="input-group-text border-0 text-muted pe-2" id="display-emailCount">
+                <span id="emailChar-count" class="pe-0 ms-auto">0</span><span class="pe-0">/64</span>
+            </div>
+         </div>
         <span asp-validation-for="Email" id="emailSignup-error" class="text-danger signup-errors"></span>
     </div>
+   
 
     <div class="form-group">
-        <label asp-for="Password" class="control-label mt-2"></label>
-        <div class="input-group">
-            <input asp-for="Password" type="password" class="form-control user-input" id="signup-password" name="signup-password"
+        <label asp-for="Password" class="control-label mt-1"></label>
+        <div class="input-group border border-1 rounded" id="signupPasswordGroup">
+            <input asp-for="Password" type="password" class="form-control user-input border-0 pe-2" id="signup-password" name="signup-password"
                    autocomplete="off"
                    required
                    placeholder="Password"
                    maxlength="128"
                    data-val="true"
                    data-val-required="Password is required!" />
-            <div class="input-group-append show-icon">
-                <div class="input-group-text icons-container">
+                  
+            <div class="input-group-text border-0 text-muted pe-0" id="display-passwordCount">
+                <span id="char-count" class="pe-0 ms-auto">0</span><span class="pe-0">/128</span>
+            </div>
+            <div class="input-group-append show-icon border-0 rounded">
+            
+                <div class="input-group-text icons-container border-0">
                     <i class="fa-regular fa-eye icons-size show-pass"></i>
                 </div>
             </div>
@@ -112,20 +200,21 @@
             </ul>
         </div>
     </div>
-    
-    <div class="form-group">
-        <label for="signup-retypepassword" class="control-label mt-2">Confirm Password</label>
-        <div class="input-group">
-
-            <input asp-for="ConfirmPassword" type="password" class="form-control user-input" id="signup-retypepassword" name="signup-retypepassword"
+    <div class="form-group mt-0">
+        <label for="signup-retypepassword" class="control-label mt-0">Confirm Password</label>
+        <div class="input-group border border-1 rounded" id="confirmPasswordGroup">
+            <input asp-for="ConfirmPassword" type="password" class="form-control user-input border-0 pe-2" id="signup-retypepassword" name="signup-retypepassword"
                    autocomplete="off"
                    required
                    placeholder="Confirm Password"
                    maxlength="128"
                    data-val="true"
                    data-val-required="Password is required!" />
-            <div class="input-group-append retype-iconpass">
-                <div class="input-group-text icons-container">
+            <div class="input-group-text border-0 text-muted pe-0" id="display-confirmCount">
+                <span id="confirmCount" class="pe-0 ms-auto">0</span><span id="confirmTotalCount" class="pe-0">/128</span>
+            </div>
+            <div class="input-group-append retype-iconpass border-0 rounded">
+                <div class="input-group-text icons-container border-0 ">
                     <i class="fa-regular fa-eye icons-size retype-pass"></i>
                 </div>
             </div>

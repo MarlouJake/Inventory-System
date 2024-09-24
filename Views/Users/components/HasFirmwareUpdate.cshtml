@@ -1,0 +1,27 @@
+﻿@using InventorySystem.Models.DataEntities
+@model Item
+
+<div class="form-group">
+    <div class="form-group mt-2  mb-0 d-flex">
+        <label asp-for="Category" class="control-label mb-0">Category:</label>
+        <p asp-for="Category" id="category-text" class="ms-2 category-text mb-0 ps-1 pe-1">@Model.Category</p>
+    </div>
+
+    <div class="mt-0 d-flex justify-content-between gap-4">
+        <div class="w-50 mt-0">
+            <label asp-for="Status" class="control-label"></label>
+            <select asp-for="Status" id="updatestatus" class="form-control update" required name="updatestatus">
+            </select>
+
+            <span asp-validation-for="Status" id="updatestatus-errror" class="text-danger"></span>
+        </div>
+
+        <div class="w-50 mt-0">
+            <label asp-for="FirmwareUpdated" class="control-label"></label>
+            <select asp-for="FirmwareUpdated" id="updatefirmware" class="form-control update" required name="updatefirmware">
+            </select>
+            <span asp-validation-for="FirmwareUpdated" id="updatefirmware-error" class="text-danger"></span>
+        </div>
+    </div>
+
+</div>

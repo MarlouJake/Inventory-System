@@ -16,11 +16,24 @@
             "Incomplete(Usable)", //4
             "Incomplete(Unusable)"  //5
         ];
-        ChangeTextColor('#firmware-status', text[0], text[1], text[2], null);
-        ChangeTextColor('#item-status', text[3], text[5], null, text[4]);
+        ChangeBackgroundColor('#firmware-status', text[0], text[1], text[2], null, null);
+        ChangeBackgroundColor('#item-status', text[3], text[5], null, text[4], null);
+        ChangeBackgroundColor('#item-category', null, null, text[11], text[10], text[9]);
     });
 </script>
+<style>
+    .status-body{
+        color: white;
+        width: 90%;
+        font-size: 0.8rem;
+        border-radius: 12px;
+        text-align: center;
+    }
 
+    .w-33 {
+        width: 33%;
+    }
+</style>
 <div>
     <h5 class="text-break text-danger"><strong>Are you sure you want to delete this item?</strong></h5>
 
@@ -69,25 +82,66 @@
             }
         </div>
 
+    </dl>
+    <dl class="d-flex w-auto gap-1" style="font-size: 0.9rem;">
+         <div class="d-block w-33">
+            <dt class="col-sm-2 status-header">
+                @Html.DisplayNameFor(model => model.Category)
+            </dt>
+            @if (!string.IsNullOrEmpty(Model.Category))
+            {
+                <dd id="item-category" class="col-sm-2 status-body">
+                    @Html.DisplayFor(model => model.Category)
+                </dd>
+            }
+            else
+            {
+                <dd id="item-category" class="col-sm-2 status-body">
+                    No Category
+                </dd>
+            }
+         </div>
 
-        <div class="d-flex" style="font-size: 0.9rem;">
-            <dt class="col-sm-2 w-50 mb-0">
+        <div class="d-block w-33">
+            <dt class="col-sm-2 mb-0 w-100">
                 @Html.DisplayNameFor(model => model.Status)
             </dt>
-            <dt class="col-sm-2 w-50 border-start ps-2">
+
+            @if (!string.IsNullOrEmpty(Model.Status))
+            {
+                <dd id="item-status" class="col-sm-2 status-body">
+                    @Html.DisplayFor(model => model.Status)
+                </dd>
+            }
+            else
+            {
+                <dd id="item-status" class="col-sm-2 status-body">
+                    No Status
+                </dd>
+            }
+
+         </div>
+
+        <div class="d-block w-33">
+            <dt class="col-sm-2 mb-0 w-100">
                 @Html.DisplayNameFor(model => model.FirmwareUpdated)
             </dt>
+
+            @if (!string.IsNullOrEmpty(Model.FirmwareUpdated))
+            {
+                <dd id="firmware-status" class="col-sm-2 status-body">
+                    @Html.DisplayFor(model => model.FirmwareUpdated)
+                </dd>
+            }
+            else
+            {
+                <dd id="firmware-status" class="col-sm-2 status-body">
+                    Not Applicable
+                </dd>
+            }
         </div>
 
-        <div class="d-flex" style="font-size: 0.8rem;">
-            <dd id="item-status" class="col-sm-10 text-break w-50">
-                @Html.DisplayFor(model => model.Status)
-            </dd>
-
-            <dd id="firmware-status" class="col-sm-10 text-break w-50 border-start ps-2">
-                @Html.DisplayFor(model => model.FirmwareUpdated)
-            </dd>
-        </div>
+   
     </dl>
     
     <form asp-controller="ValidateApi" asp-action="DeleteItem" asp-route-id="@Model.ItemId" method="post" class="mt-4 d-flex" id="delete-form" onsubmit="return DeleteRequest(this);">

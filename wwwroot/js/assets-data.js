@@ -1,61 +1,130 @@
-﻿getStatuses = function () {
-    var $statusDropdown = $('#statusDropdown');
-    var $updatestatus = $('#updatestatus');
+﻿getValues = function (api, dropdownElementId) {
+    var $dropdownElement = $(`#${dropdownElementId}`)
+   
     $.ajax({
-        url: '/api/values/get-statuses',
-        type: 'GET',
-        success: function (data) {          
-            $.each(data, function (index, item) {
-                var $option = $('<option></option>').val(item.Value).text(item.Text);
-
-                if (item.Value === "Complete") {
-                    $option.addClass('text-success'); // Set color attribute
-                } else if (item.Value === "Incomplete(Usable)") {
-                    $option.addClass('text-primary');
-                } else if (item.Value === "Incomplete(Unusable)") {
-                    $option.addClass('text-danger');
-                }
-
-                $statusDropdown.append($option);
-                $updatestatus.append($option);
-            });
-        },
-        error: function (xhr, status, error) {
-            console.log('Error fetching statuses: ' + error);
-        }
-    });
-};
-
-getOptions = function () {
-    var $updateDropdown = $('#updateDropdown');
-    var $updatefirmware = $('#updatefirmware');
-
-    $.ajax({
-        url: '/api/values/get-options',
+        url: api,
         type: 'GET',
         success: function (data) {
-            
-            //$updateDropdown.empty(); // Clear existing options
 
             $.each(data, function (index, item) {
-                var $option = $('<option></option>').val(item.Value).text(item.Text);
-
-                if (item.Value === "N/A") {
-                    $option.addClass('text-secondary'); // Apply gray color
-                } else if (item.Value === "Updated") {
-                    $option.addClass('text-success'); // Apply green color
-                } else if (item.Value === "Not Updated") {
-                    $option.addClass('text-danger'); // Apply red color
+                var $value = item.Value
+                var $option = $('<option></option>').val($value).text(item.Text);
+                switch ($value) {
+                    case 'Unknown':
+                        $option.css('color', 'gray' );
+                        break;
+                    case 'New':
+                    case 'Good':
+                    case 'Complete':
+                    case 'Updated':
+                    case 'Materials':
+                        $option.css('color', 'green');
+                        break;                       
+                    case 'Incomplete(Usable)':
+                    case 'Books':
+                    case 'Poor':
+                        $option.css('color', 'blue');
+                        break;
+                    case 'Incomplete':
+                    case 'Missing':
+                    case "Defective":
+                    case "Damaged":
+                    case 'Incomplete(Unusable)':
+                    case 'Not Updated':
+                        $option.css('color', 'red');
+                        break;
+                    case 'Robots':
+                        $option.css('color', '#fd7e14');
+                        break;
+                    default:
+                        $option.css('color', 'black');
+                        break;
                 }
 
-                $updateDropdown.append($option);
-                $updatefirmware.append($option);
+                $dropdownElement.append($option);
+
             });
         },
         error: function (xhr, status, error) {
             console.log('Error fetching options: ' + error);
+            $('<option></option>').val('').text('No option fetched');            
         }
     });
+};
+
+var text = [
+    "Updated", //0
+    "Not Updated", //1
+    "N/A", //2
+    "Complete", //3
+    "Incomplete(Usable)", //4
+    "Incomplete(Unusable)", //5   
+    "Not Applicable", //6
+    "No Category", //7
+    "No Status", //8
+    "Robots", //9
+    "Books", //10
+    "Materials", //11
+    "Missing", //12
+    "Unknown", //13
+    "Incomplete", //14
+    "New", //15
+    "Good", //16
+    "Damaged", //17
+    "Unknown", //18
+    "Defective" //19
+];
+
+function ChangeBackgroundColor(element, greenArray, redArray, grayArray, blueArray, orangeArray) {
+    var container = $(element);
+
+    if (container.length) {
+        var textcontent = container.text().trim(); // Get the text and trim any whitespace
+
+        // Variable to hold the color to apply
+        let colorToApply = 'black'; // Default color
+
+        // Determine the color to apply based on textcontent
+        switch (true) {
+            case greenArray && greenArray.includes(textcontent):
+                colorToApply = 'green'; // Set to green if in greenArray
+                break;
+            case redArray && redArray.includes(textcontent):
+                colorToApply = 'red'; // Set to red if in redArray
+                break;
+            case grayArray && grayArray.includes(textcontent):
+                colorToApply = 'gray'; // Set to gray if in grayArray
+                break;
+            case blueArray && blueArray.includes(textcontent):
+                colorToApply = 'blue'; // Set to blue if in blueArray
+                break;
+            case orangeArray && orangeArray.includes(textcontent):
+                colorToApply = '#fd7e14'; // Set to orange if in orangeArray
+                break;
+            // No additional cases needed since default is black
+        }
+
+        // Apply the determined background color
+        container.css('background-color', colorToApply);
+    }
+}
+
+
+function changeBgBaseOnCategory(baseOnCategory, firmware, status, category) {
+    switch (baseOnCategory) {
+        case 'Robots':
+            ChangeBackgroundColor(firmware, ["Updated"], ["Not Updated"], ["Unknown"], null, null);
+            ChangeBackgroundColor(status, ["Complete"], ["Incomplete(Unusable)", "Damaged", "Defective", "Missing"], ["Unknown"], ["Incomplete(Usable)"], null);
+            ChangeBackgroundColor(category, null, null, ["Materials"], ["Books"], ["Robots"]);
+            break;
+        case 'Books':
+        case 'Materials':
+            ChangeBackgroundColor(status, ["New"], ["Damaged", "Missing"], ["Poor", "Unknown"], ["Good"], null);
+            ChangeBackgroundColor(category, null, null, ["Materials"], ["Books"], ["Robots"]); 
+            break;
+        default:
+            break;
+    }
 };
 
 loadContent = function (url) {
@@ -78,4 +147,18 @@ loadContent = function (url) {
     });
 };
 
+
+function toggleDropdown(category, dropdown) {
+    if (category.val() === "Robots") {
+        dropdown.prop({
+            "disabled": false,
+            "required": true
+        });
+    } else {
+        dropdown.prop({
+            "disabled": true,
+            "required": false
+        });
+    }
+}
 

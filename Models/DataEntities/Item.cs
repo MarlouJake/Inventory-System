@@ -41,12 +41,14 @@ namespace InventorySystem.Models.DataEntities
         [DataType(DataType.Text)]
         public string? Category { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:MMMM dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:MMM. dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
+
         [DisplayName("Date Added")]
         [DataType(DataType.DateTime)]
         public DateTime ItemDateAdded { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:MMMM dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:MMM. dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
+
         [DisplayName("Last Modified")]
         [DataType(DataType.DateTime)]
         public DateTime ItemDateUpdated { get; set; }
@@ -58,6 +60,14 @@ namespace InventorySystem.Models.DataEntities
         {
             ItemDateAdded = DateTime.Now;
             ItemDateUpdated = DateTime.Now;
+        }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (Category == "Robots" && string.IsNullOrEmpty(FirmwareUpdated))
+            {
+                yield return new ValidationResult("Firmware Updated is required", new[] { nameof(FirmwareUpdated) });
+            }
         }
     }
 }

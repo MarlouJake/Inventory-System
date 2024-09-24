@@ -77,6 +77,9 @@ namespace InventorySystem.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<DateTime>("DateModified")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Email")
                         .HasColumnType("varchar(255)");
 
@@ -105,15 +108,35 @@ namespace InventorySystem.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CategoryId"));
 
-                    b.Property<string>("CategoryName")
+                    b.Property<string>("CategoryDisplayName")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Name")
                         .HasColumnType("longtext");
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Category");
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            CategoryDisplayName = "Robots",
+                            Name = "Robots"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            CategoryDisplayName = "Books",
+                            Name = "Books"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            CategoryDisplayName = "Materials",
+                            Name = "Materials"
+                        });
                 });
 
             modelBuilder.Entity("InventorySystem.Models.Identities.ItemCategory", b =>
@@ -155,18 +178,26 @@ namespace InventorySystem.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("Role");
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
                         {
                             RoleId = 1,
-                            Name = "Administrator"
+                            Name = "Administrator",
+                            RoleDisplayName = "Admin"
                         },
                         new
                         {
                             RoleId = 2,
-                            Name = "User"
+                            Name = "User",
+                            RoleDisplayName = "User"
+                        },
+                        new
+                        {
+                            RoleId = 3,
+                            Name = "Requester",
+                            RoleDisplayName = "Requester"
                         });
                 });
 
