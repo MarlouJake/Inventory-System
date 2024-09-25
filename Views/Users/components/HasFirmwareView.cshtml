@@ -1,5 +1,90 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@using InventorySystem.Models.DataEntities
+@model Item
+
+<div class="d-flex mt-1">
+
+    <dl class="d-block mt-0 w-60">
+        <div class="d-flex category-container">
+            <dt class="row-sm-2 status-header d-flex align-items-center w-40">
+                @Html.DisplayNameFor(model => model.Category)
+                <span class="semi-colon ms-auto">:</span>
+            </dt>
+            @if (!string.IsNullOrEmpty(Model.Category))
+            {
+                <dd id="item-category" class="row-sm-2 status-view">
+                    @Html.DisplayFor(model => model.Category)
+                </dd>
+            }
+            else
+            {
+                <dd id="item-category" class="row-sm-2 status-view">
+                    No Category
+                </dd>
+            }
+        </div>
+
+        <div class="d-flex mt-0">
+            <dt class="row-sm-2 status-header d-flex align-items-center">
+                @Html.DisplayNameFor(model => model.Status)
+                <span class="semi-colon ms-auto">:</span>
+            </dt>
+            @if (!string.IsNullOrEmpty(Model.Status))
+            {
+                <dd id="item-status" class="row-sm-2 status-view">
+                    @Html.DisplayFor(model => model.Status)
+                </dd>
+            }
+            else
+            {
+                <dd id="item-status" class="row-sm-2 status-view">
+                    No Status
+                </dd>
+            }
+        </div>
+
+        <div class="d-flex mt-0">
+            <dt class="row-sm-2 status-header d-flex align-items-center w-40">
+                @Html.DisplayNameFor(model => model.FirmwareUpdated)
+                <span class="semi-colon ms-auto">:</span>
+            </dt>
+
+            @if (!string.IsNullOrEmpty(Model.FirmwareUpdated))
+            {
+                <dd id="firmware-status" class="row-sm-2 status-view">
+                    @Html.DisplayFor(model => model.FirmwareUpdated)
+                </dd>
+            }
+            else
+            {
+                <dd id="firmware-status" class="row-sm-2 status-view">
+                    No Status
+                </dd>
+            }
+           
+        </div>
+    </dl>
+
+
+    <dl class="d-flex">
+        <div class="d-block date-container">
+            <dt class="row-sm-2 date-header">
+                @Html.DisplayNameFor(model => model.ItemDateAdded)
+            </dt>
+            <dd class="row-sm-2 text-break date-body">
+                @Html.DisplayFor(model => model.ItemDateAdded)
+            </dd>
+
+            <dt class="row-sm-2 date-header">
+                @Html.DisplayNameFor(model => model.ItemDateUpdated)
+            </dt>
+
+            <dd class="row-sm-2 text-break date-body">
+                @Html.DisplayFor(model => model.ItemDateUpdated)
+            </dd>
+        </div>
+
+
+
+    </dl>
+
+</div>

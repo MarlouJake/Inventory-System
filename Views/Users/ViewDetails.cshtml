@@ -16,6 +16,7 @@
         var categoryFetched = "@Html.Raw(catergoryFromModel)";
         //changeBgBaseOnCategory(baseOnCategory, firmware, status, category)
         changeBgBaseOnCategory(categoryFetched, '#firmware-status', '#item-status', '#item-category');
+        changeBgBaseOnCategory(categoryFetched, '#item-status', '#item-status', '#item-category');
     });
 
 </script>
@@ -26,13 +27,10 @@
         font-size: 0.9rem;
     }
 
-    .status-body {
+    .status-body, .status-view {
         border-radius: 12px;
         /*background-color: lightslategray;*/
         color: white;
-        margin-top: 0.7rem;
-        padding-bottom: 0.1rem;
-        margin-left: 0.3rem;
         padding-left: 0.4rem;
         padding-right: 0.4rem;
         height: 1.2rem;
@@ -43,6 +41,11 @@
         text-align: center; /* For multiline content */
     }
 
+    .status-view{
+        margin-top: 0.7rem;
+        margin-left: 0.7rem;
+    }
+
     .date-header {
         font-size: 0.9rem;
     }
@@ -51,9 +54,6 @@
         font-size: 0.8rem;
     }
 
-    .category-container {
-        margin-top: -0.6rem;
-    }
 </style>
 
 <h5 class="pt-2 d-flex">
@@ -67,6 +67,7 @@
 </h5>
 
 <hr class="mt-0 mb-0"/>
+
 <div class="row mt-0">
     <dl class="mb-0">
 
@@ -122,93 +123,19 @@
             
         </div>
     </dl>
-  
 
-    <div class="d-flex mt-0">
-
-        <dl class="d-block mt-0 w-60">
-            <div class="d-flex category-container">
-                <dt class="row-sm-2 status-header d-flex align-items-center">
-                    @Html.DisplayNameFor(model => model.Category)
-                    <span class="semi-colon ms-auto">:</span>
-                </dt>
-                @if (!string.IsNullOrEmpty(Model.Category))
-                {
-                    <dd id="item-category" class="row-sm-2 status-body">
-                        @catergoryFromModel
-                    </dd>
-                }
-                else
-                {
-                    <dd id="item-category" class="row-sm-2 status-body">
-                        No Category
-                    </dd>
-                }
-            </div>
-
-            <div class="d-flex mt-0">
-                <dt class="row-sm-2 status-header d-flex align-items-center">
-                    @Html.DisplayNameFor(model => model.Status)
-                    <span class="semi-colon ms-auto">:</span>
-                </dt>
-                @if (!string.IsNullOrEmpty(Model.Status))
-                {
-                    <dd id="item-status" class="row-sm-2 status-body">
-                        @Html.DisplayFor(model => model.Status)
-                    </dd>
-                }
-                else
-                {
-                    <dd id="item-status" class="row-sm-2 status-body">
-                        No Status
-                    </dd>
-                }
-            </div>
-
-            <div class="d-flex mt-0">
-                <dt class="row-sm-2 status-header d-flex align-items-center">
-                    @Html.DisplayNameFor(model => model.FirmwareUpdated)
-                    <span class="semi-colon ms-auto">:</span>
-                </dt>
-                @if (!String.IsNullOrEmpty(Model.FirmwareUpdated))
-                {
-                    <dd id="firmware-status" class="row-sm-2 status-body">
-                        @Html.DisplayFor(model => model.FirmwareUpdated)
-                    </dd>
-                }
-                else
-                {
-                    <dd id="firmware-status" class="row-sm-2 status-body">
-                        Not Applicable
-                    </dd>
-                }
-            </div>
-        </dl>
-
-
-        <dl class="d-flex">
-            <div class="d-block date-container">
-                <dt class="row-sm-2 date-header">
-                    @Html.DisplayNameFor(model => model.ItemDateAdded)
-                </dt>
-                <dd class="row-sm-2 text-break date-body">
-                    @Html.DisplayFor(model => model.ItemDateAdded)
-                </dd>
-
-                <dt class="row-sm-2 date-header">
-                    @Html.DisplayNameFor(model => model.ItemDateUpdated)
-                </dt>
-
-                <dd class="row-sm-2 text-break date-body">
-                    @Html.DisplayFor(model => model.ItemDateUpdated)
-                </dd>
-            </div>
-
-            
-
-        </dl>
-
+    <div id="ViewBaseOnCategory">
+        @if (Model.Category == "Robots")
+        {
+            @await Html.PartialAsync("~/Views/Users/components/HasFirmwareView.cshtml")
+        }
+        else
+        {
+            @await Html.PartialAsync("~/Views/Users/components/NoFirmwareView.cshtml")
+        }
     </div>
+
+
 
 </div>
 <div class="form-group m-0 d-flex">

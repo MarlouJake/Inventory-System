@@ -29,13 +29,15 @@ namespace InventorySystem.Models.DataEntities
         [MaxLength(5000, ErrorMessage = "Description must not exceed 5000 characters")]
         public string? ItemDescription { get; set; }
 
-        [DisplayName(DisplayNames.ItemStatus)]
+
+        [DisplayName("Status")]
         [DataType(DataType.Text)]
         public string? Status { get; set; }
 
         [DisplayName("Board Status")]
         [DataType(DataType.Text)]
         public string? FirmwareUpdated { get; set; }
+
 
         [DisplayName("Category")]
         [DataType(DataType.Text)]
@@ -62,12 +64,5 @@ namespace InventorySystem.Models.DataEntities
             ItemDateUpdated = DateTime.Now;
         }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (Category == "Robots" && string.IsNullOrEmpty(FirmwareUpdated))
-            {
-                yield return new ValidationResult("Firmware Updated is required", new[] { nameof(FirmwareUpdated) });
-            }
-        }
     }
 }

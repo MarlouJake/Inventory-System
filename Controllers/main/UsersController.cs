@@ -139,6 +139,146 @@ namespace InventorySystem.Controllers.main
             return PartialView(model);
         }
 
+        [Route("dashboard/item-view/all")]
+        [HttpGet]
+        public async Task<IActionResult> ItemViewAll(string username, int page = 1)
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+            {
+                return RedirectToAction("AccessDenied");
+            }
+            const int pageSize = 24;
+            var itemsQuery = _context.Items.Where(i => i.UserId == userId);
+
+            var totalItems = await itemsQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var items = await itemsQuery
+                .OrderBy(i => i.ItemName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var model = new ItemListViewModel
+            {
+                Items = items,
+                CurrentPage = page,
+                TotalPages = totalPages
+            };
+            ViewBag.Username = username;
+
+
+            ViewData["title"] = "Item View";
+            return PartialView(model);
+        }
+
+        [Route("dashboard/item-view/robots")]
+        [HttpGet]
+        public async Task<IActionResult> CategoryRobots(string username, int page = 1)
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+            {
+                return RedirectToAction("AccessDenied");
+            }
+            const int pageSize = 24;
+            var itemsQuery = _context.Items.Where(i => i.UserId == userId && i.Category == "Robots");
+
+            var totalItems = await itemsQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var items = await itemsQuery
+                .OrderBy(i => i.ItemName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var model = new ItemListViewModel
+            {
+                Items = items,
+                CurrentPage = page,
+                TotalPages = totalPages
+            };
+            ViewBag.Username = username;
+
+
+            ViewData["title"] = "Item View";
+            return PartialView(model);
+        }
+
+
+        [Route("dashboard/item-view/books")]
+        [HttpGet]
+        public async Task<IActionResult> CategoryBooks(string username, int page = 1)
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+            {
+                return RedirectToAction("AccessDenied");
+            }
+            const int pageSize = 24;
+            var itemsQuery = _context.Items.Where(i => i.UserId == userId && i.Category == "Books");
+
+            var totalItems = await itemsQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var items = await itemsQuery
+                .OrderBy(i => i.ItemName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var model = new ItemListViewModel
+            {
+                Items = items,
+                CurrentPage = page,
+                TotalPages = totalPages
+            };
+            ViewBag.Username = username;
+
+
+            ViewData["title"] = "Item View";
+            return PartialView(model);
+        }
+
+        [Route("dashboard/item-view/materials")]
+        [HttpGet]
+        public async Task<IActionResult> CategoryMaterials(string username, int page = 1)
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+            {
+                return RedirectToAction("AccessDenied");
+            }
+            const int pageSize = 24;
+            var itemsQuery = _context.Items.Where(i => i.UserId == userId && i.Category == "Materials");
+
+            var totalItems = await itemsQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var items = await itemsQuery
+                .OrderBy(i => i.ItemName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var model = new ItemListViewModel
+            {
+                Items = items,
+                CurrentPage = page,
+                TotalPages = totalPages
+            };
+            ViewBag.Username = username;
+
+
+            ViewData["title"] = "Item View";
+            return PartialView(model);
+        }
 
         // GET: Admin/Details/id?
         [Route("dashboard/details/{id?}")]
@@ -293,6 +433,7 @@ namespace InventorySystem.Controllers.main
         }
 
 
+        //Partials Views for Modal Update, ViewDetails, Create
         [Route("dashboard/update/partial_view_with_firmwareUpdate")]
         [HttpGet]
         public IActionResult HasFirmwareUpdate()
@@ -307,5 +448,18 @@ namespace InventorySystem.Controllers.main
             return PartialView("~/Views/Users/components/NoFirmwareUpdate.cshtml");
         }
 
+        [Route("dashboard/update/partial_view_has_firmwareview")]
+        [HttpGet]
+        public IActionResult HasFirmwareView()
+        {
+            return PartialView("~/Views/Users/components/HasFirmwareView.cshtml");
+        }
+
+        [Route("dashboard/update/partial_view_no_firmwareview")]
+        [HttpGet]
+        public IActionResult NoFirmwareView()
+        {
+            return PartialView("~/Views/Users/components/NoFirmwareView.cshtml");
+        }
     }
 }

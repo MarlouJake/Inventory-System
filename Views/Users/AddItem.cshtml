@@ -8,21 +8,81 @@
 <script>
     var itemid = '@Html.Raw(Model.ItemId)';
     $(document).ready(function () {
-        getValues('/api/values/get-statuses', 'statusDropdown');
-        getValues('/api/values/get-options', 'updateDropdown');
-        getValues('/api/values/get-categories', 'categoryDropdown');
 
+
+        getValues('/api/values/get-categories', 'categoryDropdown');
         var categoryDropdown = $('#categoryDropdown');
         var updatedropdown = $('#updateDropdown');
 
-        toggleDropdown(categoryDropdown, updatedropdown);
+
         
+        toggleDropdown(categoryDropdown, updatedropdown);
+        updateLabel();
+        hideBoardStatus();
+        fetchDropdownValues();
 
         categoryDropdown.on('change', function () {
             toggleDropdown(categoryDropdown, updatedropdown);
+            updateLabel();
+            hideBoardStatus();
+            fetchDropdownValues();
         });
+            
     });
 
+
+    function fetchDropdownValues() {
+        let CategoryDropdown = $('#categoryDropdown').val();
+        let StatusDropdown = $('#statusDropdown');
+        let FirmwareDropdown = $('#updateDropdown');
+        let AddButton = $('#add-button');
+        switch (CategoryDropdown) {
+            case 'Robots':
+                getValues('/api/values/get-statuses', 'statusDropdown');
+                getValues('/api/values/get-options', 'updateDropdown');
+                StatusDropdown.prop('disabled', false);
+                AddButton.prop('disabled', false);
+                break;
+            case 'Books':
+            case 'Materials':
+                getValues('/api/values/get-condition', 'statusDropdown');
+                StatusDropdown.prop('disabled', false);
+                AddButton.prop('disabled', false);
+                break;
+            default:
+                getValues('/api/values/get-statuses', 'statusDropdown');
+                StatusDropdown.prop('disabled', true);
+                AddButton.prop('disabled', true);
+                break;
+       }
+    }
+
+    function updateLabel(){
+        let CategoryDropdown = $('#categoryDropdown').val();
+        let codeLabel = $('#code-label');
+        let nameLabel = $('#name-label');
+
+        if (CategoryDropdown === "Books") {
+            codeLabel.text('ISBN');
+            nameLabel.text('Title');
+        }
+        else {
+            codeLabel.text('Code');
+            nameLabel.text('Name');
+        }     
+    }
+
+    function hideBoardStatus(){
+        let CategoryDropdown = $('#categoryDropdown').val();
+        let boardStatus = $('#firmwareDropdownContainer');
+
+        if (!(CategoryDropdown === "Robots")) {
+            boardStatus.addClass('d-none');
+        }
+        else {
+            boardStatus.removeClass('d-none');
+        }
+    }
  
 </script>
 
@@ -91,7 +151,7 @@
 
     <div class="form-group d-flex gap-1" style="font-size: 0.9rem;">
         <div class="w-50 col-sm-2">
-            <label asp-for="ItemCode" for="itemCode" class="control-label"></label>
+            <label asp-for="ItemCode" for="itemCode" id="code-label" class="control-label"></label>
             <input asp-for="ItemCode" id="itemCode" type="text" class="form-control form-control-sm user-input" name="itemCode"
                    autocomplete="off"
                    required
@@ -107,7 +167,7 @@
         </div>
 
         <div class="w-50 col-sm-2">
-            <label asp-for="ItemName" for="itemName" class="control-label"></label>
+            <label asp-for="ItemName" for="itemName" id="name-label" class="control-label"></label>
             <input asp-for="ItemName" id="itemName" class="form-control form-control-sm user-input" name="itemName"
                    autocomplete="off"
                    required
@@ -130,26 +190,24 @@
         </div>
     </div>
 
-    <div class="form-group d-flex gap-1">
+    <div class="form-group d-flex gap-2">
         
         <div>  
             <label asp-for="Status" for="statusDropdown" class="control-label">Status</label>
             <select asp-for="Status" id="statusDropdown" class="form-control form-control-sm w-30 user-input" required name="statusDropdown">
             </select>
-
-
         </div>
 
         <div>
             <label asp-for="Category" for="categoryDropdown" class="control-label">Category</label>
             <div class="d-flex">
-                <select asp-for="Category" id="categoryDropdown" class="form-control form-control-sm w-30 user-input" name="categoryDropdown">
+                <select asp-for="Category" id="categoryDropdown" class="form-control form-control-sm w-30 user-input" required name="categoryDropdown">
                 </select>
             </div>
         </div>
 
-        <div>
-            <label asp-for="FirmwareUpdated" for="updateDropdown" class="control-label"></label>    
+        <div id="firmwareDropdownContainer" class="d-none">
+            <label asp-for="FirmwareUpdated" for="updateDropdown" id="updateDropdownLabel" class="control-label"></label>
             <select asp-for="FirmwareUpdated" id="updateDropdown" class="form-control form-control-sm w-30 user-input" name="updateDropdown">
             </select>
             <span asp-validation-for="FirmwareUpdated" id="updateDropdown-error " class="text-danger errors"></span>
@@ -160,7 +218,7 @@
     <hr class="mt-4" />
 
     <div class="form-group m-0 d-flex">
-        <input type="submit" value="Add" class="ms-auto btn btn-sm btn-success w-30"/>
+        <input type="submit" id="add-button" value="Add" class="ms-auto btn btn-sm btn-success w-30"/>
         <input type="button" value="Cancel" class="btn btn-sm btn-outline-secondary ms-3 w-25" data-bs-dismiss="modal" />
     </div>
 </form>

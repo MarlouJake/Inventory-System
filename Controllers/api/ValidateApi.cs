@@ -42,7 +42,6 @@ namespace InventorySystem.Controllers.api
                 var message = "Validation Successful. Redirecting...";
 
                 #region --Console Logger--
-                Console.Clear();
                 Console.WriteLine(Messages.PrintUrl(redirectUrl));
                 #endregion
 
@@ -73,7 +72,6 @@ namespace InventorySystem.Controllers.api
                 var message = "Validation Successful. Redirecting...";
 
                 #region --Console Logger--
-                Console.Clear();
                 Console.WriteLine(Messages.PrintUrl(redirectUrl));
                 #endregion
                 Console.WriteLine(message);
@@ -173,7 +171,6 @@ namespace InventorySystem.Controllers.api
             }
             catch (Exception ex)
             {
-                Console.Clear();
                 Console.WriteLine(ex);
                 message = "An unknown error occurred.";
                 var response = ApiResponseUtils.ErrorResponse(null!, message);

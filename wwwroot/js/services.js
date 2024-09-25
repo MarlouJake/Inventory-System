@@ -322,11 +322,11 @@ UpdateRequest = (form) => {
         itemname: formData.get('updatename'),
         itemdescription: formData.get('updatedesc'),
         status: formData.get('updatestatus'),
-        category: formData.get('categoryDropdown'),
+        category: formData.get('categoryPartial'),
         firmwareupdated: formData.get('updatefirmware')
     };
     var dataid = $('#dataid').val();
-
+    console.log('Data:', JSON.stringify(itemdata, null, 2));
     if (!ValidateUpdate(itemdata)) {
         return false;
     }

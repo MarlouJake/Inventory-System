@@ -1,13 +1,14 @@
 ﻿@using InventorySystem.Models.DataEntities
 @model Item
-
+]
 <div class="form-group">
-    <div class="form-group mt-2  mb-0 d-flex">
+    <div class="form-group mt-3 mb-0 d-flex">
         <label asp-for="Category" class="control-label mb-0">Category:</label>
-        <p asp-for="Category" id="category-text" class="ms-2 category-text mb-0 ps-1 pe-1">@Model.Category</p>
+        <p asp-for="Category" id="category-text" class="ms-1 border category-text mb-0 ps-1 pe-1">@Model.Category</p>
+        <input id="categoryPartial" hidden name="categoryPartial" asp-for="Category" />
     </div>
 
-    <div class="mt-0 d-flex justify-content-between gap-4">
+    <div class="mt-2 d-flex justify-content-between gap-4">
         <div class="w-50 mt-0">
             <label asp-for="Status" class="control-label"></label>
             <select asp-for="Status" id="updatestatus" class="form-control update" required name="updatestatus">

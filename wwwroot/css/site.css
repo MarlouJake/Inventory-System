@@ -27,8 +27,20 @@ html {
     width: 60%;
 }
 
+.w-30 {
+    width: 30%;
+}
+
+.w-35 {
+    width: 35%;
+}
+
 .w-40 {
     width: 40%;
+}
+
+.w-45 {
+    width: 45%;
 }
 
 .hide-con {
@@ -101,7 +113,7 @@ a.navbar-brand {
     color: gray;
     background-color: white;
 }
-}
+
 /* General body styles */
 body {
     font-family: 'Poppins', sans-serif;
@@ -449,7 +461,7 @@ body {
 
 @media (max-width: 400px) {
     .category-text {
-        font-size: 0.6rem;
+        font-size: 0.3rem;
     }
 }
 

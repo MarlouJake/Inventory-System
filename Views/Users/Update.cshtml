@@ -15,15 +15,12 @@
       $(this).remove();
     });
 
-
     $(document).ready(function () {
-        var categoryDropdown = $('#categoryDropdown');
+
         var dropdownElement = $('#updatefirmware');
         var dropdownInitOption = $('#updatefirmwareValue');
 
-        getValues('/api/values/get-statuses', 'updatestatus');
-        getValues('/api/values/get-options', 'updatefirmware');
-        getValues('/api/values/get-categories', 'categoryDropdown');
+        fetchDropdownValues();
         checkcodechanges();
         //setSelectedValues();
 
@@ -48,6 +45,30 @@
         });
     });
 
+    function fetchDropdownValues() {
+        let CategoryDropdown = $('#categoryPartial').val();
+        let StatusDropdown = $('#updatestatus');
+        let FirmwareDropdown = $('#updatefirmware');
+        let AddButton = $('#add-button');
+        switch (CategoryDropdown) {
+            case 'Robots':
+                getValues('/api/values/get-statuses', 'updatestatus');
+                getValues('/api/values/get-options', 'updatefirmware');
+                StatusDropdown.prop('disabled', false);
+                AddButton.prop('disabled', false);
+                break;
+            case 'Books':
+            case 'Materials':
+                getValues('/api/values/get-condition', 'updatestatus');
+                StatusDropdown.prop('disabled', false);
+                AddButton.prop('disabled', false);
+                break;
+            default:
+                StatusDropdown.prop('disabled', true);
+                AddButton.prop('disabled', true);
+                break;
+        }
+    }
     
     function checkcodechanges(){
         var currentcode = $('#updatecode').val();
@@ -80,7 +101,6 @@
     .category-text{
         font-size: 0.8rem;
         color: white;
-        margin-top: 0.1rem;
         border-radius: 12px;
     }
 
@@ -115,7 +135,14 @@
     <div class="form-group d-flex justify-content-between gap-4">
         <div class="d-block w-50">
             <div>
-                <label asp-for="ItemCode" class="control-label"></label>
+                @if(Model.Category == "Books")
+                {
+                    <label asp-for="ItemCode" class="control-label">ISBN</label>
+                }
+                else
+                {                   
+                    <label asp-for="ItemCode" class="control-label"></label>
+                }
                 <span asp-validation-for="ItemCode" id="updatecode-error" class="text-danger ms-4 mb-5 errors"></span>
             </div>
             
@@ -133,7 +160,14 @@
         </div>
         
         <div class="d-block w-50">
-            <label asp-for="ItemName" class="control-label"></label>
+            @if(Model.Category == "Books")
+            {
+                <label asp-for="ItemName" class="control-label">Title</label>
+            }
+            else
+            {
+                <label asp-for="ItemName" class="control-label"></label>
+            }
             <input asp-for="ItemName" type="text" class="form-control user-input update" autocomplete="off"
                    name="updatename"
                    id="updatename"
@@ -147,7 +181,6 @@
         </div>
     </div>
 
-
     <div class="form-group mt-1">
             <label asp-for="ItemDescription" class="control-label"></label>
             <textarea asp-for="ItemDescription" type="text" class="form-control user-input update" autocomplete="off"
@@ -158,11 +191,12 @@
             <span asp-validation-for="ItemDescription" id="updatedesc-error" class="text-danger"></span>              
     </div>
 
-    <div id="renderBaseOnCategory">
-        @if(Model.Category == "Robots")
+    <div id="UpdateBaseOnCategory">
+        @if (Model.Category == "Robots")
         {
             @await Html.PartialAsync("~/Views/Users/components/HasFirmwareUpdate.cshtml")
-        } else
+        }
+        else
         {
             @await Html.PartialAsync("~/Views/Users/components/NoFirmwareUpdate.cshtml")
         }

@@ -5,7 +5,30 @@
     
     $(document).ready(function () {
         changeBackground(); 
+        changeDisplayName();
     });
+
+    function changeDisplayName(){
+
+        $('.catergoryValue').each(function () { 
+            
+            let categoryVal = $(this);
+            let value = categoryVal.text().trim();
+            let displayName = categoryVal.siblings('.displayName');  
+            switch(value){
+                case 'Robots':
+                case 'Materials':
+                    displayName.text('Code:');
+                    break;
+                case 'Books':
+                    displayName.text('ISBN:');
+                    break;
+                default:
+                    displayName.text('Code:');
+                    break;
+            }
+        });
+    }
 
     function changeBackground() {
         $('.card-status').each(function () {
@@ -13,8 +36,13 @@
             var status = $cardStatus.text().trim();
             var $displayStatus = $cardStatus.siblings('.display-status');  
 
+            if (!status) {
+            status = 'No Status';  
+        }
+
             switch (status) {
                 case 'Unknown':
+                case 'Poor':
                     $displayStatus.css('background-color', 'gray').text(status);
                     break;
                 case 'Complete':
@@ -22,7 +50,7 @@
                     $displayStatus.css('background-color', 'green').text(status);
                     break;
                 case 'Good':
-                    $displayStatus.css('background-color', 'blue');
+                    $displayStatus.css('background-color', 'blue').text(status);
                     break;
                 case 'Damaged':
                 case 'Defective':
@@ -52,9 +80,14 @@
 </script>
 
 <div class="card">
+   
     <div class="card-body">
         <h6 class="card-title mb-1 fs-6"><strong>@Model.ItemName</strong></h6>
-        <p class="card-text mb-1"><strong>Code:</strong> @Model.ItemCode</p>
+        <p class="card-text mb-1">
+            <span hidden class="d-none catergoryValue">@Model.Category</span>
+            <strong class="displayName"></strong>
+            <span class="displayCodeValue">@Model.ItemCode</span/>
+        </p>
         <p class="card-text mb-0">
             <span class="card-status d-none">@Model.Status</span>
             <span class="display-status ps-2 pe-2 mb-0"></span>

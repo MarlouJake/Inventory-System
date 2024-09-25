@@ -5,7 +5,7 @@
         url: api,
         type: 'GET',
         success: function (data) {
-
+            $dropdownElement.empty();
             $.each(data, function (index, item) {
                 var $value = item.Value
                 var $option = $('<option></option>').val($value).text(item.Text);
@@ -127,6 +127,15 @@ function changeBgBaseOnCategory(baseOnCategory, firmware, status, category) {
     }
 };
 
+
+/** 
+ * Function to dynamically load page content in the dashboard.
+ * Active button in sidebar also changes based on the URL or URI of the content loaded.
+ * 
+ * Returns HTML content for the partial view.
+ * @param {string} url - URI or URL of the API
+ * @returns {string} Returns HTML content for the partial view.
+ **/
 loadContent = function (url) {
     $('#view-all').html(spinner + 'Loading...');
 
@@ -148,14 +157,21 @@ loadContent = function (url) {
 };
 
 
-function toggleDropdown(category, dropdown) {
-    if (category.val() === "Robots") {
-        dropdown.prop({
+
+/**Enable or Disable & Add or Remove attr required  to the firmware status dropdown
+ * @param {JQuery} input - ID of input dropdown
+ * @param {JQuery} target - ID of target dropdown
+ * 
+ * 
+ **/
+function toggleDropdown(input, target) {
+    if (input.val() === "Robots") {
+        target.prop({
             "disabled": false,
             "required": true
         });
     } else {
-        dropdown.prop({
+        target.prop({
             "disabled": true,
             "required": false
         });

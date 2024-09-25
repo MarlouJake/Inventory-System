@@ -78,10 +78,7 @@ namespace InventorySystem.Controllers.api
                 var errorMessage = "An error occurred while connecting to the MySQL database.";
 
                 #region --Console Logger--
-                Console.Clear();
-                Console.ForegroundColor = ConsoleColor.Red;
                 Console.Error.WriteLine($"\nMySQL Exception Caught: {sqlEx}\n");
-                Console.ResetColor();
                 #endregion
 
                 var response = ApiResponseUtils.CustomResponse(false, errorMessage, null);
@@ -92,10 +89,7 @@ namespace InventorySystem.Controllers.api
                 var errorMessage = "Username or Password incorrect";
 
                 #region --Console Logger--
-                Console.Clear();
-                Console.ForegroundColor = ConsoleColor.Red;
                 Console.Error.WriteLine($"\nException Caught: {ex}\n");
-                Console.ResetColor();
                 #endregion
 
                 var response = ApiResponseUtils.CustomResponse(false, errorMessage, null);
