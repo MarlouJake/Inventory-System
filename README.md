@@ -1,11 +1,13 @@
 # Project "Inventory Management System"
 
-The project is still incomplete but has a bit of responsiveness and does have CRUD operations working.
+
+The project is still incomplete but has a bit of responsiveness and does have CRUD operations working. After completing the **Prerequisites**, **Installation**, **Configuration**, and **Migration**, you can use the signup function on the login page to gain access to the dashboard.
 
 ## Description
 
-This project is built using ASP.NET Core with Entity Framework Core and targets **.NET 8.0**. It includes identity management, database support for MySQL, and uses Entity Framework migrations. This project also supports MSSQL Server, but adjustments are needed in the `Program.cs` file for Dependency Injection when using MSSQL. Additionally, there may be adjustments required in the `Models/` attributes to complement MSSQL Server.
-
+The project is still incomplete but has a bit of responsiveness and does have CRUD operations working. 
+Do the 
+You can use the signup function on the login page to gain access to the dashboard.
 ## Technologies Used
 
 - **ASP.NET Core**: A cross-platform framework for building modern cloud-based web applications.
