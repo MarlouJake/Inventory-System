@@ -2,9 +2,22 @@
 
 The project is still incomplete but has a bit of responsiveness and does have CRUD operations working.
 
-
 ## Description
+
 This project is built using ASP.NET Core with Entity Framework Core and targets **.NET 8.0**. It includes identity management, database support for MySQL, and uses Entity Framework migrations. This project also supports MSSQL Server, but adjustments are needed in the `Program.cs` file for Dependency Injection when using MSSQL. Additionally, there may be adjustments required in the `Models/` attributes to complement MSSQL Server.
+
+## Technologies Used
+
+- **ASP.NET Core**: A cross-platform framework for building modern cloud-based web applications.
+- **Entity Framework Core**: An object-relational mapper (ORM) for .NET that simplifies data access.
+- **MySQL**: A popular open-source relational database management system.
+- **MSSQL Server**: A relational database management system developed by Microsoft.
+- **ASP.NET Core Identity**: A membership system that adds login functionality to your application.
+- **Razor Pages and MVC**: Frameworks for building web applications using the Model-View-Controller pattern.
+- **JavaScript**: Used for frontend logic, particularly for API fetch operations.
+- **HTML/CSS**: Used for structuring and styling the user interface.
+- **Bootstrap**: A front-end framework for developing responsive and mobile-first websites.
+- **jQuery**: A fast, small, and feature-rich JavaScript library that simplifies HTML document traversal and manipulation.
 
 ## Prerequisites
 
