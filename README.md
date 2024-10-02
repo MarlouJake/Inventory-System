@@ -11,7 +11,6 @@ This project is built using ASP.NET Core with Entity Framework Core and targets 
 - **ASP.NET Core**: A cross-platform framework for building modern cloud-based web applications.
 - **Entity Framework Core**: An object-relational mapper (ORM) for .NET that simplifies data access.
 - **MySQL**: A popular open-source relational database management system.
-- **MSSQL Server**: A relational database management system developed by Microsoft.
 - **ASP.NET Core Identity**: A membership system that adds login functionality to your application.
 - **Razor Pages and MVC**: Frameworks for building web applications using the Model-View-Controller pattern.
 - **JavaScript**: Used for frontend logic, particularly for API fetch operations.
