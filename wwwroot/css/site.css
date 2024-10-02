@@ -159,6 +159,7 @@ body {
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     background-color: #343a40;
     z-index: 1060;
+    transition: left 0.3s ease;
 }
 
     #sidebar h3 {
@@ -259,15 +260,17 @@ body {
     max-width: 150px; /* Set a maximum width */
     overflow: hidden; /* Hide overflow */
     text-overflow: ellipsis; /* Add ellipsis */
-}
-
-.display-status{
-    border-radius: 12px;
+    white-space: nowrap; /* Prevent text from breaking to the next line */
 }
 
 .card-title {
     font-size: 0.75rem;
+    max-width: 150px; /* Set a maximum width */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add ellipsis */
+    white-space: nowrap; /* Prevent text from breaking to the next line */
 }
+
 
 .card-footer {
     border-top: 1px solid #dee2e6;
@@ -285,15 +288,16 @@ body {
 .no-items {
     display: flex;
     justify-content: center; /* Center horizontally */
-    width: 100%;
-    margin-top: 20px; /* Add margin if needed */
-    text-align: center;
+    align-items: center; /* Center vertically if needed */
+    margin-top: 50px; /* Add margin if needed */
+    width: 100%; /* Ensure it takes full width */
+    text-align: center; /* Ensure text is centered */
 }
 
 
 
 .input-error {
-    border: 1px solid red;
+    border: 1px solid red !important;
 }
 
 .input-blur {
@@ -340,7 +344,13 @@ body {
         border-color: #fd7e14 !important;
     }
 
-
+.hamburger {
+    display: none;
+    cursor: pointer;
+}
+.app-name {
+    display: none;
+}
 /* Responsive styles */
 
 @media (max-width: 1469px) {
@@ -377,32 +387,12 @@ body {
    
 }
 
-@media (min-width: 891px) {
-    #sidebar {
-        display: block; /* Show the sidebar */
-    }
-
-    .navbar-toggler {
-        display: none; /* Hide the hamburger button */
-    }
-}
-
 @media (max-width: 890px) {
-    #sidebar {
-        display: none; /* Hide the sidebar */
-    }
-
-    #sidebar-content{
-        display: none;
-    }
 
     .navbar-toggler {
         display: block; /* Show the hamburger button */
     }
 
-    #main-content {
-        margin: 0; /* Reset left margin */
-    }
 
     .pagination {
         display: flex;
@@ -417,14 +407,34 @@ body {
 
 
 
-@media (max-width: 821) {
+@media (max-width: 820px) {
+    #sidebar {
+        display: none !important;
+    }
+
+    .hamburger {
+        display: block !important;
+    }
+
+    .app-name {
+        display: block !important;
+    }
 
     #main-content {
         margin: 0;
+        padding: 15px;
     }
 
+    .category-label{
+        font-size: 0.9rem;
+    }
 
+    #category-buttons button {
+        font-size: 0.7rem;
+    }
 }
+
+
 
 @media (max-width: 725px) {
 
@@ -493,5 +503,6 @@ body {
         position: relative;
         transition: all 0.3s; /* Optional: add some transition */
     }
+
 
 

@@ -6,17 +6,20 @@ namespace InventorySystem.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
+        public DbSet<Admin> Admins { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ItemCategory> ItemCategories { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<CreateHistory> CreateHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            /*User model Constraints*/
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
@@ -25,10 +28,12 @@ namespace InventorySystem.Data
                 .HasIndex(u => u.Email)
                 .IsUnique();
 
+            /*Item model Constraints*/
             modelBuilder.Entity<Item>()
-                .HasIndex(i => i.ItemCode)
+                .HasIndex(i => new { i.UserId, i.ItemCode })
                 .IsUnique();
 
+            /*UserRole model Builder*/
             modelBuilder.Entity<UserRole>()
                 .HasKey(ur => new { ur.UserId, ur.RoleId });
 
@@ -42,6 +47,17 @@ namespace InventorySystem.Data
                 .WithMany(r => r.UserRoles)
                 .HasForeignKey(ur => ur.RoleId);
 
+
+            /*Create History Model Builder*/
+            modelBuilder.Entity<CreateHistory>()
+                .HasKey(ch => ch.HistoryId);
+
+
+            /*Roles model builder*/
+            modelBuilder.Entity<Role>()
+                .HasKey(r => r.RoleId);
+
+            /*Role Seeding*/
             modelBuilder.Entity<Role>().HasData(
                     new Role
                     {
@@ -64,6 +80,7 @@ namespace InventorySystem.Data
 
                 );
 
+            /*Category Seeding*/
             modelBuilder.Entity<Category>().HasData(
                     new Category
                     {

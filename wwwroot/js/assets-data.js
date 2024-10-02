@@ -1,17 +1,37 @@
-﻿getValues = function (api, dropdownElementId) {
-    var $dropdownElement = $(`#${dropdownElementId}`)
-   
+﻿
+/**
+ * Fetches values from a specified API and populates a dropdown element with the retrieved options.
+ * 
+ * This function performs an AJAX GET request to the provided API endpoint. Upon successful 
+ * retrieval of data, it populates a dropdown element identified by its ID with options. 
+ * Each option's text and color are set based on the value retrieved from the API response. 
+ * If an error occurs during the request, it logs the error to the console and adds a 
+ * default option indicating that no options were fetched.
+ * 
+ * @param {string} api - The URL of the API endpoint to fetch data from.
+ * @param {string} dropdownElementId - The ID of the HTML dropdown element to populate with options.
+ * 
+ * @returns {void} This function does not return a value; it modifies the dropdown element 
+ *                 directly by adding option elements.
+ * 
+ * @example
+ * // Example usage to populate a dropdown with values from an API
+ * getValues('https://api.example.com/values', 'myDropdown');
+ */
+getValues = function (api, dropdownElementId) {
+    var $dropdownElement = $(`#${dropdownElementId}`);
+
     $.ajax({
         url: api,
         type: 'GET',
         success: function (data) {
             $dropdownElement.empty();
             $.each(data, function (index, item) {
-                var $value = item.Value
+                var $value = item.Value;
                 var $option = $('<option></option>').val($value).text(item.Text);
                 switch ($value) {
                     case 'Unknown':
-                        $option.css('color', 'gray' );
+                        $option.css('color', 'gray');
                         break;
                     case 'New':
                     case 'Good':
@@ -19,7 +39,7 @@
                     case 'Updated':
                     case 'Materials':
                         $option.css('color', 'green');
-                        break;                       
+                        break;
                     case 'Incomplete(Usable)':
                     case 'Books':
                     case 'Poor':
@@ -42,39 +62,93 @@
                 }
 
                 $dropdownElement.append($option);
-
             });
         },
         error: function (xhr, status, error) {
             console.log('Error fetching options: ' + error);
-            $('<option></option>').val('').text('No option fetched');            
+            $('<option></option>').val('').text('No option fetched').appendTo($dropdownElement);
         }
     });
 };
 
+
+/**
+ * An array of status and category options for case checking.
+ * 
+ * This array is utilized to verify and validate the status or category of 
+ * items in various contexts. It provides a predefined list of acceptable 
+ * values that can be checked against input data. This is useful for 
+ * ensuring that the input matches expected categories or statuses.
+ * 
+ * @type {string[]}
+ * @constant
+ * @example
+ * // Usage in case checking
+ * function isValidStatus(status) {
+ *     return text.includes(status);
+ * }
+ * 
+ * @returns {string[]} An array of status and category strings for validation.
+ */
 var text = [
-    "Updated", //0
-    "Not Updated", //1
-    "N/A", //2
-    "Complete", //3
-    "Incomplete(Usable)", //4
-    "Incomplete(Unusable)", //5   
-    "Not Applicable", //6
-    "No Category", //7
-    "No Status", //8
-    "Robots", //9
-    "Books", //10
-    "Materials", //11
-    "Missing", //12
-    "Unknown", //13
-    "Incomplete", //14
-    "New", //15
-    "Good", //16
-    "Damaged", //17
-    "Unknown", //18
-    "Defective" //19
+    "Updated",                  // 0: Indicates the item has been updated.
+    "Not Updated",              // 1: Indicates the item has not been updated.
+    "N/A",                      // 2: Not Applicable, used when the status does not apply.
+    "Complete",                 // 3: Indicates the item is complete.
+    "Incomplete(Usable)",       // 4: Indicates the item is incomplete but usable.
+    "Incomplete(Unusable)",     // 5: Indicates the item is incomplete and unusable.
+    "Not Applicable",           // 6: Same as N/A; indicates non-applicability.
+    "No Category",              // 7: Indicates that the item has no assigned category.
+    "No Status",                // 8: Indicates that there is no status assigned to the item.
+    "Robots",                   // 9: Indicates the category related to robots.
+    "Books",                    // 10: Indicates the category related to books.
+    "Materials",                // 11: Indicates the category related to materials.
+    "Missing",                  // 12: Indicates that the item is missing.
+    "Unknown",                  // 13: Indicates an unknown status.
+    "Incomplete",               // 14: Indicates that the item is incomplete.
+    "New",                      // 15: Indicates that the item is new.
+    "Good",                     // 16: Indicates that the item is in good condition.
+    "Damaged",                  // 17: Indicates that the item is damaged.
+    "Unknown",                  // 18: Indicates an unknown status.
+    "Defective"                 // 19: Indicates that the item is defective.
 ];
 
+
+
+/**
+ * Changes the background color of a specified HTML element based on its text content.
+ * 
+ * This function checks the text content of the specified element against several arrays 
+ * of strings (greenArray, redArray, grayArray, blueArray, and orangeArray) to determine 
+ * the appropriate background color. If the text matches an entry in any of the arrays, 
+ * the corresponding color will be applied to the background of the element. If no matches 
+ * are found, the default background color will be black.
+ * 
+ * @param {string} element - The selector for the HTML element whose background color 
+ *                           will be changed. This can be a CSS selector string.
+ * @param {string[]} greenArray - An array of strings representing values that will 
+ *                                 set the background color to green.
+ * @param {string[]} redArray - An array of strings representing values that will 
+ *                               set the background color to red.
+ * @param {string[]} grayArray - An array of strings representing values that will 
+ *                               set the background color to gray.
+ * @param {string[]} blueArray - An array of strings representing values that will 
+ *                               set the background color to blue.
+ * @param {string[]} orangeArray - An array of strings representing values that will 
+ *                                 set the background color to orange.
+ * 
+ * @returns {void} This function does not return a value; it modifies the background 
+ *                 color of the specified element directly.
+ * 
+ * @example
+ * // Example usage with the provided text array
+ * ChangeBackgroundColor('#myElement', 
+ *                       ['Complete', 'Good', 'Updated'],     // Green conditions
+ *                       ['Damaged', 'Defective', 'Missing'], // Red conditions
+ *                       ['Incomplete(Usable)', 'Incomplete(Unusable)'], // Gray conditions
+ *                       ['Books', 'Materials'],               // Blue conditions
+ *                       ['New', 'Unknown']);                   // Orange conditions
+ */
 function ChangeBackgroundColor(element, greenArray, redArray, grayArray, blueArray, orangeArray) {
     var container = $(element);
 
@@ -110,6 +184,32 @@ function ChangeBackgroundColor(element, greenArray, redArray, grayArray, blueArr
 }
 
 
+
+/**
+ * Changes the background color of elements based on a specified category.
+ * 
+ * This function uses the `ChangeBackgroundColor` function to apply different 
+ * background colors to elements representing firmware, status, and category 
+ * based on the provided category type. It adjusts the colors based on predefined 
+ * conditions associated with 'Robots', 'Books', and 'Materials'.
+ * 
+ * @param {string} baseOnCategory - The category that determines how the 
+ *                                  background colors are set. Can be 'Robots', 
+ *                                  'Books', or 'Materials'.
+ * @param {string} firmware - The selector for the HTML element representing the 
+ *                            firmware status.
+ * @param {string} status - The selector for the HTML element representing the 
+ *                          status of the item.
+ * @param {string} category - The selector for the HTML element representing the 
+ *                            category of the item.
+ * 
+ * @returns {void} This function does not return a value; it modifies the background 
+ *                 color of the specified elements directly based on the category.
+ * 
+ * @example
+ * // Example usage to change background based on category
+ * changeBgBaseOnCategory('Robots', '#firmwareElement', '#statusElement', '#categoryElement');
+ */
 function changeBgBaseOnCategory(baseOnCategory, firmware, status, category) {
     switch (baseOnCategory) {
         case 'Robots':
@@ -120,12 +220,13 @@ function changeBgBaseOnCategory(baseOnCategory, firmware, status, category) {
         case 'Books':
         case 'Materials':
             ChangeBackgroundColor(status, ["New"], ["Damaged", "Missing"], ["Poor", "Unknown"], ["Good"], null);
-            ChangeBackgroundColor(category, null, null, ["Materials"], ["Books"], ["Robots"]); 
+            ChangeBackgroundColor(category, null, null, ["Materials"], ["Books"], ["Robots"]);
             break;
         default:
             break;
     }
-};
+}
+
 
 
 /** 
@@ -137,26 +238,158 @@ function changeBgBaseOnCategory(baseOnCategory, firmware, status, category) {
  * @returns {string} Returns HTML content for the partial view.
  **/
 loadContent = function (url) {
-    $('#view-all').html(spinner + 'Loading...');
-
+    $('.card-container').html(spinnerContainer);
     $.ajax({
         url: url,
         type: 'GET',
         success: function (response) {
-            // Replace the content of #view-all based on the view url
             $('#view-all').html(response);
             $('#sidebar .nav-link').removeClass('disabled').find('.spinner').hide();
-            $('#sidebar .nav-link').removeClass('active bgc-orange'); // Remove active from all links
-            $('#sidebar .nav-link[data-url="' + url + '"]').addClass('active bgc-orange');
+            $('#sidebar .nav-link').removeClass('active bgc-orange'); 
+            setTimeout(() => {
+                $('#sidebar .nav-link[data-url="' + url + '"]').addClass('active bgc-orange');
+            }, 20);
+            
         },
         error: function () {
-            $('#view-all').html('<div class="alert alert-danger">Error loading content. Please try again.</div>');
+            $('#view-all .card-container').html(noItemContainer);
             $('#sidebar .nav-link').removeClass('disabled').find('.spinner').hide();
         }
     });
 };
 
+function loadPage(category, pageNumber) {
+    var itemcode = $('#searchbar').val().trim();
+    $.ajax({
+        //url: 'Url.Action("CategoryView", "Users", new { username = ViewBag.Username })' + '?page=' + pageNumber,
+        url: 'dashboard/item-view/category',
+        type: 'GET',
+        cache: false,
+        data: { category: category, page: pageNumber },
+        success: function (response) {
+            $('#view-all').html(response);
+            updatePaginationControls(response);
+        },
+        error: function (error) {
+            $('#view-all').html(noContent);
+            console.log("Error loading page: ", error);
+        }
+    });
+}
 
+function loadItemsByCategory(category, pageNumber) {
+    $('.card-container').html(spinnerContainer);
+    $.ajax({
+        url: 'dashboard/item-view/category',
+        type: 'GET',
+        cache: false,
+        data: { category: category, page: pageNumber },
+        success: function (response) {
+            $('#view-all').html(response);
+            $('#category-buttons .category-button').removeClass('disabled').find('.spinner').hide();
+            updatePaginationControls(response);
+        },
+        error: function (xhr) {
+            $('.card-container').html(noItemContainer);
+            
+            $('.category-button').removeClass('disabled').find('.spinner').hide();
+        }
+    });
+}
+
+function loadItems(itemcode, category, pageNumber) {
+   $('card-container').html(spinnerContainer);
+    $.ajax({
+        url: 'dashboard/search/', 
+        type: 'GET',
+        cache: false,
+        data: { itemcode: itemcode, category: category, page: pageNumber },
+        success: function (response) {
+            $('#view-all').html(response);
+
+            updatePaginationControls(response);
+        },
+        error: function (xhr) {
+            $('.card-container').html(noItemContainer);
+           
+        }
+    });
+}
+
+function toggleNavbar(uri) {
+    let dashboardNav = $('#dashboard-nav');
+    let summaryNav = $('#summary-nav');
+    let requestsNav = $('#requests-nav');
+    let itemViewcategoryUri = 'dashboard/item-view/category';
+    let itemViewAllUri = 'dashboard/item-view/all';
+    let summaryUri = 'summary';
+    let requestUri = 'requests';
+
+    // Hide all by default
+    dashboardNav.addClass('hide-con').removeClass('show-con');
+    summaryNav.addClass('hide-con').removeClass('show-con');
+    requestsNav.addClass('hide-con').removeClass('show-con');
+
+    switch (uri) {
+        case itemViewAllUri:
+        case itemViewcategoryUri:
+            dashboardNav.addClass('show-con').removeClass('hide-con');
+            break;
+        case summaryUri:
+            summaryNav.addClass('show-con').removeClass('hide-con');
+            break;
+        case requestUri:
+            requestsNav.addClass('show-con').removeClass('hide-con');
+            break;
+        default:
+            // Optionally handle the default case (everything remains hidden)
+            break;
+    }
+}
+
+function toggleSearchContainer(url) {
+    var searchContainer = $('#hide-container');
+    var categoryContainer = $('#hide-categories');
+
+    switch (url) {
+        case 'dashboard/item-view/all/':
+        case 'dashboard/item-view/category/':
+
+            searchContainer.addClass('show-con');
+            categoryContainer.addClass('show-con');
+            searchContainer.removeClass('hide-con');
+            categoryContainer.removeClass('hide-con');
+            break;
+        default:
+            searchContainer.removeClass('show-con');
+            categoryContainer.removeClass('show-con');
+            searchContainer.addClass('hide-con');
+            categoryContainer.addClass('hide-con');
+            break;
+    }
+}
+
+function toggleSummaryNavbar(url) {
+    let navbar = $('#summary-nav');
+    switch (url) {
+        case 'summary':
+            navbar.removeClass('hide-con');
+            navbar.addClass('show-con');
+            break;
+        default:
+            navbar.addClass('hide-con');
+            navbar.removeClass('show-con');
+            break;
+    }
+}
+function updatePaginationControls(response) {
+    // Assuming response contains pagination data or structure
+    var totalPages = response.totalPages; // Get total pages from response
+    var currentPage = response.currentPage; // Get current page from response
+
+    // Update pagination controls
+    // This will depend on the structure of your response and pagination controls
+}
 
 /**Enable or Disable & Add or Remove attr required  to the firmware status dropdown
  * @param {JQuery} input - ID of input dropdown

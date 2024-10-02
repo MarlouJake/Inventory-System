@@ -2,24 +2,25 @@
 using InventorySystem.Utilities;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InventorySystem.Models.DataEntities
 {
     public class Item
     {
-        [DisplayName(DisplayNames.ItemId)]
         [Key]
+        [DisplayName(DisplayNames.ItemId)]
         public int ItemId { get; set; }
 
 
         [ValidateField]
         [NoSpaces]
-        [CharacterLength(3, 20)]
+        [CharacterLength(3, 128)]
         [DisplayName(DisplayNames.ItemCode)]
         public string? ItemCode { get; set; }
 
         [ValidateField]
-        [CharacterLength(3, 20)]
+        [CharacterLength(3, 128)]
         [DisplayName(DisplayNames.ItemName)]
         public string? ItemName { get; set; }
 
@@ -56,8 +57,10 @@ namespace InventorySystem.Models.DataEntities
         public DateTime ItemDateUpdated { get; set; }
 
         [DisplayName(DisplayNames.UserId)]
+        [ForeignKey("UserId")]
         public int? UserId { get; set; }
 
+        public virtual User? User { get; set; }
         public Item()
         {
             ItemDateAdded = DateTime.Now;

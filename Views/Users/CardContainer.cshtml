@@ -1,0 +1,34 @@
+﻿@using InventorySystem.Models.Pagination
+@model ItemListViewModel
+
+@{
+    int count = 0;
+}
+
+<div class="card-container mt-3 mb-4 border-top border-warning p-2">
+    @if (Model.Items == null || !Model.Items.Any())
+    {
+        <script>
+            $('.card-container').addClass('d-flex justify-content-center align-items-center h-auto');
+
+        </script>
+
+        <div class="no-items text-center">
+            <p class="text-center">No items found.</p>
+        </div>
+    }
+    else
+    {
+        <script>
+            $('.card-container').removeClass('d-flex justify-content-center align-items-center h-auto');
+
+        </script>
+        @foreach (var item in Model.Items)
+        {
+            if (count >= 24) break; // Stop rendering cards after # items
+            @await Html.PartialAsync("ItemCard", item)
+            count++; // Increment the counter after rendering each item
+        }
+        <!-- Pagination Controls -->
+    }
+</div>

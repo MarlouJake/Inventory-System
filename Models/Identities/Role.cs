@@ -1,9 +1,11 @@
 ﻿using InventorySystem.Utilities;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 namespace InventorySystem.Models.Identities
 {
     public class Role
     {
+        [Key]
         [DisplayName(DisplayNames.RoleId)]
         public int RoleId { get; set; }
 

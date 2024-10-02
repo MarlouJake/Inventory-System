@@ -64,8 +64,6 @@
 
 
 
-
-
     $(document).ready(function () {
         // Initialize pagination on page load
         updatePagination();
@@ -76,10 +74,13 @@
             var href = $(this).attr('href');
             var page = new URLSearchParams(href.split('?')[1]).get('page');
             if (page) {
-                loadItems(parseInt(page));
+                let category = $('.ctg-selected').data('string');
+                loadPage(category, parseInt(page));
             }
         });
     });
+
+
 </script>
 <!-- Pagination -->
 @if (Model.TotalPages > 1)

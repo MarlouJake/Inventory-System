@@ -85,13 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //UserLogoutAction();
     DisplaySuccessAndError();
-    const loginButton = document.getElementById('loginButton');
-    if (loginButton) {
-        loginButton.addEventListener('click', function () {
-            window.location.href = '/';
-        });
-    }
- 
+
+  
 });
 
 function getScreenSize() {

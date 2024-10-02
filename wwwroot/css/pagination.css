@@ -12,6 +12,7 @@
     background-color: rgba(52, 58, 64, 0.7);
     backdrop-filter: blur(60%);
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    height: 4rem;
 }
 
 

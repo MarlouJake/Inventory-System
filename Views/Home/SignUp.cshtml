@@ -50,6 +50,11 @@
         confirmPassword.addEventListener('input', () => updateCharCount(confirmPassword, confirmCountDisplay));
         confirmPassword.addEventListener('focus', () => addBorderClass(confirmPasswordGroup));
         confirmPassword.addEventListener('blur', () => removeBorderClass(confirmPasswordGroup));
+
+        document.getElementById('signup-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            apiService.createRequest(event.target);
+        });
         
     });
 
@@ -81,7 +86,14 @@
         font-size: 0.7rem;
         margin-top: 0;
     }
+    
+    .username-group{
+        margin-bottom: 0;
+    }
 
+    span.signup-errors{
+        margin-top: 0;
+    }
 
     .validation-lists-item p{
         margin-top: 0;
@@ -116,7 +128,7 @@
 
 <h5 class="text-break"><strong>Sign Up</strong></h5>
 
-<form asp-controller="ValidateApi" asp-action="Create" method="post" class="forms" onsubmit="return CreateRequest(this);">
+<form asp-controller="ValidateApi" asp-action="Create" method="post" class="forms"  id="signup-form">
     <div class="form-group">
         <label asp-for="Username" class="control-label"></label>
         <div class="input-group border border-1 rounded" id="username-group">

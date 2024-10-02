@@ -23,7 +23,7 @@
 
     <script src="~/js/utils.js" asp-append-version="true" defer></script>
     <script src="~/js/validate-form.js" asp-append-version="true" defer></script>
-    <script src="~/js/auth.js" asp-append-version="true" defer></script>
+    <script src="~/js/requests.js" asp-append-version="true" defer></script>
     <script src="~/js/services.js" asp-append-version="true" defer></script>
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 </head>
@@ -42,21 +42,22 @@
 
             <div id="prompt-message" class="popup-message alert alert-success">
             </div>
+            <!-- Top Bar -->
+            <div id="top-bar-bg" class="bg-dark fixed-top d-flex p-2">
+                <!-- Hamburger Button inside the Top Bar (Left-aligned) -->
+                <span class="hamburger ms-2">
+                    <i class="fa fa-bars fa-2x text-orange" onclick="toggleSidebar()"></i>
+                </span>
+                <h4 class="text-orange m-1 ms-3 app-name">IMS</h4>
+            </div>
+
 
             <!-- Sidebar Navigation -->
-            <nav id="sidebar" class="bg-dark" style="z-index: 1900;">
+            <nav id="sidebar" class="bg-dark d-flex flex-column" >
                 <div class="d-flex justify-content-between">
                     <div class="d-flex fs-1">
                         <h4 class="text-orange">IMS</h4>
                     </div>
-
-
-                    <div class="d-flex btn-sm">
-                        <a title="Logout" id="user-logout" onclick="LogoutRequest('@Url.Action("Logout", "ValidateApi", new { username = Html.Raw(ViewBag.Username) })');">
-                            <i class="fa-solid fa-right-to-bracket text-danger fs-4"></i>
-                        </a>
-                    </div>
-
                 </div>
 
                 <div>
@@ -65,27 +66,37 @@
 
                 <hr class="text-white" />
 
-                <ul class="nav flex-column tabs text-light">
+                <ul class="nav flex-column tabs text-light flex-grow-1">
                     <li class="nav-item m-0 p-0">
-                        <a class="nav-link" id="items-link" data-url="dashboard/item-view">Dashboard</a>
+                        <a class="nav-link" id="items-link" data-url="dashboard/item-view/all">Dashboard</a>
                         <i class="fa fa-spinner fa-spin spinner" style="display: none;"></i>
                     </li>
                     <li class="nav-item m-0 p-0">
-                        <a class="nav-link" id="summary-link" data-url="dashboard/summary">Summary</a>
+                        <a class="nav-link" id="summary-link" data-url="summary">Summary</a>
                         <i class="fa fa-spinner fa-spin spinner" style="display: none;"></i>
                     </li>
                     <li class="nav-item m-0 p-0">
-                        <a class="nav-link" id="request-link" data-url="dashboard/requests">Requests</a>
+                        <a class="nav-link" id="request-link" data-url="requests">Requests</a>
                         <i class="fa fa-spinner fa-spin spinner" style="display: none;"></i>
+                    </li>
+                    <li class="nav-item m-0 p-0">
+                        <a class="nav-link d-flex" id="user-logout">
+                            <i class="fa-solid fa-right-to-bracket text-danger fs-4"></i>
+                            <span class="ms-2"> Logout</span>
+                        </a>
                     </li>
                 </ul>
+
+                <footer class="border-top footer text-muted bg-dark">
+                    <div class="container text-start">
+                        &copy; 2024 - Inventory System - MJN
+                    </div>
+                </footer>
             </nav>
 
-            <!-- Top Bar -->
-            <span id="top-bar-bg" class="bg-dark fixed-top">
 
-            </span>
 
+            
             @RenderBody()
         </div>
     </div>

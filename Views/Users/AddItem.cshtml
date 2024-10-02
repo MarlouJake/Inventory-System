@@ -104,6 +104,10 @@
         width:8rem;
     }
 
+    .w-25{
+        width:5rem !important;
+    }
+
     .user-input:focus {
         outline: none;
         border-color: none;
@@ -160,7 +164,7 @@
                    data-val-required="Item code is required!"
                    data-val-minlength="Item code must be at least 3 characters long."
                    data-val-minlength-min="3"
-                   maxlength="20"
+                   maxlength="128"
                    pattern="\S+" onkeydown="if(['Space'].includes(arguments[0].code)){return false;}" />
 
             <span asp-validation-for="ItemCode" id="itemCode-error" class="text-danger errors"></span>
@@ -175,7 +179,7 @@
                    data-val="true"
                    data-val-required="Item name is required!"
                    data-val-minlength="Item name must be at least 3 characters long."
-                   maxlength="20" />
+                   maxlength="128" />
             <span asp-validation-for="ItemName" id="itemName-error" class="text-danger errors"></span>
         </div>
     </div>
@@ -185,8 +189,11 @@
             <label asp-for="ItemDescription" for="itemDescription" class="control-label"></label>
             <textarea asp-for="ItemDescription" id="itemDescription" type="text" class="form-control form-control-sm user-input" name="itemDescription"
                       autocomplete="off"
-                      placeholder="Description"></textarea>
-            <span asp-validation-for="ItemDescription" class="text-danger"></span>
+                      placeholder="Description" 
+                      maxlength="5000">
+            </textarea>
+                      
+            <span asp-validation-for="ItemDescription" id="itemDescription-errror" class="text-danger"></span>
         </div>
     </div>
 
@@ -208,7 +215,7 @@
 
         <div id="firmwareDropdownContainer" class="d-none">
             <label asp-for="FirmwareUpdated" for="updateDropdown" id="updateDropdownLabel" class="control-label"></label>
-            <select asp-for="FirmwareUpdated" id="updateDropdown" class="form-control form-control-sm w-30 user-input" name="updateDropdown">
+            <select asp-for="FirmwareUpdated" id="updateDropdown" class="form-control form-control-sm w-28 user-input" name="updateDropdown">
             </select>
             <span asp-validation-for="FirmwareUpdated" id="updateDropdown-error " class="text-danger errors"></span>
         </div>

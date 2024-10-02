@@ -1,51 +1,59 @@
 ﻿using InventorySystem.Data;
 using InventorySystem.Models.DataEntities;
+using InventorySystem.Models.Responses;
 using InventorySystem.Utilities;
 using InventorySystem.Utilities.Api;
 using InventorySystem.Utilities.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System.Security.Claims;
 
 namespace InventorySystem.Controllers.api
 {
     [Route("api/u/services/")]
     [ApiController]
-    public class ServicesApi(ApplicationDbContext context) : ControllerBase
+    public class ServicesApi(ApplicationDbContext context, GetClaims getClaims) : ControllerBase
     {
         private readonly ApplicationDbContext _context = context;
-
-        [HttpPost("create/user")]
-        public async Task<IActionResult> CreateNewAccount([FromBody] User model)
+        private readonly GetClaims _getClaims = getClaims;
+        private int? userId;
+        private string? message;
+        private ApiResponse? response;
+        private string? redirectTo;
+        public async Task OnActionExecuting(ActionExecutingContext context)
         {
-            var newUser = new User
-            {
-                Username = model.Username,
-                Email = model.Email,
-                Password = HashHelper.HashPassword(model.Password!),
-            };
+            // Set userId from claims
+            userId = _getClaims.GetIdClaim(User);
 
-            var seedrole = new SeedUserRole(_context);
-            var (isSuccess, message, statuscode) = await seedrole.AddUserRole(newUser, "User");
+            // If userId is null, return a 403 Forbidden response
+            if (userId == null)
+            {
+                message = "User ID does not exist";
+                response = ApiResponseUtils.CustomResponse(false, message, userId);
 
-            if (isSuccess)
-            {
-                var redirectTo = "home/login";
-                var response = ApiResponseUtils.SuccessResponse(null!, message, redirectTo);
-                return StatusCode(statuscode, response);
+                context.Result = new JsonResult(response) // Respond with a JSON result
+                {
+                    StatusCode = StatusCodes.Status403Forbidden // Set the status code to 403
+                };
+
+                Console.Error.WriteLine(message);
+                Console.WriteLine("User ID Claim: {0}", userId);
+                return; // Stop further action execution
             }
-            else
-            {
-                var response = ApiResponseUtils.CustomResponse(isSuccess, message, null);
-                return StatusCode(statuscode, response);
-            }
+
+            context.HttpContext.Items["UserId"] = userId;
+
+            await Task.CompletedTask;
         }
+
+
 
         [HttpPost("add")]
         public async Task<IActionResult> AppendItem([FromBody][Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,FirmwareUpdated,Category,ItemDateAdded,ItemDateUpdated,UserId")] Item model)
         {
+
             try
             {
                 var url = Url.Action("AppendItem", "ServicesApi");
@@ -54,71 +62,71 @@ namespace InventorySystem.Controllers.api
 
                 if (model == null)
                 {
-                    var message = $"Data is {null}";
-                    var response = ApiResponseUtils.CustomResponse(false, message, model);
+                    message = $"Data is {null}";
+                    response = ApiResponseUtils.CustomResponse(false, message, model);
                     Console.Error.WriteLine(message);
                     return StatusCode(StatusCodes.Status404NotFound, response);
                 }
 
-                var existingCode = await _context.Items.AnyAsync(i => i.ItemCode == model.ItemCode);
+                userId = _getClaims.GetIdClaim(User);
+
+                if (userId == null)
+                {
+                    var message = "User ID is not available.";
+                    var response = ApiResponseUtils.CustomResponse(false, message, null);
+                    return StatusCode(StatusCodes.Status403Forbidden, response);
+                }
+
+                var existingCode = await _context.Items.AnyAsync(i => i.ItemCode == model.ItemCode && i.UserId == userId);
 
                 if (existingCode)
                 {
-                    var message = "Item code already in use";
-                    var response = ApiResponseUtils.CustomResponse(false, message, model);
+                    message = "Item code already in use";
+                    response = ApiResponseUtils.CustomResponse(false, message, model);
                     Console.Error.WriteLine(message);
                     return StatusCode(StatusCodes.Status409Conflict, response);
                 }
 
-                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-                if (userIdClaim != null && int.TryParse(userIdClaim, out var userId))
-                {
-                    model.UserId = userId;
 
-                    _context.Items.Add(model);
-                    await _context.SaveChangesAsync();
-                    var items = await _context.Items
-                        .Where(i => i.UserId == userId)
-                        .ToListAsync();
+                model.UserId = userId;
 
-                    var redirectTo = "/dashboard/item-view";
-                    var message = "Item added successfully";
-                    Console.WriteLine(message);
-                    Console.WriteLine("URL: {0}", redirectTo);
-                    var response = ApiResponseUtils.SuccessResponse(null!, message, redirectTo);
-                    return StatusCode(StatusCodes.Status201Created, response);
-                }
-                else
-                {
-                    var message = "User ID not doesn't exist";
-                    var response = ApiResponseUtils.CustomResponse(false, message, model);
-                    Console.Error.WriteLine(message);
-                    return StatusCode(StatusCodes.Status404NotFound, response);
+                _context.Items.Add(model);
+                await _context.SaveChangesAsync();
 
-                }
+
+                redirectTo = "dashboard/item-view/all";
+                message = "Added successfully";
+
+                Console.WriteLine($"Inserted data: {JsonConvert.SerializeObject(model)}");
+                Console.WriteLine(message);
+                Console.WriteLine("URL: {0}", redirectTo);
+                Console.WriteLine("User ID Claim in create: {0}", userId);
+                response = ApiResponseUtils.SuccessResponse(null!, message, redirectTo);
+                return StatusCode(StatusCodes.Status201Created, response);
+
 
             }
             catch (MySqlException sqlEx)
             {
-                var errorMessage = "An error occurred while connecting to the MySQL database.";
+                message = "An error occurred while connecting to the MySQL database.";
 
                 #region --Console Logger--
                 Console.Error.WriteLine($"\nMySQL Exception Caught: {sqlEx}\n");
                 #endregion
 
-                var response = ApiResponseUtils.CustomResponse(false, errorMessage, null);
+                response = ApiResponseUtils.CustomResponse(false, message, null);
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
             catch (Exception ex)
             {
-                var errorMessage = "An unknown error occurred.";
+                message = "An unknown error occurred.";
 
                 #region --Console Logger--
                 Console.Error.WriteLine($"\nException Caught: {ex}\n");
                 #endregion
 
-                var response = ApiResponseUtils.CustomResponse(false, errorMessage, null);
+                response = ApiResponseUtils.CustomResponse(false, message, null);
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
@@ -126,21 +134,28 @@ namespace InventorySystem.Controllers.api
         [HttpPut("modify/{id?}")]
         public async Task<IActionResult> ModifyItem([FromBody][Bind("ItemId,ItemCode,ItemName,ItemDescription,Status,FirmwareUpdated,Category,ItemDateUpdated,UserId")] Item model, int id)
         {
-            string message = "";
             int Status404 = StatusCodes.Status404NotFound;
             int Status500 = StatusCodes.Status500InternalServerError;
             id = model.ItemId;
             var url = Url.Action("ModifyItem", "ServicesApi");
             Messages.PrintUrl(url);
             Console.WriteLine($"Received data: {JsonConvert.SerializeObject(model)}");
-            Console.WriteLine("id: ", id);
             Console.WriteLine("input id: {0}", model.ItemId);
             try
             {
+                userId = _getClaims.GetIdClaim(User);
+
+                if (userId == null)
+                {
+                    var message = "User ID is not available.";
+                    var response = ApiResponseUtils.CustomResponse(false, message, null);
+                    return StatusCode(StatusCodes.Status403Forbidden, response);
+                }
+
                 if (model == null)
                 {
                     message = $"Data is {null}";
-                    var response = ApiResponseUtils.CustomResponse(false, message, model);
+                    response = ApiResponseUtils.CustomResponse(false, message, model);
                     Console.Error.WriteLine(message);
                     return StatusCode(Status404, response);
                 }
@@ -149,7 +164,7 @@ namespace InventorySystem.Controllers.api
                 if (existingItem == null)
                 {
                     message = $"Item not found: {existingItem}, {id}";
-                    var response = ApiResponseUtils.CustomResponse(false, message, model);
+                    response = ApiResponseUtils.CustomResponse(false, message, model);
                     Console.Error.WriteLine(message);
                     return StatusCode(Status404, response);
                 }
@@ -161,47 +176,34 @@ namespace InventorySystem.Controllers.api
                 if (existingItem.ItemCode != model.ItemCode)
                 {
                     // Check if the new ItemCode already exists in the database
-                    var existingCode = await _context.Items.AnyAsync(i => i.ItemCode == model.ItemCode && i.ItemId != model.ItemId);
+                    var existingCode = await _context.Items.AnyAsync(i => i.ItemCode == model.ItemCode && i.UserId == userId);
 
                     if (existingCode)
                     {
                         message = "Item code already in use";
-                        var response = ApiResponseUtils.CustomResponse(false, message, model);
+                        response = ApiResponseUtils.CustomResponse(false, message, model);
                         Console.Error.WriteLine(message);
                         return StatusCode(StatusCodes.Status409Conflict, response);
                     }
                 }
 
-                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                model.UserId = userId;
+                model.ItemDateAdded = existingItem.ItemDateAdded;
 
-                if (userIdClaim != null && int.TryParse(userIdClaim, out var userId))
-                {
-                    model.UserId = userId;
+                _context.Items.Update(model);
+                await _context.SaveChangesAsync();
 
-                    model.ItemDateAdded = existingItem.ItemDateAdded;
+                var items = await _context.Items
+                    .Where(i => i.UserId == userId)
+                    .ToListAsync();
 
-                    _context.Items.Update(model);
-                    await _context.SaveChangesAsync();
-
-                    var items = await _context.Items
-                        .Where(i => i.UserId == userId)
-                        .ToListAsync();
-
-                    var redirectTo = "/dashboard/item-view";
-                    message = "Item updated successfully";
-                    Console.WriteLine(message);
-                    Console.WriteLine("URL: {0}", redirectTo);
-                    var response = ApiResponseUtils.SuccessResponse(null!, message, redirectTo);
-                    return StatusCode(StatusCodes.Status200OK, response);
-                }
-                else
-                {
-                    message = "User ID not doesn't exist";
-                    var response = ApiResponseUtils.CustomResponse(false, message, model);
-                    Console.Error.WriteLine(message);
-                    return StatusCode(StatusCodes.Status404NotFound, response);
-
-                }
+                redirectTo = "dashboard/item-view/all";
+                message = "Updated successfully";
+                Console.WriteLine(message);
+                Console.WriteLine("URL: {0}", redirectTo);
+                Console.WriteLine("User ID Claim: {0}", userId);
+                response = ApiResponseUtils.SuccessResponse(null!, message, redirectTo);
+                return StatusCode(StatusCodes.Status200OK, response);
 
             }
             catch (MySqlException sqlEx)
@@ -215,7 +217,7 @@ namespace InventorySystem.Controllers.api
                 Console.ResetColor();
                 #endregion
 
-                var response = ApiResponseUtils.CustomResponse(false, message, null);
+                response = ApiResponseUtils.CustomResponse(false, message, null);
                 return StatusCode(Status500, response);
             }
             catch (Exception ex)
@@ -226,81 +228,68 @@ namespace InventorySystem.Controllers.api
                 Console.Error.WriteLine($"\nException Caught: {ex}\n");
                 #endregion
 
-                var response = ApiResponseUtils.CustomResponse(false, message, null);
+                response = ApiResponseUtils.CustomResponse(false, message, null);
                 return StatusCode(Status500, response);
             }
         }
 
 
-        [HttpDelete("remove-confirm/{id}")]
-        public async Task<IActionResult> RemoveItem(int id)
+#pragma warning disable ASP0018 // Unused route parameter
+        [HttpDelete("remove-confirm/{id?}")]
+#pragma warning restore ASP0018 // Unused route parameter
+        public async Task<IActionResult> RemoveConfirm([FromBody] int? id)
         {
-            string message = "";
+
             int Status404 = StatusCodes.Status404NotFound;
             int Status500 = StatusCodes.Status500InternalServerError;
 
             try
             {
-                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                Console.WriteLine($"User ID Claim: {userIdClaim}");
-
                 var item = await _context.Items.FindAsync(id);
                 if (item == null)
                 {
                     message = "Item doesn't exist";
-                    var response = ApiResponseUtils.CustomResponse(false, message, null);
+                    response = ApiResponseUtils.CustomResponse(false, message, null);
+                    Console.WriteLine(message);
                     return await Task.FromResult(StatusCode(Status404, response));
                 }
 
 
-                if (userIdClaim != null && int.TryParse(userIdClaim, out var userId))
-                {
-                    _context.Items.Remove(item);
-                    await _context.SaveChangesAsync();
-                    var items = await _context.Items
-                            .Where(i => i.UserId == userId)
-                            .ToListAsync();
+                _context.Items.Remove(item);
+                await _context.SaveChangesAsync();
 
-                    var redirectTo = "/dashboard/item-view";
-                    message = "Item deleted successfully";
-                    Console.WriteLine(message);
-                    Console.WriteLine("URL: {0}", redirectTo);
-                    var response = ApiResponseUtils.SuccessResponse(null!, message, redirectTo);
-                    return StatusCode(StatusCodes.Status200OK, response);
-                }
-                else
-                {
-                    message = "User ID not doesn't exist";
-                    var response = ApiResponseUtils.CustomResponse(false, message, null);
-                    Console.Error.WriteLine(message);
-                    return StatusCode(Status404, response);
-                }
+                var items = await _context.Items
+                        .Where(i => i.UserId == userId)
+                        .ToListAsync();
+
+                redirectTo = "dashboard/item-view/all";
+                message = "Deleted successfully";
+
+                Console.WriteLine(message);
+                Console.WriteLine("URL: {0}", redirectTo);
+                Console.WriteLine("User ID recieved: {0}", userId);
+
+                response = ApiResponseUtils.SuccessResponse(null!, message, redirectTo);
+                return StatusCode(StatusCodes.Status200OK, response);
             }
             catch (MySqlException sqlEx)
             {
                 message = "An error occurred while connecting to the MySQL database.";
-
-                #region --Console Logger--
                 Console.Error.WriteLine($"\nMySQL Exception Caught: {sqlEx}\n");
-                #endregion
 
-                var response = ApiResponseUtils.CustomResponse(false, message, null);
+                response = ApiResponseUtils.CustomResponse(false, message, null);
                 return StatusCode(Status500, response);
             }
             catch (Exception ex)
             {
                 message = "An unknown error occurred.";
-
-                #region --Console Logger--
                 Console.Error.WriteLine($"\nException Caught: {ex}\n");
-                #endregion
 
-                var response = ApiResponseUtils.CustomResponse(false, message, null);
+                response = ApiResponseUtils.CustomResponse(false, message, null);
                 return StatusCode(Status500, response);
             }
-
-
         }
+
     }
 
 

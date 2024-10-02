@@ -3,22 +3,18 @@
 
 @{
     ViewData["Title"] = "Confirm Delete";
+    string catergoryFromModel = ViewBag.Category;
     Layout = null;
 }
 
 <script>
-        $(document).ready(function () {
-        var text = [
-            "Updated", //0
-            "Not Updated", //1
-            "N/A", //2
-            "Complete", //3
-            "Incomplete(Usable)", //4
-            "Incomplete(Unusable)"  //5
-        ];
-        ChangeBackgroundColor('#firmware-status', text[0], text[1], text[2], null, null);
-        ChangeBackgroundColor('#item-status', text[3], text[5], null, text[4], null);
-        ChangeBackgroundColor('#item-category', null, null, text[11], text[10], text[9]);
+    $(document).ready(function () {
+        var categoryFetched = "@Html.Raw(catergoryFromModel)";
+ 
+        //changeBgBaseOnCategory(baseOnCategory, firmware, status, category)
+        changeBgBaseOnCategory(categoryFetched, '#firmware-status', '#item-status', '#item-category');
+        changeBgBaseOnCategory(categoryFetched, '#item-status', '#item-status', '#item-category');
+
     });
 </script>
 <style>
@@ -43,13 +39,25 @@
 
     <dl>
         <div class="d-flex" style="font-size: 0.9rem;">
-            <dt class="d-flex col-sm-2 w-50">
-                @Html.DisplayNameFor(model => model.ItemCode)
-            </dt>
+            @if (Model.Category == "Books")
+            {
+                <dt class="d-flex col-sm-2 w-50">
+                    @Html.DisplayName("ISBN")
+                </dt>
+                <dt class="d-flex col-sm-2 w-50 border-start ps-2">
+                    @Html.DisplayName("Title")
+                </dt>
+            }
+            else
+            {
+                <dt class="d-flex col-sm-2 w-50">
+                    @Html.DisplayNameFor(model => model.ItemCode)
+                </dt>
+                <dt class="d-flex col-sm-2 w-50 border-start ps-2">
+                    @Html.DisplayNameFor(model => model.ItemName)
+                </dt>
+            }
 
-            <dt class="d-flex col-sm-2 w-50 border-start ps-2">
-                @Html.DisplayNameFor(model => model.ItemName)
-            </dt>
 
         </div>
 
@@ -83,66 +91,16 @@
         </div>
 
     </dl>
-    <dl class="d-flex w-auto gap-1" style="font-size: 0.9rem;">
-         <div class="d-block w-33">
-            <dt class="col-sm-2 status-header">
-                @Html.DisplayNameFor(model => model.Category)
-            </dt>
-            @if (!string.IsNullOrEmpty(Model.Category))
-            {
-                <dd id="item-category" class="col-sm-2 status-body">
-                    @Html.DisplayFor(model => model.Category)
-                </dd>
-            }
-            else
-            {
-                <dd id="item-category" class="col-sm-2 status-body">
-                    No Category
-                </dd>
-            }
-         </div>
-
-        <div class="d-block w-33">
-            <dt class="col-sm-2 mb-0 w-100">
-                @Html.DisplayNameFor(model => model.Status)
-            </dt>
-
-            @if (!string.IsNullOrEmpty(Model.Status))
-            {
-                <dd id="item-status" class="col-sm-2 status-body">
-                    @Html.DisplayFor(model => model.Status)
-                </dd>
-            }
-            else
-            {
-                <dd id="item-status" class="col-sm-2 status-body">
-                    No Status
-                </dd>
-            }
-
-         </div>
-
-        <div class="d-block w-33">
-            <dt class="col-sm-2 mb-0 w-100">
-                @Html.DisplayNameFor(model => model.FirmwareUpdated)
-            </dt>
-
-            @if (!string.IsNullOrEmpty(Model.FirmwareUpdated))
-            {
-                <dd id="firmware-status" class="col-sm-2 status-body">
-                    @Html.DisplayFor(model => model.FirmwareUpdated)
-                </dd>
-            }
-            else
-            {
-                <dd id="firmware-status" class="col-sm-2 status-body">
-                    Not Applicable
-                </dd>
-            }
-        </div>
-
-   
-    </dl>
+    <div id="DeleteViewBaseOnCategory">
+        @if(Model.Category == "Robots")
+        {
+            @await Html.PartialAsync("~/Views/Users/components/HasFirmwareDelete.cshtml")
+        }
+        else
+        {
+            @await Html.PartialAsync("~/Views/Users/components/NoFirmwareDelete.cshtml")
+        }
+    </div>
     
     <form asp-controller="ValidateApi" asp-action="DeleteItem" asp-route-id="@Model.ItemId" method="post" class="mt-4 d-flex" id="delete-form" onsubmit="return DeleteRequest(this);">
         <input type="hidden"  asp-for="@Model.ItemId" id="delete-id" name="delete-id"/>

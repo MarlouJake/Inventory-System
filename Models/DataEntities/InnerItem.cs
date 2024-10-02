@@ -12,7 +12,6 @@ namespace InventorySystem.Models.DataEntities
         [Key]
         public int InnerItemId { get; set; }
 
-
         [ForeignKey(DisplayNames.ItemId)]
         [DisplayName(DisplayNames.ParentId)]
         public int ItemParentId { get; set; }

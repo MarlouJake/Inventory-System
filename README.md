@@ -2,8 +2,6 @@
 
 Practice Project
 
-With Basic CRUD Operations
-
 TECH's Used:
 C#
 ASP.NET MVC

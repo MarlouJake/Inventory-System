@@ -1,5 +1,6 @@
 using InventorySystem.Models.Page;
 using InventorySystem.Utilities;
+using InventorySystem.Utilities.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -36,7 +37,7 @@ namespace InventorySystem.Controllers.main
             Messages.PrintUrl(url);
             var demouser = "demo1 || demo1@user.com";
             var demouserpass = "@demo2024";
-            var demoUserPass = HashHelper.HashPassword(demouserpass);
+            var demoUserPass = HashHelper.HashString(demouserpass);
             Console.WriteLine("Temp Demo Username: {0}\nTemp Demo Password: {1}", demouser, demoUserPass);
             return PartialView();
         }
@@ -51,8 +52,8 @@ namespace InventorySystem.Controllers.main
             var demouser = "demo || demo@user.com";
             var adminpass = "@AdminLogger1234";
             var demouserpass = "@demo2024";
-            var tempAdminPass = HashHelper.HashPassword(adminpass);
-            var demoUserPass = HashHelper.HashPassword(demouserpass);
+            var tempAdminPass = HashHelper.HashString(adminpass);
+            var demoUserPass = HashHelper.HashString(demouserpass);
             Console.WriteLine("Temp Admin Username: {0}\nTemp Demo Username: {1}", adminuser, demouser);
             Console.WriteLine("Unhashed Temp Admin Password: {0}\nUnhashed Demo User Password: {1}", adminpass, demouserpass);
             Console.WriteLine("Hashed Temp Admin Password: {0}\nHashed Demo User Password: {1}", tempAdminPass, demoUserPass);

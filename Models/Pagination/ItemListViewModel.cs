@@ -11,6 +11,7 @@ namespace InventorySystem.Models.Pagination
         public int CurrentPage { get; set; }
         [DisplayName(DisplayNames.TotalPage)]
         public int TotalPages { get; set; }
+        public string? Category { get; set; }
     }
 
 }

@@ -87,101 +87,10 @@ function getBrowserInfo() {
     };
 };
 
-function Validations() {
-    const Post = methods[0];
-    const Put = methods[2];
-
-    const Login = actions[0];
-    const Logout = actions[1];
-    const Add = actions[2];
-    const Modify = actions[4];
-
-    const PostSuccess = SuccessMessages[0];
-    const ResponseValid = SuccessMessages[1];
-    const LoginSuccess = SuccessMessages[2];
-    const AddingSuccess = SuccessMessages[4];
-    const PutSuccess = SuccessMessages[5];
-    const UpdateSuccess = SuccessMessages[6];
-
-    const LoginFailed = ErrorMessages[0];
-    const PostFailed = ErrorMessages[3];
-    const ResponseInvalid = ErrorMessages[4];
-    const AddingFailed = ErrorMessages[7];
-    const PutFaield = ErrorMessages[9];
-    const UpdateFailed = ErrorMessages[11];
 
 
-    const FillRequiredFields = ValidateFields[1];
-    const UsernamePasswordIncorrect = ValidateFields[2];
-    const UsernameEmpty = ValidateFields[4];
-    const PasswordEmpty = ValidateFields[6];
-    const UsernameLength = ValidateFields[7];
-    const PasswordLegth = ValidateFields[8];
-    const MatchFound = ValidateFields[9];
-    const InvalidCredentials = ValidateFields[10];
-    const SuccessToAddDatabase = ValidateFields[11];
-    const FailedToAddDatabase = ValidateFields[12];
-    const InvalidInput = ValidateFields[13];
-
-    const UpdatedSuccessfully = ActionMessages[0];
-    const FailedToUpdate = ActionMessages[1];
 
 
-    const LogoutSuccess = SuccessMessages[3];
-    const LogoutFailed = ErrorMessages[1];
-    const LogoutError = ErrorMessages[6];
-    const AddingError = ErrorMessages[8];
-    const PutError = ErrorMessages[10];
-
-    const LogingIn = LoadingMessages[0];
-    const LogingOut = LoadingMessages[1];
-    const PleaseWait = LoadingMessages[2];
-
-    const PostError = ErrorMessages[2];
-
-    return validations = {
-        Post, //0
-        Login, //1
-        PostSuccess, //2
-        ResponseValid, //3
-        LoginSuccess, //4
-        LoginFailed, //5
-        PostFailed, //6
-        ResponseInvalid, //7
-        UsernameEmpty, //8
-        PasswordEmpty, //9
-        UsernameLength, //10
-        PasswordLegth, //11
-        LogoutSuccess, //12
-        LogoutFailed, //13
-        LogingIn, //14
-        LogingOut, //15
-        PleaseWait, //16
-        Logout, //17
-        PostError, //18
-        MatchFound, //19
-        InvalidCredentials, //20
-        UsernamePasswordIncorrect, //21
-        FillRequiredFields, //22
-        LogoutError, //23
-        AddingSuccess,
-        AddingFailed,
-        AddingError,
-        Add,
-        SuccessToAddDatabase,
-        FailedToAddDatabase,
-        InvalidInput,
-        Put,
-        Modify,
-        PutSuccess,
-        PutError,
-        PutFaield,
-        UpdateSuccess,
-        UpdateFailed,
-        UpdatedSuccessfully,
-        FailedToUpdate
-    };
-}
 
 
 function ProcessRequest() {
@@ -195,7 +104,7 @@ function ProcessRequest() {
 }
 
 //Returns  JSON Format text
-function jsonResult( method, _action, _actionMessage1, boolvalue1, _actionMessage2, boolvalue2, actionresponse,
+function jsonResult( method, _action, boolvalue, body, actionresponse,
     requestmessage, api, responsestatus, _targetroute, _browserinfo) {
 
     const timestamp = new Date().toLocaleString('en-US', DateFormatOptions);
@@ -204,59 +113,24 @@ function jsonResult( method, _action, _actionMessage1, boolvalue1, _actionMessag
         method,
         actions: {
             action: _action,
-            [_actionMessage1]: [boolvalue1],
-            [_actionMessage2]: [boolvalue2],
+            success: boolvalue,
             message: actionresponse
         },
+        body,
         requestmessage: requestmessage,
         apiurl: api,
         response: responsestatus,
         targeroute: getUrl(_targetroute),
         browserdetails: {
-            [browserInfo.name]: browserInfo.version
+            browserName: browserInfo.name,
+            browserVersion:  browserInfo.version
         },
         timestamp
     };
 };
 
 //Function for input-error class
-function RemoveClass(element) {
-    element.classList.remove('input-error');
-};
 
-function UserLoginValidateField() {
-    const username = document.getElementById('username');
-    const usernameError = document.getElementById('username-error');
-    const password = document.getElementById('password');
-    const passwordError = document.getElementById('password-error');
-
-    //User Login Form input fields client-side validation
-    if (username || password) {
-        username.addEventListener('input', function () {
-            usernameError.textContent = '';
-            RemoveClass(username);
-
-            if (username.value.length >= 64) {
-                usernameError.textContent = "Username or Email reached maximum limit of 64 characters";
-            } else {
-                usernameError.textContent = '';
-                RemoveClass(username);
-            }
-        });
-        password.addEventListener('input', function () {
-            passwordError.textContent = '';
-            RemoveClass(password);
-
-            if (password.value.length >= 128) {
-                passwordError.textContent = "Password reached maximum limit of 128 characters";
-            } else {
-                passwordError.textContent = '';
-                RemoveClass(password);
-            }
-        });
-
-    }
-}
 function DisplaySuccessAndError() {
     // Show success message if it exists
     const successMessage = document.getElementById('success-message');
@@ -279,22 +153,40 @@ function DisplaySuccessAndError() {
 }
 
 function ShowPassword(input, main, icon) {
-    main.on('mousedown', function () {
-        holdTimeout = setTimeout(() => {
+    let holdTimeout;
 
-            if (main) {
-                if (input.attr('type') === 'password') {
-                    input.attr('type', 'text');
-                    icon.removeClass('fa-regular').addClass('fa-solid');
-                }
-            }
-        }, 50);
+    // Helper function to show the password
+    const showPassword = () => {
+        if (input.attr('type') === 'password') {
+            input.attr('type', 'text');
+            icon.removeClass('fa-regular').addClass('fa-solid');
+        }
+    };
+
+    // Helper function to hide the password
+    const hidePassword = () => {
+        input.attr('type', 'password');
+        icon.removeClass('fa-solid').addClass('fa-regular');
+    };
+
+    // Handle both mousedown and touchstart for showing the password
+    main.on('mousedown touchstart', function (e) {
+        e.preventDefault(); // Prevent default action to avoid unwanted behavior (e.g., text selection)
+
+        holdTimeout = setTimeout(showPassword, 50);  // Show password after 50ms delay
         $(this).addClass('holding');
 
-        $(this).on('mouseup', function () {
+        // Handle mouseup and touchend for hiding the password
+        $(this).on('mouseup touchend', function () {
+            clearTimeout(holdTimeout);  // Clear the timeout if the user releases early
+            hidePassword();  // Hide the password again
+            $(this).removeClass('holding');
+        });
+
+        // Prevent the hold action from continuing if the user moves the finger or mouse away
+        $(this).on('mouseleave touchcancel', function () {
             clearTimeout(holdTimeout);
-            input.attr('type', 'password');
-            icon.removeClass('fa-solid').addClass('fa-regular');
+            hidePassword();
             $(this).removeClass('holding');
         });
     });
@@ -302,8 +194,7 @@ function ShowPassword(input, main, icon) {
 
 
 
-
 //initialize Validation Function
-const validationMessages = Validations();
+
 const browserInfo = getBrowserInfo();
 const process = ProcessRequest();

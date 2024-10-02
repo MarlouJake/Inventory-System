@@ -1,0 +1,44 @@
+﻿@using InventorySystem.Models.DataEntities
+@model Item;
+
+<dl class="d-flex w-auto gap-1" style="font-size: 0.9rem;">
+    <div class="d-block w-50">
+        <dt class="col-sm-2 status-header">
+            @Html.DisplayNameFor(model => model.Category)
+        </dt>
+        @if (!string.IsNullOrEmpty(Model.Category))
+        {
+            <dd id="item-category" class="col-sm-2 status-body" style="width: 30%;">
+                @Html.DisplayFor(model => model.Category)
+            </dd>
+        }
+        else
+        {
+            <dd id="item-category" class="col-sm-2 status-body w-30">
+                No Category
+            </dd>
+        }
+    </div>
+
+    <div class="d-block w-50">
+        <dt class="col-sm-2 mb-0 w-100">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+
+        @if (!string.IsNullOrEmpty(Model.Status))
+        {
+            <dd id="item-status" class="col-sm-2 status-body" style="width: 40%;">
+                @Html.DisplayFor(model => model.Status)
+            </dd>
+        }
+        else
+        {
+            <dd id="item-status" class="col-sm-2 status-body" style="width: 40%;">
+                No Status
+            </dd>
+        }
+
+    </div>
+</dl>
+
+

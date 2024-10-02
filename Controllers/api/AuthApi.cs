@@ -1,7 +1,7 @@
 ﻿using InventorySystem.Data;
 using InventorySystem.Models.Accounts;
-using InventorySystem.Utilities;
 using InventorySystem.Utilities.Api;
+using InventorySystem.Utilities.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -23,17 +23,18 @@ namespace InventorySystem.Controllers.api
         [HttpPost("redirect")]
         public async Task<IActionResult> GetUser([FromBody] LoginModel model)
         {
+            string message;
             try
             {
                 // Retrieve user from database (you might want to fetch more details if needed)
                 var user = await _context.Users
                     .FirstOrDefaultAsync(u => (u.Username == model.Username || u.Email == model.Username)
-                                              && u.Password == HashHelper.HashPassword(model.Password!));
+                                              && u.Password == HashHelper.HashString(model.Password!));
 
                 if (user == null)
                 {
-                    var data = "Username or Password incorrect";
-                    var result = ApiResponseUtils.CustomResponse(false, data, model!);
+                    message = "Username or Password incorrect";
+                    var result = ApiResponseUtils.CustomResponse(false, message, model!);
                     return StatusCode(StatusCodes.Status401Unauthorized, result);
                 }
 
@@ -68,14 +69,14 @@ namespace InventorySystem.Controllers.api
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
                 // Redirect to the user dashboard
-                var message = "Authenticated";
+                message = "Authenticated";
                 var redirectUrl = Url.Action("UserDashboard", "Users", new { roleName = roles.FirstOrDefault()!, username = user.Username });
                 var response = ApiResponseUtils.SuccessResponse(true, message, redirectUrl!);
                 return StatusCode(StatusCodes.Status200OK, response);
             }
             catch (MySqlException sqlEx)
             {
-                var errorMessage = "An error occurred while connecting to the MySQL database.";
+                var errorMessage = "An error occurred while connecting to the server.";
 
                 #region --Console Logger--
                 Console.Error.WriteLine($"\nMySQL Exception Caught: {sqlEx}\n");

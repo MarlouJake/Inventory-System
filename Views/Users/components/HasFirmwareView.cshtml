@@ -11,7 +11,7 @@
             </dt>
             @if (!string.IsNullOrEmpty(Model.Category))
             {
-                <dd id="item-category" class="row-sm-2 status-view">
+                <dd id="item-category" class="row-sm-2 status-view" style="font-size:0.5rem;">
                     @Html.DisplayFor(model => model.Category)
                 </dd>
             }
@@ -30,7 +30,7 @@
             </dt>
             @if (!string.IsNullOrEmpty(Model.Status))
             {
-                <dd id="item-status" class="row-sm-2 status-view">
+                <dd id="item-status" class="row-sm-2 status-view text-break text-wrap" style="font-size:0.5rem;">
                     @Html.DisplayFor(model => model.Status)
                 </dd>
             }
@@ -50,7 +50,7 @@
 
             @if (!string.IsNullOrEmpty(Model.FirmwareUpdated))
             {
-                <dd id="firmware-status" class="row-sm-2 status-view">
+                <dd id="firmware-status" class="row-sm-2 status-view" style="font-size:0.5rem;">
                     @Html.DisplayFor(model => model.FirmwareUpdated)
                 </dd>
             }

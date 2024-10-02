@@ -1,4 +1,5 @@
 using InventorySystem.Data;
+using InventorySystem.Utilities.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +35,7 @@ internal class Program
                 options.JsonSerializerOptions.PropertyNamingPolicy = null;
 
             });
+        services.AddScoped<GetClaims>();
 
         // Add CORS policy
         services.AddCors(options =>
@@ -92,7 +94,7 @@ internal class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
-        // Custom middleware to handle 401 and 404 responses
+        // Custom middleware to handle status code
         app.UseStatusCodePages(async context =>
         {
             var response = context.HttpContext.Response;
@@ -105,12 +107,21 @@ internal class Program
                 return;
             }
 
-            /*/ Handle other status codes if needed
-            if (statusCode == 404 || statusCode == 401)
-            {
-                response.Redirect("/access-denied");
-            }*/
+
         });
+
+        app.Use(async (context, next) =>
+        {
+            await next();
+
+            var response = context.Response;
+
+            if (response.StatusCode == 401)
+            {
+                context.Response.Redirect("/access-denied");
+            }
+        });
+
 
         // CORS policy
         app.UseCors("AllowAll");
@@ -164,6 +175,12 @@ internal class Program
                 pattern: "api/u/redirect",
                 defaults: new { controller = "AuthApi", action = "GetUser" });
 
+            _ = endpoints.MapControllerRoute(
+                name: "api-u-services-delete",
+                pattern: "api/u/services/remove-confirm/{id?}",
+                defaults: new { controller = "Services", action = "RemoveConfirm" });
+
+
 
             // Standard dashboard route
             _ = endpoints.MapControllerRoute(
@@ -183,6 +200,33 @@ internal class Program
                 pattern: "{roleName}/inventory/{username}/dashboard/update/{id?}",
                 defaults: new { controller = "Users", action = "Update" })
                 .RequireAuthorization("RequireUserRole");
+
+            _ = endpoints.MapControllerRoute(
+            name: "delete",
+            pattern: "{roleName}/inventory/{username}/dashboard/remove/{id?}",
+            defaults: new { controller = "Users", action = "Delete" })
+            .RequireAuthorization("RequireUserRole");
+
+            _ = endpoints.MapControllerRoute(
+              name: "viewAll",
+              pattern: "{roleName}/inventory/{username}/dashboard/item-view/all",
+              defaults: new { controller = "Users", action = "ItemViewAll" })
+              .RequireAuthorization("RequireUserRole");
+
+
+            _ = endpoints.MapControllerRoute(
+              name: "categoryView",
+              pattern: "{roleName}/inventory/{username}/dashboard/item-view/category",
+              defaults: new { controller = "Users", action = "CategoryView" })
+              .RequireAuthorization("RequireUserRole");
+
+            _ = endpoints.MapControllerRoute(
+             name: "searchView",
+             pattern: "{roleName}/inventory/{username}/dashboard/search/",
+             defaults: new { controller = "Users", action = "Search" })
+             .RequireAuthorization("RequireUserRole");
         });
+
+        app.UseDeveloperExceptionPage();
     }
 }

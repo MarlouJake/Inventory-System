@@ -68,7 +68,7 @@ namespace InventorySystem.Controllers.api
             }
             else
             {
-                var redirectUrl = Url.Action("CreateNewAccount", "ServicesApi");
+                var redirectUrl = Url.Action("CreateNewAccount", "RegisterApi");
                 var message = "Validation Successful. Redirecting...";
 
                 #region --Console Logger--
@@ -155,7 +155,7 @@ namespace InventorySystem.Controllers.api
             }
         }
 
-        [HttpPost("remove/{id}")]
+        [HttpPost("remove/{id?}")]
         public async Task<IActionResult> DeleteItem([FromBody] int? id)
         {
             string message = "";
@@ -164,7 +164,8 @@ namespace InventorySystem.Controllers.api
 
             try
             {
-                var redirectUrl = Url.Action("RemoveItem", "ServicesApi", new { id }, Request.Scheme);
+                var redirectUrl = Url.Action("RemoveConfirm", "ServicesApi", new { id }, Request.Scheme);
+
                 message = "Validation Successful. Redirecting...";
                 var response = ApiResponseUtils.SuccessResponse(id!, message, redirectUrl!);
                 return await Task.FromResult(StatusCode(StatusCodes.Status202Accepted, response));
@@ -182,21 +183,22 @@ namespace InventorySystem.Controllers.api
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
+            // Sign out the user from the cookie authentication scheme
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Optionally, delete the authentication cookie explicitly (usually not needed)
             Response.Cookies.Delete(CookieAuthenticationDefaults.AuthenticationScheme);
 
+            // Redirect URLs after logout
             var logOutUrl = Url.Action("LoginPage", "Home");
             var returnUrl = Url.Action("Index", "Home");
 
-            // Print the URL to the console
+            // Print the URL to the console for debugging
             Console.WriteLine(Messages.PrintUrl(logOutUrl));
 
-            return new JsonResult(new
-            {
-                isValid = true,
-                redirectUrl = returnUrl,
-                successMessage = "Logout Successful!"
-            });
+            var message = "Logout Successful!";
+            var response = ApiResponseUtils.SuccessResponse(null!, message, returnUrl!);
+            return await Task.FromResult(StatusCode(StatusCodes.Status200OK, response));
         }
     }
 }

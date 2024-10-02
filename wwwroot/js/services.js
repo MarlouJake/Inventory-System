@@ -17,7 +17,7 @@
     };
 
 
-    if (!ValidateDataInput(itemdata, '#itemCode', '#itemName', '#itemCode-error', '#itemName-error')) {
+    if (!ValidateDataInput(itemdata, '#itemCode', '#itemName', "#itemDescription", '#itemCode-error', '#itemName-error', '#itemDescription-errror')) {
         
         return false;
     }
@@ -128,6 +128,7 @@
 };
 
 AddItem = (data, url) => {
+    let activeCategory = $('.ctg-selected').data('string');
     $('#itemCode-error').text('');
     $('.form-control').removeClass('input-error').addClass('input-success');
 
@@ -150,10 +151,14 @@ AddItem = (data, url) => {
 
                     $("#dynamic-modal").modal('hide');
                     $("#message-success").text(addsuccess).fadeIn().delay(500).fadeOut();
-                    if ($('#searchbar').val()) {
-                        $('#searchbar').val('');
+                    
+                    //loadPage(currentPage);
+
+                    if ($('#searchbar').val() !== "") {
+                        loadItems($('#searchbar').val(), activeCategory, currentPage); // Load items based on search term
+                    } else {
+                        loadItemsByCategory(activeCategory, currentPage);
                     }
-                    loadPage(currentPage);   
                 }
                 else{
                     console.error('An error occured while adding item:'+ response.Message);
@@ -234,41 +239,6 @@ AddItem = (data, url) => {
     return false;
 };
 
-function loadItemView(url) {
-    try {
-        $.ajax({
-            type: 'GET',
-            url: url,
-            contentType: 'application/text',
-            dataType: 'text',
-            success: function (response) {
-               
-             
-            },
-            error: function (jqXHR, textStatus) {
-                // Parse the response as JSON
-                //var response = jqXHR.responseJSON;
-
-                // Extract the message from the response, or use a default message
-                //var message = response;
-
-                // Extract the status message
-                //var statusMessage = jqXHR.statusText || 'Unknown Error';
-
-                // Construct the full error message
-                //var responsemessage = `Server responded with status code: ${jqXHR.status} ${textStatus}.`;
-                //var details = responsemessage;
-                console.error('Error fetching item view:', jqXHR);
-                ShowError(jqXHR);
-            }
-        });
-    }
-    catch (ex){
-        console.error('An error occured while requesting the view: ', ex);
-        ShowError(ex);
-    }
-    
-}
 
 function ValidateInput(data) {
     $('#itemCode-error').text('');
@@ -325,9 +295,11 @@ UpdateRequest = (form) => {
         category: formData.get('categoryPartial'),
         firmwareupdated: formData.get('updatefirmware')
     };
+
     var dataid = $('#dataid').val();
-    console.log('Data:', JSON.stringify(itemdata, null, 2));
-    if (!ValidateUpdate(itemdata)) {
+
+    if (!ValidateDataInput(itemdata, '#updatecode', '#updatename', "#updatedesc", '#updatecode-error', '#updatename-error', '#updatedesc-error-errror')) {
+
         return false;
     }
 
@@ -377,6 +349,7 @@ UpdateRequest = (form) => {
 };
 
 ModifyItem = (data, url, dataid) => {
+    let activeCategory = $('.ctg-selected').data('string');
     $('#updatecode-error').text('');
     $('.form-control').removeClass('input-error').addClass('input-success');
     try {
@@ -394,7 +367,13 @@ ModifyItem = (data, url, dataid) => {
                     $("#dynamic-modal").modal('hide');
 
                     $("#message-success").text(response.Message).fadeIn().delay(500).fadeOut();
-                    loadPage(currentPage);
+                    //loadPage(currentPage);
+
+                    if ($('#searchbar').val() !== "") {
+                        loadItems($('#searchbar').val(), activeCategory, currentPage); // Load items based on search term
+                    } else {
+                        loadItemsByCategory(activeCategory, currentPage);
+                    }
 
                 }
                 else {
@@ -456,62 +435,9 @@ ModifyItem = (data, url, dataid) => {
     return false;
 }
 
-function ValidateUpdate(data) {
-    $('#updatecode-error').text('');
-    $('#updatename-error').text('');
-    $('#updatedesc-error').text('');
-    $('#updatestatus-error').text('');
-    $('#updatefirmware-error').text('');
-    $('.form-control').removeClass('input-error').addClass('input-success');
-
-    let isValid = true;
-
-    if(!data.itemcode || data.itemcode.trim() === '') {
-        $('#updatecode').addClass('input-error');
-        $('#updatecode-error').text('Item code is required');
-        isValid = false;
-        console.error('code empty');
-    } else if(data.itemcode.length < 3) {
-        $('#updatecode').addClass('input-error');
-        $('#updatecode-error').text('Item code is should be atleast 3 characters');
-        isValid = false;
-        console.error('code short');
-    } else if(data.itemcode.length > 20) {
-        $('#updatecode').addClass('input-error');
-        $('#updatecode-error').text('Item code is should not exceed 20 characters');
-        isValid = false;
-        console.error('code exceed length');
-    }
-
-    if (!data.itemname || data.itemname.trim() === '') {
-        $('#updatename').addClass('input-error');
-        $('#updatename-error').text('Item name is required');
-        isValid = false;
-        console.error('name empty');
-    } else if(data.itemname.length < 3) {
-        $('#updatename').addClass('input-error');
-        $('#updatename-error').text('Item name is should be atleast 3 characters');
-        isValid = false;
-        console.error('name short');
-    } else if(data.itemname.length > 20) {
-        $('#updatename').addClass('input-error');
-        $('#updatename-error').text('Item name should not exceed 20 characters');
-        isValid = false;
-        console.error('name exceed length');
-    }
-
-
-    if(!isValid) {
-        console.error('Validation errors');
-    }
-
-    return isValid;
-}
-
-
 DeleteRequest = (form) => {
     var deleteid = parseInt($('#delete-id').val(), 10);
-
+   
     if (isNaN(deleteid)) {
         ShowError('No item id retrieve');
         return false;
@@ -527,7 +453,7 @@ DeleteRequest = (form) => {
 
                 if (response.IsValid) {
                     if (response.RedirectUrl) {
-                        RemoveItem(response.RedirectUrl);
+                        RemoveItem(response.RedirectUrl, deleteid);
                     }
                     else {
                         var details = "Route sent by the server missing.";
@@ -556,13 +482,15 @@ DeleteRequest = (form) => {
     return false;
 };
 
-RemoveItem = (url) => {
-    const id = $('#delete-id').val();  
+RemoveItem = (url, id) => {
+    let activeCategory = $('.ctg-selected').data('string');
 
     try {
         $.ajax({
             type: 'DELETE',
             url: url,
+            contentType: 'application/json',
+            data: JSON.stringify(id),
             success: function (response, textStatus, jqXHR) {
                 var status = `Status Code: ${jqXHR.status}`;
                 var details = `Server responded with status code: ${jqXHR.status} ${textStatus}`;
@@ -581,16 +509,18 @@ RemoveItem = (url) => {
                     'dashboard/item-view'
                 );
 
-                console.log("API Data: ", JSON.stringify(result, null, 2));
-
                 if (response.IsValid) {
-
-                    
-
+                 
                     $("#dynamic-modal").modal('hide');
 
                     $("#message-success").text(response.Message).fadeIn().delay(500).fadeOut();
-                    loadPage(currentPage);
+                    //loadPage(currentPage);
+
+                    if ($('#searchbar').val() !== "") {
+                        loadItems($('#searchbar').val(), activeCategory, currentPage); // Load items based on search term
+                    } else {
+                        loadItemsByCategory(activeCategory, currentPage);
+                    }
 
                 }
                 else {

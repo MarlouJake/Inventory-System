@@ -74,3 +74,102 @@ const ActionMessages = [
     'Updated Successfully', //0
     'Failed To Update', //1
 ];
+
+
+function Validations() {
+    const Post = methods[0];
+    const Put = methods[2];
+
+    const Login = actions[0];
+    const Logout = actions[1];
+    const Add = actions[2];
+    const Modify = actions[4];
+
+    const PostSuccess = SuccessMessages[0];
+    const ResponseValid = SuccessMessages[1];
+    const LoginSuccess = SuccessMessages[2];
+    const AddingSuccess = SuccessMessages[4];
+    const PutSuccess = SuccessMessages[5];
+    const UpdateSuccess = SuccessMessages[6];
+
+    const LoginFailed = ErrorMessages[0];
+    const PostFailed = ErrorMessages[3];
+    const ResponseInvalid = ErrorMessages[4];
+    const AddingFailed = ErrorMessages[7];
+    const PutFaield = ErrorMessages[9];
+    const UpdateFailed = ErrorMessages[11];
+
+
+    const FillRequiredFields = ValidateFields[1];
+    const UsernamePasswordIncorrect = ValidateFields[2];
+    const UsernameEmpty = ValidateFields[4];
+    const PasswordEmpty = ValidateFields[6];
+    const UsernameLength = ValidateFields[7];
+    const PasswordLegth = ValidateFields[8];
+    const MatchFound = ValidateFields[9];
+    const InvalidCredentials = ValidateFields[10];
+    const SuccessToAddDatabase = ValidateFields[11];
+    const FailedToAddDatabase = ValidateFields[12];
+    const InvalidInput = ValidateFields[13];
+
+    const UpdatedSuccessfully = ActionMessages[0];
+    const FailedToUpdate = ActionMessages[1];
+
+
+    const LogoutSuccess = SuccessMessages[3];
+    const LogoutFailed = ErrorMessages[1];
+    const LogoutError = ErrorMessages[6];
+    const AddingError = ErrorMessages[8];
+    const PutError = ErrorMessages[10];
+
+    const LogingIn = LoadingMessages[0];
+    const LogingOut = LoadingMessages[1];
+    const PleaseWait = LoadingMessages[2];
+
+    const PostError = ErrorMessages[2];
+
+    return validations = {
+        Post, //0
+        Login, //1
+        PostSuccess, //2
+        ResponseValid, //3
+        LoginSuccess, //4
+        LoginFailed, //5
+        PostFailed, //6
+        ResponseInvalid, //7
+        UsernameEmpty, //8
+        PasswordEmpty, //9
+        UsernameLength, //10
+        PasswordLegth, //11
+        LogoutSuccess, //12
+        LogoutFailed, //13
+        LogingIn, //14
+        LogingOut, //15
+        PleaseWait, //16
+        Logout, //17
+        PostError, //18
+        MatchFound, //19
+        InvalidCredentials, //20
+        UsernamePasswordIncorrect, //21
+        FillRequiredFields, //22
+        LogoutError, //23
+        AddingSuccess,
+        AddingFailed,
+        AddingError,
+        Add,
+        SuccessToAddDatabase,
+        FailedToAddDatabase,
+        InvalidInput,
+        Put,
+        Modify,
+        PutSuccess,
+        PutError,
+        PutFaield,
+        UpdateSuccess,
+        UpdateFailed,
+        UpdatedSuccessfully,
+        FailedToUpdate
+    };
+}
+
+const validationMessages = Validations();

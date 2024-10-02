@@ -3,39 +3,44 @@ using InventorySystem.Models.DataEntities;
 using InventorySystem.Models.Pagination;
 using InventorySystem.Models.Responses;
 using InventorySystem.Utilities.Api;
+using InventorySystem.Utilities.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace InventorySystem.Controllers.main
 {
     [Authorize("RequireUserRole")]
     [Route("{roleName}/inventory/{username}/")]
-    public class UsersController(ApplicationDbContext context) : Controller
+    public class UsersController(ApplicationDbContext context, GetClaims getClaims) : Controller
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly GetClaims _getClaims = getClaims;
+        private int? userId;
+
+
+        // This method is called before every action method in the controller
+        public override void OnActionExecuting(ActionExecutingContext actionContext)
+        {
+            // Set userId from claims
+            userId = _getClaims.GetIdClaim(User);
+
+            if (userId == null)
+            {
+                actionContext.Result = RedirectToAction("AccessDenied", "Home");
+            }
+
+
+            // Call the base method
+            base.OnActionExecuting(actionContext);
+        }
 
         [Route("dashboard")]
         [HttpGet]
         public async Task<IActionResult> UserDashboard(string roleName, string username, int page = 1)
         {
-            // Retrieve UserId of logged-in user from claims
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
-            {
-                // Handle the case where the UserID is not available or invalid
-                return RedirectToAction("AccessDenied", "Home");
-            }
-
-            // Ensure the logged-in user matches the username provided in the URL
             var user = await _context.Users.FindAsync(userId);
-            if (user == null || user.Username != username)
-            {
-                // Handle the case where the username doesn't match the logged-in user
-                return RedirectToAction("AccessDenied", "Home");
-            }
 
             // Optionally check if the roleName matches one of the user's roles
             var userRoles = await _context.UserRoles
@@ -43,9 +48,11 @@ namespace InventorySystem.Controllers.main
                 .Select(ur => ur.Role!.Name)
                 .ToListAsync();
 
-            if (!userRoles.Contains(roleName))
+            bool userNull = user == null;
+            bool hasUserRole = !userRoles.Contains(roleName);
+
+            if (userNull || hasUserRole)
             {
-                // Handle the case where the roleName is not associated with the user
                 return RedirectToAction("AccessDenied", "Home");
             }
 
@@ -68,7 +75,8 @@ namespace InventorySystem.Controllers.main
             {
                 Items = items,
                 CurrentPage = page,
-                TotalPages = totalPages
+                TotalPages = totalPages,
+                Category = "All"
             };
 
             ViewBag.SuccessMessage = $"Welcome, {username}!";
@@ -78,11 +86,13 @@ namespace InventorySystem.Controllers.main
 
             ViewData["Layout"] = "~/Views/Shared/_DashboardLayout.cshtml";
             ViewData["title"] = "User Dashboard";
+
+            Console.WriteLine("UserId dashboard: {0}", userId);
             return View(model);
         }
 
 
-        [Route("dashboard/summary")]
+        [Route("summary")]
         [HttpGet]
         public IActionResult Summary(string username)
         {
@@ -93,7 +103,7 @@ namespace InventorySystem.Controllers.main
         }
 
 
-        [Route("dashboard/requests")]
+        [Route("requests")]
         [HttpGet]
         public IActionResult Requests(string username)
         {
@@ -103,17 +113,11 @@ namespace InventorySystem.Controllers.main
             return PartialView();
         }
 
-
+        /*
         [Route("dashboard/item-view")]
         [HttpGet]
         public async Task<IActionResult> ItemView(string username, int page = 1)
         {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
-            {
-                return RedirectToAction("AccessDenied");
-            }
             const int pageSize = 24;
             var itemsQuery = _context.Items.Where(i => i.UserId == userId);
 
@@ -130,62 +134,63 @@ namespace InventorySystem.Controllers.main
             {
                 Items = items,
                 CurrentPage = page,
-                TotalPages = totalPages
+                TotalPages = totalPages,
+                Category = "All"
             };
             ViewBag.Username = username;
 
 
             ViewData["title"] = "Item View";
             return PartialView(model);
-        }
+        }*/
 
         [Route("dashboard/item-view/all")]
         [HttpGet]
         public async Task<IActionResult> ItemViewAll(string username, int page = 1)
         {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
-            {
-                return RedirectToAction("AccessDenied");
-            }
+            int? id = userId;
             const int pageSize = 24;
+            var itemsQuery = _context.Items.Where(i => i.UserId == id);
+
+            var totalItems = await itemsQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var items = await itemsQuery
+                .OrderBy(i => i.ItemName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var model = new ItemListViewModel
+            {
+                Items = items,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                Category = "All"
+            };
+            ViewBag.Username = username;
+
+
+            ViewData["title"] = "Item View";
+            Console.WriteLine("UserId view all: {0}", userId);
+            Console.WriteLine("Total Items found in view all: {0}", totalItems);
+            return PartialView(model);
+        }
+
+
+        [Route("dashboard/item-view/category")]
+        [HttpGet]
+        public async Task<IActionResult> CategoryView(string username, string category, int page = 1)
+        {
+
+            const int pageSize = 24;
+
             var itemsQuery = _context.Items.Where(i => i.UserId == userId);
 
-            var totalItems = await itemsQuery.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-            var items = await itemsQuery
-                .OrderBy(i => i.ItemName)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            var model = new ItemListViewModel
+            if (category != "All")
             {
-                Items = items,
-                CurrentPage = page,
-                TotalPages = totalPages
-            };
-            ViewBag.Username = username;
-
-
-            ViewData["title"] = "Item View";
-            return PartialView(model);
-        }
-
-        [Route("dashboard/item-view/robots")]
-        [HttpGet]
-        public async Task<IActionResult> CategoryRobots(string username, int page = 1)
-        {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
-            {
-                return RedirectToAction("AccessDenied");
+                itemsQuery = _context.Items.Where(i => i.Category == category && i.UserId == userId);
             }
-            const int pageSize = 24;
-            var itemsQuery = _context.Items.Where(i => i.UserId == userId && i.Category == "Robots");
 
             var totalItems = await itemsQuery.CountAsync();
             var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
@@ -200,196 +205,26 @@ namespace InventorySystem.Controllers.main
             {
                 Items = items,
                 CurrentPage = page,
-                TotalPages = totalPages
+                TotalPages = totalPages,
+                Category = "All"
             };
             ViewBag.Username = username;
 
-
+            Console.WriteLine("UserId category view: {0}", userId);
+            Console.WriteLine("Total Items found in category view: {0}", totalItems);
             ViewData["title"] = "Item View";
-            return PartialView(model);
+            return PartialView("ItemViewAll", model);
         }
 
-
-        [Route("dashboard/item-view/books")]
-        [HttpGet]
-        public async Task<IActionResult> CategoryBooks(string username, int page = 1)
-        {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
-            {
-                return RedirectToAction("AccessDenied");
-            }
-            const int pageSize = 24;
-            var itemsQuery = _context.Items.Where(i => i.UserId == userId && i.Category == "Books");
-
-            var totalItems = await itemsQuery.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-            var items = await itemsQuery
-                .OrderBy(i => i.ItemName)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            var model = new ItemListViewModel
-            {
-                Items = items,
-                CurrentPage = page,
-                TotalPages = totalPages
-            };
-            ViewBag.Username = username;
-
-
-            ViewData["title"] = "Item View";
-            return PartialView(model);
-        }
-
-        [Route("dashboard/item-view/materials")]
-        [HttpGet]
-        public async Task<IActionResult> CategoryMaterials(string username, int page = 1)
-        {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
-            {
-                return RedirectToAction("AccessDenied");
-            }
-            const int pageSize = 24;
-            var itemsQuery = _context.Items.Where(i => i.UserId == userId && i.Category == "Materials");
-
-            var totalItems = await itemsQuery.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-            var items = await itemsQuery
-                .OrderBy(i => i.ItemName)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            var model = new ItemListViewModel
-            {
-                Items = items,
-                CurrentPage = page,
-                TotalPages = totalPages
-            };
-            ViewBag.Username = username;
-
-
-            ViewData["title"] = "Item View";
-            return PartialView(model);
-        }
-
-        // GET: Admin/Details/id?
-        [Route("dashboard/details/{id?}")]
-        [HttpGet]
-        #region --Previous ViewDetails Method--
-        public async Task<IActionResult> ViewDetails(int? id, string username, string roleName)
-        {
-
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
-            {
-                return RedirectToAction("AccessDenied");
-            }
-
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var item = await _context.Items
-                .FirstOrDefaultAsync(m => m.ItemId == id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-            ViewBag.Username = username;
-            ViewBag.RoleName = roleName;
-            ViewBag.Category = item.Category;
-            return PartialView(item);
-        }
-        #endregion
-
-
-        // GET: Admin/Create
-        [Route("dashboard/add-item/")]
-        [HttpGet]
-        public IActionResult AddItem(string username)
-        {
-            var item = new Item();
-            return PartialView(item);
-        }
-
-
-
-        #region --Previous Update Method--
-        [Route("dashboard/modify/{id?}")]
-        [HttpGet]
-        public async Task<IActionResult> Update(int? id, string username)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var item = await _context.Items
-                .FindAsync(id);
-
-            if (item == null)
-
-            {
-                return NotFound();
-            }
-
-
-            return PartialView(item);
-        }
-
-        #endregion
-
-
-        #region --Previous Delete Method--
-        [HttpGet]
-        [Route("dashboard/remove/{id}")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var item = await _context.Items
-                .FirstOrDefaultAsync(m => m.ItemId == id);
-
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-
-            return PartialView(item);
-        }
-
-        #endregion
 
         [Route("dashboard/search/")]
         [HttpGet]
-        public async Task<IActionResult> Search(string itemcode, int page = 1)
+        public async Task<IActionResult> Search(string itemcode, string category, int page = 1)
         {
             int pageSize = 24;
             ApiResponse response = null!;
             string message = "";
             var redirectUrl = "";
-
-
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
-            {
-                return RedirectToAction("AccessDenied", "Home");
-            }
 
             var items = _context.Items
                                .Where(i => i.UserId == userId); // Filter by userId
@@ -397,7 +232,12 @@ namespace InventorySystem.Controllers.main
 
             if (!string.IsNullOrEmpty(itemcode))
             {
-                items = items.Where(i => i.ItemCode!.StartsWith(itemcode)); // Filters items by code
+                items = items.Where(i => i.ItemCode!.StartsWith(itemcode) && i.UserId == userId); // Filters items by code             
+            }
+
+            if (category != "All")
+            {
+                items = items.Where(i => i.Category == category && i.UserId == userId);
             }
 
             // Get the total number of filtered items
@@ -417,7 +257,8 @@ namespace InventorySystem.Controllers.main
             {
                 Items = paginatedItems,
                 CurrentPage = page,
-                TotalPages = totalPages
+                TotalPages = totalPages,
+                Category = category
             };
 
             if (!model.Items.Any())
@@ -427,11 +268,103 @@ namespace InventorySystem.Controllers.main
                 response = ApiResponseUtils.SuccessResponse(model.Items!, message, redirectUrl!);
                 return StatusCode(StatusCodes.Status404NotFound, response);
             }
-
-            redirectUrl = Url.Action("Search", "Users");
-            return PartialView("ItemView", model);
+            ViewData["Category"] = category;
+            Console.WriteLine("UserId search: {0}", userId);
+            Console.WriteLine("Total Items found in search: {0}", totalItems);
+            return PartialView("ItemViewAll", model);
         }
 
+
+        // GET: Admin/Details/id?
+        [Route("dashboard/details/{id?}")]
+        [HttpGet]
+        public async Task<IActionResult> ViewDetails(int? id, string username, string roleName)
+        {
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var item = await _context.Items
+                .FirstOrDefaultAsync(m => m.ItemId == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            ViewBag.Username = username;
+            ViewBag.RoleName = roleName;
+            ViewBag.Category = item.Category;
+            return PartialView(item);
+        }
+
+
+
+        // GET: Admin/Create
+        [Route("dashboard/add-item/")]
+        [HttpGet]
+        public IActionResult AddItem()
+        {
+            var item = new Item();
+            return PartialView(item);
+        }
+
+
+        [Route("dashboard/modify/{id?}")]
+        [HttpGet]
+        public async Task<IActionResult> Update(int? id)
+        {
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var item = await _context.Items
+                .FindAsync(id);
+
+            if (item == null)
+
+            {
+                return NotFound();
+            }
+
+
+            return PartialView(item);
+        }
+
+        [HttpGet]
+        [Route("dashboard/remove/{id?}")]
+        public async Task<IActionResult> Delete(int? id)
+        {
+
+            Console.WriteLine("User ID: {0}", userId);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var item = await _context.Items
+                .FirstOrDefaultAsync(m => m.ItemId == id);
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+
+            ViewBag.Category = item.Category;
+            ViewBag.Claim = userId;
+
+            return PartialView(item);
+        }
+
+        [HttpGet]
+        [Route("dashboard/import-file")]
+        public IActionResult ImportFile()
+        {
+            return PartialView();
+        }
 
         //Partials Views for Modal Update, ViewDetails, Create
         [Route("dashboard/update/partial_view_with_firmwareUpdate")]
@@ -460,6 +393,20 @@ namespace InventorySystem.Controllers.main
         public IActionResult NoFirmwareView()
         {
             return PartialView("~/Views/Users/components/NoFirmwareView.cshtml");
+        }
+
+        [Route("dashboard/update/partial_view_has_firmwaredelete")]
+        [HttpGet]
+        public IActionResult HasFirmwareDelete()
+        {
+            return PartialView("~/Views/Users/components/HasFirmwareDelete.cshtml");
+        }
+
+        [Route("dashboard/update/partial_view_no_firmwaredelete")]
+        [HttpGet]
+        public IActionResult NoFirmwareDelete()
+        {
+            return PartialView("~/Views/Users/components/NoFirmwareDelete.cshtml");
         }
     }
 }

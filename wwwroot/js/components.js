@@ -1,8 +1,20 @@
 ﻿
 let spinner = `
-    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">      
     </span>
 `;
+
+let overlayDiv = ''
+
+let spinnerContainer = ` <div  class="text-center ms-5 mt-5 " style="width: 100vw;">
+                            <p class="ms-1">${spinner} Loading...</p>
+                        </div>`;
+
+
+let noItemContainer = ` <div  class="text-center text-muted ms-5 mt-5 ps-3" style="width: 100vw;">
+                            <p>No items found</p>
+                        </div>`;
+let noContent = `<div class="text-nowrap"> <p class="ms-1">No content found</p> </div>`;
 
 let newModal = `
                     <div class="modal fade" id="display-modal" tabindex="-1" role="dialog" aria-labelledby="displaymodal" data-bs-backdrop="static" data-bs-keyboard="false">
@@ -75,28 +87,3 @@ function hideModal() {
     }
 };
 
-function ValidateForm(data) {
-    // Reset error messages and input styles
-    $('#username-error').text('');
-    $('#password-error').text('');
-    $('.form-control').removeClass('input-error').addClass('input-success');
-
-    let isValid = true; // Variable to track form validity
-
-    // Manual validation for username
-    if (!data.username || data.username.trim() === '') {
-        $('#username').addClass('input-error');
-        $('#username-error').text(validationMessages.UsernameEmpty);
-        isValid = false;
-    } 
-
-    // Manual validation for password
-    if (!data.password || data.password.trim() === '') {
-        $('#password').addClass('input-error');
-        $('#password-error').text(validationMessages.PasswordEmpty);
-        isValid = false;
-    }
-
-
-    return isValid; // Return the form validity status
-}

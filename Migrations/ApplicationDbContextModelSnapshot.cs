@@ -22,6 +22,66 @@ namespace InventorySystem.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("InventorySystem.Models.DataEntities.Admin", b =>
+                {
+                    b.Property<int>("AdminId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AdminId"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("AdminId");
+
+                    b.ToTable("Admins");
+                });
+
+            modelBuilder.Entity("InventorySystem.Models.DataEntities.CreateHistory", b =>
+                {
+                    b.Property<int?>("HistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int?>("HistoryId"));
+
+                    b.Property<string>("Category")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ItemCode")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ItemName")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("HistoryId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CreateHistories");
+                });
+
             modelBuilder.Entity("InventorySystem.Models.DataEntities.Item", b =>
                 {
                     b.Property<int>("ItemId")
@@ -60,7 +120,7 @@ namespace InventorySystem.Migrations
 
                     b.HasKey("ItemId");
 
-                    b.HasIndex("ItemCode")
+                    b.HasIndex("UserId", "ItemCode")
                         .IsUnique();
 
                     b.ToTable("Items");
@@ -218,6 +278,30 @@ namespace InventorySystem.Migrations
                     b.ToTable("UserRoles");
                 });
 
+            modelBuilder.Entity("InventorySystem.Models.DataEntities.CreateHistory", b =>
+                {
+                    b.HasOne("InventorySystem.Models.DataEntities.Item", "Items")
+                        .WithMany()
+                        .HasForeignKey("ItemId");
+
+                    b.HasOne("InventorySystem.Models.DataEntities.User", "Users")
+                        .WithMany("CreateHistories")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Items");
+
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("InventorySystem.Models.DataEntities.Item", b =>
+                {
+                    b.HasOne("InventorySystem.Models.DataEntities.User", "User")
+                        .WithMany("Items")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("InventorySystem.Models.Identities.ItemCategory", b =>
                 {
                     b.HasOne("InventorySystem.Models.Identities.Category", "Category")
@@ -258,6 +342,10 @@ namespace InventorySystem.Migrations
 
             modelBuilder.Entity("InventorySystem.Models.DataEntities.User", b =>
                 {
+                    b.Navigation("CreateHistories");
+
+                    b.Navigation("Items");
+
                     b.Navigation("UserRoles");
                 });
 

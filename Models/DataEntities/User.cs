@@ -9,8 +9,8 @@ namespace InventorySystem.Models.DataEntities
     public class User
     {
 
-        [DisplayName(DisplayNames.UserId)]
         [Key]
+        [DisplayName(DisplayNames.UserId)]
         public int UserId { get; set; }
 
         [DisplayName(DisplayNames.Username)]
@@ -47,6 +47,9 @@ namespace InventorySystem.Models.DataEntities
         [DisplayName(DisplayNames.UserRole)]
         public ICollection<UserRole>? UserRoles { get; set; }
 
+        // Navigation property to show the history created by the user
+        public ICollection<CreateHistory>? CreateHistories { get; set; }
+        public ICollection<Item>? Items { get; set; }
         public User()
         {
             DateCreated = DateTime.Now;
