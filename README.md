@@ -154,15 +154,5 @@ The project is using MySQL. You'll need to reconfigure the MySQL database connec
 ## Contribution
 
 Feel free to fork this repository and submit pull requests. Any improvements or bug fixes are welcome.
-
-TECH's Used:
-C#
-ASP.NET MVC
-HTML
-CSS
-JAVASCRIPT
-JQUERY
-BOOTSTRAP
-
 ```
 No license yet.
