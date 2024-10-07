@@ -147,7 +147,7 @@ The project is using MySQL. You'll need to reconfigure the MySQL database connec
 ## Tools and Packages Used
 
 - **ASP.NET Core Identity** (`Microsoft.AspNetCore.Identity`)
-- **Entity Framework Core** with MySQL support (`MySql.EntityFrameworkCore`, `omelo.EntityFrameworkCore.MySql`)
+- **Entity Framework Core** with MySQL support (`MySql.EntityFrameworkCore`, `Pomelo.EntityFrameworkCore.MySql`)
 - **Razor Pages and MVC** for building the front-end views
 - **Code Generation Tools** (`Microsoft.VisualStudio.Web.CodeGeneration.Design`) for scaffolding and other operations
 
