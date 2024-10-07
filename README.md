@@ -129,22 +129,6 @@ The project is using MySQL. You'll need to reconfigure the MySQL database connec
 
 5. Open the application in your browser at `https://localhost:5001` (or the port specified in the launch settings).
 
-## API Fetch Logic in wwwroot
-
-The project handles frontend API fetch operations from the `wwwroot` directory, specifically in the `wwwroot/js/` folder together with other scripts. If you need to modify or extend API fetch logic, you can find the JavaScript responsible for it in this directory.
-
-For example, an API call might look like this in `wwwroot/js/api-fetch.js`:
-```javascript
-fetch('/api/data')
-  .then(response => response.json())
-  .then(data => {
-    console.log(data);
-  })
-  .catch(error => {
-    console.error('Error fetching API:', error);
-  });
-```
-
 ## Project Structure
 
 - `wwwroot/`: Contains static frontend assets, such as the logic for API fetch operations, stylesheets, images, font, frontend libraries.
