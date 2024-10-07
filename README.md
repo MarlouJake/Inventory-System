@@ -26,7 +26,6 @@ Before running the project, ensure you have the following installed:
 
 - [.NET SDK 8.0](https://dotnet.microsoft.com/download/dotnet/8.0) or later
 - [MySQL Server](https://dev.mysql.com/downloads/mysql/)
-- [Node.js](https://nodejs.org/) (not used in the project, but can be used if needed for handling frontend assets)
 - [Entity Framework Core Tools](https://docs.microsoft.com/en-us/ef/core/cli/dotnet) (if not installed globally)
 - [Visual Studio Code](https://code.visualstudio.com/) or [Visual Studio](https://visualstudio.microsoft.com/)
 
