@@ -141,8 +141,8 @@ The project is using MySQL. You'll need to reconfigure the MySQL database connec
   - `main/`: Contans the view controller.
 - `Models/`: Contains the Entity Framework models and database context.
  - `Utilities/`: Contains the Helpers or Utility classes for the project
-  - `Api/`: Contains helper for Api responses and validation logics.
-  - `Data/`: Contains claim helper, password hasher, and database seeding
+   - `Api/`: Contains helper for Api responses and validation logics.
+   - `Data/`: Contains claim helper, password hasher, and database seeding
 
 ## Tools and Packages Used
 
