@@ -18,7 +18,8 @@ You can use the signup function on the login page to gain access to the dashboar
 - **JavaScript**: Used for frontend logic, particularly for API fetch operations.
 - **HTML/CSS**: Used for structuring and styling the user interface.
 - **Bootstrap**: A front-end framework for developing responsive and mobile-first websites.
-- **jQuery**: A fast, small, and feature-rich JavaScript library that simplifies HTML document traversal and manipulation.
+- **jQuery and AJAX**: jQuery is a fast, small, and feature-rich JavaScript library that simplifies HTML document traversal and manipulation. It also provides powerful **AJAX** capabilities for making asynchronous HTTP requests to fetch or send data without refreshing the page.
+
 
 ## Prerequisites
 
