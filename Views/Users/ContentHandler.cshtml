@@ -1,0 +1,75 @@
+﻿@using InventorySystem.Models.Pagination
+@using System.Security.Claims;
+@model ItemListViewModel
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    var CurrentUsername = ViewBag.Username as string;
+
+}
+
+<script>
+
+    var activeCategory = "All";
+    var currentUsername = '@Html.Raw(CurrentUsername)';
+    var info = $('#layoutbody #message-success');
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        $('#username-container').text(currentUsername);
+        info.text(`Welcome ${currentUsername.toUpperCase()}!`).fadeIn().delay(1000).fadeOut();
+    });
+
+
+    $(document).ready(function () {
+
+       
+
+        loadContent('dashboard');
+
+        $('#sidebar .nav-link').on('click', function (e) {
+            sidebarEvent(e, this);
+        });
+
+        $('#user-logout').on('click', function logoutEvent(e) {
+            e.preventDefault();
+            apiService.logoutRequest('@Url.Action("Logout", "ValidateApi", new { username = CurrentUsername })');
+        });
+
+    });
+
+
+    function sidebarEvent(e, element) {
+        e.preventDefault();
+
+        
+        clickedElementId = $(e.target).attr('id');
+
+        if ($(element).hasClass('active')) {
+            return;
+        }
+        
+        $('#searchbar').val('');
+
+        $(element).addClass('active');
+
+        renderContent(element);
+        
+        removeChecks();
+    }
+
+
+    function renderContent(element) {
+        let url = $(element).data('url');
+        loadContent(url);
+    }
+
+
+    
+
+
+</script>
+
+<div id="content-container" class=" m-0 p-0 w-100">
+    <div id="content-handler" class="">
+    </div>
+</div>

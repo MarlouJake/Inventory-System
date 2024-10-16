@@ -2,7 +2,7 @@
 @model Item
 
 @{
-    ViewData["Title"] = "Confirm Delete";
+    ViewData["Title"] = "Delete Confirm";
     string catergoryFromModel = ViewBag.Category;
     Layout = null;
 }
@@ -15,6 +15,13 @@
         changeBgBaseOnCategory(categoryFetched, '#firmware-status', '#item-status', '#item-category');
         changeBgBaseOnCategory(categoryFetched, '#item-status', '#item-status', '#item-category');
 
+        var id = [];
+        id.push(@Model.ItemId);
+        var idArray = id;
+       
+        $('#deleteButtonView').on('click', function(){
+          DeleteRequest(idArray);
+        });
     });
 </script>
 <style>
@@ -102,11 +109,13 @@
         }
     </div>
     
-    <form asp-controller="ValidateApi" asp-action="DeleteItem" asp-route-id="@Model.ItemId" method="post" class="mt-4 d-flex" id="delete-form" onsubmit="return DeleteRequest(this);">
-        <input type="hidden"  asp-for="@Model.ItemId" id="delete-id" name="delete-id"/>
-        <input type="submit" value="Confirm" class="ms-auto btn btn-danger" />
+    <div class="mt-4 d-flex" id="delete-form" >
+    
+        <button class="ms-auto btn btn-danger" id="deleteButtonView">
+            Confirm
+        </button>
         <input type="button" value="Cancel" class="btn btn-outline-secondary ms-1 close-modalBtn" data-bs-dismiss="modal" />
-    </form>
+    </div>
 </div>
 
 

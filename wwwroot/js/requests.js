@@ -32,7 +32,6 @@
         };
 
         if (!ValidateForm(data)) {
-            console.log('validation');
             return false;
         }
 
@@ -126,33 +125,28 @@
         switch(action) {
             case 'login':
                 this.CheckResponse(response) ? this.authRequest(data, response.RedirectUrl) : this.showError(message);
-                console.log('login case');
                 break;
 
             case 'auth':
                 this.CheckResponse(response) ? this.CheckRoute(response) : this.showError(message);
-                console.log('auth case');
                 break;
 
             case 'signup':
                 $('.signup-errors').text('');
                 $('.input-group').removeClass('input-error');
                 this.CheckResponse(response) ? this.registerRequest(data, response.RedirectUrl) : this.showError(message);
-                console.log('signup case');
                 break;
 
             case 'register':
                 this.CheckResponse(response) ? this.showSuccess(message) : this.showError(message);
-                console.log('register case');
                 break;
 
             case 'logout':
                 this.CheckResponse(response) ? window.location.href = response.RedirectUrl : this.showError(message);
-                console.log('logout case');
                 break;
 
             default:
-                console.error('No switch case input matching');
+                console.error('No input matching');
                 return false;
                 break;
         }
@@ -221,13 +215,11 @@
 
 
     validateForm(data) {
-        // Implement validation logic
-        return true; // or false based on validation
+        return true; 
     }
 
     validateSignup(data) {
-        // Implement signup validation logic
-        return true; // or false based on validation
+        return true; 
     }
 }
 

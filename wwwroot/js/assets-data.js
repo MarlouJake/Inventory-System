@@ -1,5 +1,4 @@
-﻿
-/**
+﻿/**
  * Fetches values from a specified API and populates a dropdown element with the retrieved options.
  * 
  * This function performs an AJAX GET request to the provided API endpoint. Upon successful 
@@ -24,6 +23,7 @@ getValues = function (api, dropdownElementId) {
     $.ajax({
         url: api,
         type: 'GET',
+        timeout: 10000,
         success: function (data) {
             $dropdownElement.empty();
             $.each(data, function (index, item) {
@@ -64,9 +64,15 @@ getValues = function (api, dropdownElementId) {
                 $dropdownElement.append($option);
             });
         },
-        error: function (xhr, status, error) {
+        error: function (textStatus, error) {
             console.log('Error fetching options: ' + error);
             $('<option></option>').val('').text('No option fetched').appendTo($dropdownElement);
+
+            if (textStatus === 'timeout') {
+                console.log('The request timed out.');
+            } else {
+                console.log("Error loading page: ", textStatus);
+            }
         }
     });
 };
@@ -239,60 +245,87 @@ function changeBgBaseOnCategory(baseOnCategory, firmware, status, category) {
  **/
 loadContent = function (url) {
     $('.card-container').html(spinnerContainer);
+
     $.ajax({
         url: url,
         type: 'GET',
+        cache: true,
+        timeout: 10000,
         success: function (response) {
-            $('#view-all').html(response);
+            $('#content-handler').html(response);
             $('#sidebar .nav-link').removeClass('disabled').find('.spinner').hide();
             $('#sidebar .nav-link').removeClass('active bgc-orange'); 
+
+            //$('.category-button').removeClass('ctg-selected');        
+            //$('.category-button[data-string="All"]').addClass('ctg-selected');
+
             setTimeout(() => {
                 $('#sidebar .nav-link[data-url="' + url + '"]').addClass('active bgc-orange');
             }, 20);
             
         },
-        error: function () {
-            $('#view-all .card-container').html(noItemContainer);
+        error: function (textStatus) {
             $('#sidebar .nav-link').removeClass('disabled').find('.spinner').hide();
+
+            if (textStatus === 'timeout') {
+                console.log('The request timed out.');
+            } else {
+                console.log("Error loading page: ", textStatus);
+            }
         }
     });
 };
 
 function loadPage(category, pageNumber) {
-    var itemcode = $('#searchbar').val().trim();
+    //var itemcode = $('#searchbar').val().trim();
+    
     $.ajax({
-        //url: 'Url.Action("CategoryView", "Users", new { username = ViewBag.Username })' + '?page=' + pageNumber,
-        url: 'dashboard/item-view/category',
+        url: 'inventory/items/uncategorized',
         type: 'GET',
-        cache: false,
+        timeout: 10000,
+        cache: true,
         data: { category: category, page: pageNumber },
         success: function (response) {
-            $('#view-all').html(response);
-            updatePaginationControls(response);
+            $('#view-all').html(response);        
+            updatePaginationControls(response);          
         },
-        error: function (error) {
+        error: function (textStatus) {
             $('#view-all').html(noContent);
-            console.log("Error loading page: ", error);
+            
+
+            if (textStatus === 'timeout') {
+                console.log('The request timed out.');
+            } else {
+                console.log("Error loading page: ", textStatus);
+            }
         }
     });
 }
 
 function loadItemsByCategory(category, pageNumber) {
-    $('.card-container').html(spinnerContainer);
+    $('card-container').html(spinnerContainer);
     $.ajax({
-        url: 'dashboard/item-view/category',
+        url: 'inventory/items/categorized',
         type: 'GET',
+        timeout: 10000,
         cache: false,
         data: { category: category, page: pageNumber },
         success: function (response) {
             $('#view-all').html(response);
             $('#category-buttons .category-button').removeClass('disabled').find('.spinner').hide();
+            $(`.category-button[data-string="${category}"]`).addClass('ctg-selected');
             updatePaginationControls(response);
+            resetCheckState();
         },
-        error: function (xhr) {
-            $('.card-container').html(noItemContainer);
-            
+        error: function (textStatus) {
+            $('.card-container').html(noItemContainer);           
             $('.category-button').removeClass('disabled').find('.spinner').hide();
+
+            if (textStatus === 'timeout') {
+                console.log('The request timed out.');
+            } else {
+                console.log('An error occurred: ' + textStatus);
+            }
         }
     });
 }
@@ -300,95 +333,137 @@ function loadItemsByCategory(category, pageNumber) {
 function loadItems(itemcode, category, pageNumber) {
    $('card-container').html(spinnerContainer);
     $.ajax({
-        url: 'dashboard/search/', 
+        url: 'inventory/search/', 
         type: 'GET',
+        timeout: 10000,
         cache: false,
         data: { itemcode: itemcode, category: category, page: pageNumber },
         success: function (response) {
             $('#view-all').html(response);
-
+            resetCheckState();
             updatePaginationControls(response);
         },
-        error: function (xhr) {
+        error: function (textStatus) {
             $('.card-container').html(noItemContainer);
-           
+            if (textStatus === 'timeout') {
+                console.log('The request timed out.');
+            } else {
+                console.log('An error occurred: ' + textStatus);
+            }
         }
     });
 }
 
-function toggleNavbar(uri) {
-    let dashboardNav = $('#dashboard-nav');
-    let summaryNav = $('#summary-nav');
-    let requestsNav = $('#requests-nav');
-    let itemViewcategoryUri = 'dashboard/item-view/category';
-    let itemViewAllUri = 'dashboard/item-view/all';
-    let summaryUri = 'summary';
-    let requestUri = 'requests';
 
-    // Hide all by default
-    dashboardNav.addClass('hide-con').removeClass('show-con');
-    summaryNav.addClass('hide-con').removeClass('show-con');
-    requestsNav.addClass('hide-con').removeClass('show-con');
-
-    switch (uri) {
-        case itemViewAllUri:
-        case itemViewcategoryUri:
-            dashboardNav.addClass('show-con').removeClass('hide-con');
-            break;
-        case summaryUri:
-            summaryNav.addClass('show-con').removeClass('hide-con');
-            break;
-        case requestUri:
-            requestsNav.addClass('show-con').removeClass('hide-con');
-            break;
-        default:
-            // Optionally handle the default case (everything remains hidden)
-            break;
+function loadPageByNumber(pageNumber, currentPage) {
+    let category = $('.ctg-selected').data('string');
+    let itemCode = $('#searchbar').val().trim();
+    if (pageNumber != currentPage) {
+        if (itemCode === '') {
+            loadItemsByCategory(category, pageNumber);
+        } else {
+            loadItems(itemCode, category, pageNumber);
+        }
+    } else {
+        $("html, body").animate({ scrollTop: 0 }, "smooth");
+        return false;
     }
+
 }
 
-function toggleSearchContainer(url) {
-    var searchContainer = $('#hide-container');
-    var categoryContainer = $('#hide-categories');
+function deleteSelectedItem() {
+    let checkedBoxes = $('.delete-checkbox:checked');
+    let itemIds = [];
 
-    switch (url) {
-        case 'dashboard/item-view/all/':
-        case 'dashboard/item-view/category/':
-
-            searchContainer.addClass('show-con');
-            categoryContainer.addClass('show-con');
-            searchContainer.removeClass('hide-con');
-            categoryContainer.removeClass('hide-con');
-            break;
-        default:
-            searchContainer.removeClass('show-con');
-            categoryContainer.removeClass('show-con');
-            searchContainer.addClass('hide-con');
-            categoryContainer.addClass('hide-con');
-            break;
-    }
+    checkedBoxes.each(function () {
+        const data = {
+            itemId : $(this).closest('.card').data('item-id'),
+            itemName : $(this).closest('.card').data('item-name'),
+            itemCode: $(this).closest('.card').data('item-code'),
+            itemCategory: $(this).closest('.card').data('item-category'),
+            itemStatus: $(this).closest('.card').data('item-status')
+        }
+        console.log('Selected item: ' + JSON.stringify(data, null, 2));
+        itemIds.push(data.itemId);
+    });
+    console.log('Total item(s): ', itemIds.length);
+    alert(`Total item(s): ${itemIds.length}`);
+    //DeleteRequest(itemIds);
 }
 
-function toggleSummaryNavbar(url) {
-    let navbar = $('#summary-nav');
-    switch (url) {
-        case 'summary':
-            navbar.removeClass('hide-con');
-            navbar.addClass('show-con');
-            break;
-        default:
-            navbar.addClass('hide-con');
-            navbar.removeClass('show-con');
-            break;
-    }
-}
+//function toggleNavbar(uri) {
+//    let dashboardNav = $('#dashboard-nav');
+//    let inventoryNav = $('#summary-nav');
+//    let requestsNav = $('#requests-nav');
+//    let itemViewcategoryUri = 'inventory/items/categorized';
+//    let inventory = 'inventory';
+//    let dashboard = 'dashboard';
+//    let requests = 'requests';
+
+//    // Hide all by default
+//    dashboardNav.addClass('hide-con').removeClass('show-con');
+//    inventoryNav.addClass('hide-con').removeClass('show-con');
+//    requestsNav.addClass('hide-con').removeClass('show-con');
+
+//    switch (uri) {
+//        case inventory:
+//        case itemViewcategoryUri:
+//            dashboardNav.addClass('show-con').removeClass('hide-con');
+//            break;
+//        case dashboard:
+//            summaryNav.addClass('show-con').removeClass('hide-con');
+//            break;
+//        case requests:
+//            requestsNav.addClass('show-con').removeClass('hide-con');
+//            break;
+//        default:
+//            // Optionally handle the default case (everything remains hidden)
+//            break;
+//    }
+//}
+
+//function toggleSearchContainer(url) {
+//    var searchContainer = $('#hide-container');
+//    var categoryContainer = $('#hide-categories');
+
+//    switch (url) {
+//        case 'dashboard/item-view/all/':
+//        case 'dashboard/item-view/category/':
+
+//            searchContainer.addClass('show-con');
+//            categoryContainer.addClass('show-con');
+//            searchContainer.removeClass('hide-con');
+//            categoryContainer.removeClass('hide-con');
+//            break;
+//        default:
+//            searchContainer.removeClass('show-con');
+//            categoryContainer.removeClass('show-con');
+//            searchContainer.addClass('hide-con');
+//            categoryContainer.addClass('hide-con');
+//            break;
+//    }
+//}
+
+//function toggleSummaryNavbar(url) {
+//    let navbar = $('#summary-nav');
+//    switch (url) {
+//        case 'summary':
+//            navbar.removeClass('hide-con');
+//            navbar.addClass('show-con');
+//            break;
+//        default:
+//            navbar.addClass('hide-con');
+//            navbar.removeClass('show-con');
+//            break;
+//    }
+//}
+
 function updatePaginationControls(response) {
-    // Assuming response contains pagination data or structure
+    
     var totalPages = response.totalPages; // Get total pages from response
     var currentPage = response.currentPage; // Get current page from response
 
     // Update pagination controls
-    // This will depend on the structure of your response and pagination controls
 }
 
 /**Enable or Disable & Add or Remove attr required  to the firmware status dropdown
@@ -397,6 +472,7 @@ function updatePaginationControls(response) {
  * 
  * 
  **/
+
 function toggleDropdown(input, target) {
     if (input.val() === "Robots") {
         target.prop({

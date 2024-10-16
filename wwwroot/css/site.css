@@ -16,6 +16,22 @@
 /* Base font size adjustments */
 html {
     font-size: 14px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+
+/* General body styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
 }
 
 @media (min-width: 768px) {
@@ -23,6 +39,7 @@ html {
         font-size: 16px;
     }
 }
+
 .w-60 {
     width: 60%;
 }
@@ -55,9 +72,10 @@ html {
 .text-orange {
     color: #fd7e14 !important;
 }
-.bgc-lsg{
-     background-color  : lightslategray !important;
-     color:white !important;
+
+.bgc-lsg {
+    background-color: lightslategray !important;
+    color: white !important;
 }
 
     .bgc-lsg:hover {
@@ -79,11 +97,10 @@ a.navbar-brand {
         background-color: #fd7e14 !important;
     }
 
-.index-navbar a.nav-link:hover {
-    background-color: lightslategray !important;
-    color: black !important;
-    
-}
+    .index-navbar a.nav-link:hover {
+        background-color: lightslategray !important;
+        color: black !important;
+    }
 
 #loginbutton:active {
     background-color: lightslategray !important;
@@ -99,25 +116,20 @@ a.navbar-brand {
     transition: ease 0.1s;
 }
 
-.outline-orange{
+.outline-orange {
     border: 1px solid #fd7e14 !important;
 }
 
 .bgc-orange:hover, .ctg-selected:hover {
     background-color: #e06c12 !important;
-    border: 1px solid white !important;
 }
-  
+
 .ctg-notselected {
     border: 1px solid #fd7e14;
     color: gray;
     background-color: white;
 }
 
-/* General body styles */
-body {
-    font-family: 'Poppins', sans-serif;
-}
 
 /* Button styles */
 .btn-common {
@@ -150,17 +162,14 @@ body {
 
 /* Sidebar */
 #sidebar {
-    width: 220px;
+    width: 184px;
     height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
     padding: 15px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    background-color: #343a40;
-    z-index: 1060;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
     transition: left 0.3s ease;
+    flex-shrink: 0;
 }
+
 
     #sidebar h3 {
         margin-bottom: 20px;
@@ -168,18 +177,8 @@ body {
 
     #sidebar .nav-link {
         color: #ffffff;
-        margin: 5px 0;
+        user-select: none;
     }
-
-/* Main content */
-#main-content{
-    margin-left: 109px;
-    box-sizing: border-box;
-    width: 100%;
-    padding: 15px; /* adjust as needed */
-    overflow-x: hidden; /* hides horizontal overflow */
-}
-
 
 
 
@@ -196,9 +195,6 @@ body {
         font-size: 0.875rem;
     }
 
-#top-bar-bg {
-    height: 3rem;
-}
 
 
 .tabs .nav-link {
@@ -206,9 +202,14 @@ body {
     cursor: pointer;
 }
 
-.tabs .nav-link:hover {
-    background-color: lightslategray!important;
-}
+    .tabs .nav-link:hover {
+        background-color:  rgb(128, 128, 128, 0.3);
+    }
+
+    .tabs .nav-link .active:hover {
+        background-color: inherit !important;
+        color: inherit !important;
+    }
 
 
 .nav-link.disabled {
@@ -219,6 +220,9 @@ body {
 .nav-link.active {
     color: #fd7e14;
 }
+
+
+
 
 
 #username-container {
@@ -307,7 +311,7 @@ body {
 .input-focus {
     border: 1px solid blue;
 }
-  
+
 
 .input-success:focus {
     border-color: #4CAF50; /* Green border when focused */
@@ -348,6 +352,7 @@ body {
     display: none;
     cursor: pointer;
 }
+
 .app-name {
     display: none;
 }
@@ -359,9 +364,8 @@ body {
     }
 
     #main-content {
-        margin-left: 140px;
         padding: 15px;
-        overflow: auto;
+        overflow-y: auto;
     }
 }
 
@@ -381,10 +385,6 @@ body {
     .card-container {
         grid-template-columns: repeat(4, 1fr); /* Adjust to 4 items per row on medium screens */
     }
-
-   
-
-   
 }
 
 @media (max-width: 890px) {
@@ -425,7 +425,7 @@ body {
         padding: 15px;
     }
 
-    .category-label{
+    .category-label {
         font-size: 0.9rem;
     }
 
@@ -480,29 +480,128 @@ body {
     border-color: transparent; /* Optional: remove border */
 }
 
-.navbar-toggler-custom .navbar-toggler-icon {
-    background-image: none; /* Remove default icon */
+    .navbar-toggler-custom .navbar-toggler-icon {
+        background-image: none; /* Remove default icon */
+    }
+
+        .navbar-toggler-custom .navbar-toggler-icon::before {
+            content: '';
+            display: block;
+            width: 30px; /* Width of your icon */
+            height: 3px; /* Height of your icon */
+            background-color: orange; /* Change to your desired color */
+            position: relative;
+            transition: all 0.3s; /* Optional: add some transition */
+        }
+
+        .navbar-toggler-custom .navbar-toggler-icon::after {
+            content: '';
+            display: block;
+            width: 30px; /* Width of your icon */
+            height: 3px; /* Height of your icon */
+            background-color: orange; /* Change to your desired color */
+            position: relative;
+            transition: all 0.3s; /* Optional: add some transition */
+        }
+
+#searchbar {
+    font-size: 0.8rem;
+    caret-color: #fd7e14;
 }
 
-    .navbar-toggler-custom .navbar-toggler-icon::before {
-        content: '';
-        display: block;
-        width: 30px; /* Width of your icon */
-        height: 3px; /* Height of your icon */
-        background-color: orange; /* Change to your desired color */
-        position: relative;
-        transition: all 0.3s; /* Optional: add some transition */
+    #searchbar:focus, #searchbar:active {
+        border: none;
+        outline: none;
+        box-shadow: none;
     }
 
-    .navbar-toggler-custom .navbar-toggler-icon::after {
-        content: '';
-        display: block;
-        width: 30px; /* Width of your icon */
-        height: 3px; /* Height of your icon */
-        background-color: orange; /* Change to your desired color */
-        position: relative;
-        transition: all 0.3s; /* Optional: add some transition */
+.search-icon-container {
+    cursor: pointer;
+    background-color: white;
+}
+
+.bi-plus-square {
+    margin-top: 0.2rem;
+    margin-left: 0.8rem;
+}
+
+
+.button-text {
+    font-size: 0.8rem;
+}
+
+.category-label {
+    font-size: 0.8rem;
+}
+
+
+.category-button-radius {
+    border-radius: 4px;
+    font-size: 0.8rem;
+    width: 4rem;
+    padding: 1px;
+}
+
+/* Remove default list styles from ul */
+#category-buttons {
+    list-style: none; /* Remove bullets */
+    padding-left: 0; /* Remove default padding */
+    user-select: none;
+}
+
+
+    #category-buttons li {
+        display: inline; /* Ensure the buttons are inline */
     }
 
+    #category-buttons button {
+        font-size: 0.7rem;
+    }
+
+/* Optional styling for category buttons */
+.category-button {
+    margin-left: 10px;
+}
 
 
+.title-sm {
+    margin-left: 0;
+}
+
+.checkAll-box {
+    user-select: none;
+    font-size: 0.84rem;
+}
+
+#uploadButton, #selectAllButton, #deleteCardButton {
+    font-size: 0.8rem;
+    background-color: white !important;
+    color: gray;
+}
+
+#deleteCardButton {
+    color: gray;
+}
+
+.checkAll-box:hover, #uploadButton:hover, .deleteCardButtonHover:hover {
+    color: white !important;
+}
+
+#uploadButton:hover, .checkAll-box:hover, #deleteCardButton:hover {
+    background-color: #fd7e14 !important;
+}
+
+#deleteCardButton:disabled {
+    background-color: white !important;
+    color: gray !important;
+    cursor: default !important;
+}
+
+    #deleteCardButton:disabled:hover {
+        background-color: white !important;
+        pointer-events: none;
+    }
+
+.checkAll-box label {
+    cursor: pointer;
+}

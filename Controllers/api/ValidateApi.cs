@@ -1,6 +1,6 @@
-﻿using InventorySystem.Data;
-using InventorySystem.Models.Accounts;
+﻿using InventorySystem.Models.Accounts;
 using InventorySystem.Models.DataEntities;
+using InventorySystem.Models.Responses;
 using InventorySystem.Utilities;
 using InventorySystem.Utilities.Api;
 using Microsoft.AspNetCore.Authentication;
@@ -13,10 +13,8 @@ namespace InventorySystem.Controllers.api
     [Authorize]
     [Route("api/u/validate/")]
     [ApiController]
-    public class ValidateApi(ILogger<ValidateApi> logger, ApplicationDbContext context) : ControllerBase
+    public class ValidateApi : ControllerBase
     {
-        private readonly ILogger<ValidateApi> _logger = logger;
-        private readonly ApplicationDbContext _context = context;
 
         [AllowAnonymous]
         [HttpPost("login")]
@@ -39,7 +37,7 @@ namespace InventorySystem.Controllers.api
             else
             {
                 var redirectUrl = Url.Action("GetUser", "AuthApi");
-                var message = "Validation Successful. Redirecting...";
+                var message = "Redirecting...";
 
                 #region --Console Logger--
                 Console.WriteLine(Messages.PrintUrl(redirectUrl));
@@ -69,7 +67,7 @@ namespace InventorySystem.Controllers.api
             else
             {
                 var redirectUrl = Url.Action("CreateNewAccount", "RegisterApi");
-                var message = "Validation Successful. Redirecting...";
+                var message = "Redirecting...";
 
                 #region --Console Logger--
                 Console.WriteLine(Messages.PrintUrl(redirectUrl));
@@ -166,7 +164,7 @@ namespace InventorySystem.Controllers.api
             {
                 var redirectUrl = Url.Action("RemoveConfirm", "ServicesApi", new { id }, Request.Scheme);
 
-                message = "Validation Successful. Redirecting...";
+                message = "Redirecting...";
                 var response = ApiResponseUtils.SuccessResponse(id!, message, redirectUrl!);
                 return await Task.FromResult(StatusCode(StatusCodes.Status202Accepted, response));
             }
@@ -175,6 +173,46 @@ namespace InventorySystem.Controllers.api
                 Console.WriteLine(ex);
                 message = "An unknown error occurred.";
                 var response = ApiResponseUtils.ErrorResponse(null!, message);
+                return await Task.FromResult(StatusCode(Status500, response));
+            }
+        }
+
+        [HttpPost("remove-multiple-item/{id?}")]
+        public async Task<IActionResult> DeleteMultipleItem([FromBody] int[]? ids)
+        {
+            string message = "";
+            //int Status404 = StatusCodes.Status404NotFound;
+            int Status500 = StatusCodes.Status500InternalServerError;
+            ApiResponse response;
+            try
+            {
+                // Check if any IDs were provided
+                if (ids == null || ids.Length == 0)
+                {
+                    message = "No IDs provided for deletion.";
+                    response = ApiResponseUtils.ErrorResponse(null!, message);
+                    return await Task.FromResult(StatusCode(StatusCodes.Status400BadRequest, response));
+                }
+
+                // Here you would typically handle the deletion of items with the provided IDs
+                foreach (var id in ids)
+                {
+                    // Call your deletion logic here for each id
+                    Console.WriteLine($"Deleting item with ID: {id}");
+                    // Example: await _yourService.DeleteItemAsync(id);
+                }
+
+                var redirectUrl = Url.Action("MultipleRemoveConfirm", "ServicesApi", new { ids }, Request.Scheme);
+
+                message = "Redirecting...";
+                response = ApiResponseUtils.SuccessResponse(ids!, message, redirectUrl!);
+                return await Task.FromResult(StatusCode(StatusCodes.Status202Accepted, response));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                message = "An unknown error occurred.";
+                response = ApiResponseUtils.ErrorResponse(null!, message);
                 return await Task.FromResult(StatusCode(Status500, response));
             }
         }

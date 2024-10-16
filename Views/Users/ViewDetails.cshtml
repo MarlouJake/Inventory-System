@@ -3,7 +3,8 @@
 
 @{
     ViewData["Title"] = "User Details";
-    string catergoryFromModel = ViewBag.Category;
+    string categoryFromModel = ViewBag.Category;
+    int itemId = ViewBag.ItemId;
     Layout = null;
 }
 <script>
@@ -13,12 +14,46 @@
     });
 
     $(document).ready(function () {
-        var categoryFetched = "@Html.Raw(catergoryFromModel)";
+        var categoryFetched = "@Html.Raw(categoryFromModel)";
         //changeBgBaseOnCategory(baseOnCategory, firmware, status, category)
         changeBgBaseOnCategory(categoryFetched, '#firmware-status', '#item-status', '#item-category');
         changeBgBaseOnCategory(categoryFetched, '#item-status', '#item-status', '#item-category');
+
+        getPartialView(categoryFetched);
     });
 
+
+    function getPartialView(category){
+        let url;
+        switch(category){
+            case 'Robots':
+                url = 'inventory/details/partial_views/has_firmwareview';
+                break;
+            case 'Books':
+            case 'Materials':
+                url = 'inventory/details/partial_views/no_firmwareview';
+                break;
+            default:
+                console.error('Category not  found: ', category);
+                break;
+        }
+
+            fetch(`${url}?id=${@Html.Raw(itemId)}`, {
+               method: 'GET',
+               headers: {
+                   'Content-Type' : 'text/html',                    
+               }
+        }).then(response => {
+            if(!response.ok){
+               throw new Error('Network response was not ok');
+            }
+            return response.text();
+        }).then(data => {
+                   $('#ViewBaseOnCategory').html(data);
+        }).catch(error => {
+               connsole.error('There was a problem with the fetch operation:', error);
+        });
+    }
 </script>
 
 <style>
@@ -54,15 +89,16 @@
         font-size: 0.8rem;
     }
 
+    #deleteButtonView i{
+        font-size: 0.8rem;
+    }
+
 </style>
 
 <h5 class="pt-2 d-flex">
     <strong class="pt-1">Item Details</strong>
-    <a class="ms-auto fs-5 btn btn-danger d-inline-flex" id="deleteButton" onclick="ModalShow('dashboard/remove/@Model.ItemId')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash text-light" viewBox="0 0 16 16">
-            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
-            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
-        </svg>
+    <a class="ms-auto fs-5 btn btn-danger d-inline-flex" id="deleteButtonView" onclick="ModalShow('inventory/remove/@Model.ItemId')">
+        <i class="fa-solid fa-trash-can"></i>
     </a>
 </h5>
 
@@ -72,7 +108,7 @@
     <dl class="mb-0">
 
         <div class="d-flex" style="font-size: 0.9rem;">
-            @if (catergoryFromModel == "Books")
+            @if (categoryFromModel == "Books")
             {
                 <dt class="d-flex col-sm-2 w-50">
                     @Html.DisplayName("ISBN")
@@ -125,20 +161,13 @@
     </dl>
 
     <div id="ViewBaseOnCategory">
-        @if (Model.Category == "Robots")
-        {
-            @await Html.PartialAsync("~/Views/Users/components/HasFirmwareView.cshtml")
-        }
-        else
-        {
-            @await Html.PartialAsync("~/Views/Users/components/NoFirmwareView.cshtml")
-        }
+        
     </div>
 
 
 
 </div>
 <div class="form-group m-0 d-flex">
-    <a onclick="ModalShow(`dashboard/modify/@Model.ItemId`)" class="btn btn-sm w-25 btn-success ms-auto">Modify</a>
+    <a onclick="ModalShow(`inventory/modify/@Model.ItemId`)" class="btn btn-sm w-25 btn-success ms-auto">Modify</a>
     <input type="button" value="Cancel" class="ms-2 btn btn-sm w-25 btn-outline-secondary" data-bs-dismiss="modal" />
 </div>

@@ -4,9 +4,39 @@
 <script>
     
     $(document).ready(function () {
+        
+        /*
+        $('.card').each(function () {
+            $(this).on('click', function () {
+                const itemId = $(this).data('item-id');
+                ModalShow('dashboard/details/'+itemId);
+                
+            });
+        });
+        */
         changeBackground(); 
         changeDisplayName();
+        
+        
+        
     });
+
+    function checkResponse(response){
+        if (response.IsValid) {
+            if (response.RedirectUrl) {
+                RemoveItem(response.RedirectUrl, deleteid);
+            }
+            else {
+                var details = "Route sent by the server missing.";
+                ShowError(details);
+            }
+        }
+        else {
+            console.log("Response Invalid: ", response);
+            ShowError("Response invalid");
+        }
+    
+    }
 
     function changeDisplayName(){
 
@@ -76,13 +106,21 @@
         });
     }
 
-    
+     $('.delete-checkbox ').on('change', function () {
+            resetCheckState();
+        });
 </script>
 
-<div class="card">
-   
-    <div class="card-body">
-        <h6 class="card-title mb-1 fs-6"><strong>@Model.ItemName</strong></h6>
+<div class="card position-relative" data-item-id="@Model.ItemId" data-item-name="@Model.ItemName"
+    data-item-code="@Model.ItemCode" data-item-category="@Model.Category" data-item-status="@Model.Status"> 
+
+    <div class="d-none checkboxes-container">
+        <input class="delete-checkbox position-absolute mt-2 me-2" type="checkbox" style="top: 0; right: 0;" />
+    </div>
+    <div class="card-body mt-0">
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="card-title mb-1 fs-6"><strong>@Model.ItemName</strong></h6>
+        </div>
         <p class="card-text mb-1">
             <span hidden class="d-none catergoryValue">@Model.Category</span>
             <strong class="displayName"></strong>
@@ -92,11 +130,12 @@
             <span class="card-status d-none">@Model.Status</span>
             <span class="display-status ps-1 pe-1 mb-0"></span>
         </p>
-    </div>
-    <div class="card-footer mt-0">
-        <a onclick="ModalShow('dashboard/details/@Model.ItemId')"
-           class="btn btn-crud btn-sm  mt-0 form-control text-light">
-            View
+
+        <a onclick="ModalShow('inventory/details/@Model.ItemId')" 
+           class="btn btn-crud btn-sm mt-2 form-control text-light">
+           View
         </a>
     </div>
 </div>
+
+

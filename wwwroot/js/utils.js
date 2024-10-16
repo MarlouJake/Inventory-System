@@ -192,6 +192,105 @@ function ShowPassword(input, main, icon) {
     });
 }
 
+let isFired = false;
+
+async function resetCheckState() {
+    if (isFired) return; // Prevent re-entrant calls
+
+    isFired = true;
+
+    let deleteCard = $('#deleteCardButton');
+    let checkBoxes = $('.checkboxes-container, .selectAllItems');
+
+    if ($('#selectAllCheckBox').is(':checked')) {
+        deleteCard.prop('disabled', false);
+        deleteCard.addClass('deleteCardButtonHover text-orange');
+        checkBoxes.removeClass('d-none');
+    } else {
+        deleteCard.prop('disabled', true);
+        deleteCard.css('color', 'gray');
+        deleteCard.removeClass('deleteCardButtonHover text-orange');
+        checkBoxes.addClass('d-none');
+        await removeChecks(); // Marked as await since it might involve async operations
+    }
+
+    isFired = false;
+}
+
+async function checkAll() {
+    let selectAll = $('#selectAllItems').is(':checked');
+    $('.delete-checkbox').each(function () {
+        $(this).prop('checked', selectAll);
+        $(this).trigger('change');
+    });
+    await countCheck(); // Marked as await since it might involve async operations
+}
+
+let isInit = false;
+
+async function countCheck() {
+    if (isInit) return; // Prevent re-entrant calls
+
+    isInit = true;
+
+    let selectAll = $('#selectAllItems');
+    let checkBoxes = $('.delete-checkbox:checked');
+    let totalCheckBox = $('.delete-checkbox').length;
+
+    selectAll.prop('checked', checkBoxes.length < totalCheckBox);
+    selectAll.trigger('change');
+
+    isInit = false;
+}
+
+async function removeChecks() {
+    $('.delete-checkbox').each(function () {
+        $(this).prop('checked', false).trigger('change');
+    });
+
+    $('#selectAllItems, #selectAllCheckBox').prop('checked', false).trigger('change');
+}
+
+async function checkState(selector) {
+    let checkBox = $(selector);
+    checkBox.prop('checked', !checkBox.is(':checked'));
+    checkBox.trigger('change');
+}
+
+// Example of async handling that might be added in future enhancements
+async function simulateAsyncOperation() {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            console.log('Async operation completed.');
+            resolve();
+        }, 1000); // Simulating a delay
+    });
+}
+
+
+
+
+/*
+function saveCheckboxState() {
+    $('.delete-button').each(function () {
+        let itemId = $(this).data('id');
+        checkboxStates[itemId] = $(this).is(':checked');
+    });
+}
+
+function restoreCheckboxStates() {
+    $('.delete-checkbox').each(function () {
+        let itemId = $(this).data('id');
+        if (checkboxStates[itemId]) {
+            $(this).prop('checked', true);
+        } else {
+            $(this).prop('checked', false);
+        }
+    });
+}
+*/
+
+
 
 
 //initialize Validation Function

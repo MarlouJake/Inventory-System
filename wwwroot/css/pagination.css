@@ -4,10 +4,8 @@
     width: 100%; /* Make sure the container is full width */
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
-    padding-bottom: 0.8rem;
     margin-bottom: 0;
+    padding-bottom: 0.8rem;
     z-index: 1000;
     background-color: rgba(52, 58, 64, 0.7);
     backdrop-filter: blur(60%);
@@ -43,8 +41,4 @@
     }
 
 
-@media (min-width: 891px) {
-    .pagination {
-        margin-left: 6rem; /* Space for the sidebar */
-    }
-}
+

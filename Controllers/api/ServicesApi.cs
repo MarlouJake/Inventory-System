@@ -96,7 +96,7 @@ namespace InventorySystem.Controllers.api
 
 
                 redirectTo = "dashboard/item-view/all";
-                message = "Added successfully";
+                message = "Add successful";
 
                 Console.WriteLine($"Inserted data: {JsonConvert.SerializeObject(model)}");
                 Console.WriteLine(message);
@@ -109,7 +109,7 @@ namespace InventorySystem.Controllers.api
             }
             catch (MySqlException sqlEx)
             {
-                message = "An error occurred while connecting to the MySQL database.";
+                message = "An error occurred while connecting to the database.";
 
                 #region --Console Logger--
                 Console.Error.WriteLine($"\nMySQL Exception Caught: {sqlEx}\n");
@@ -198,7 +198,7 @@ namespace InventorySystem.Controllers.api
                     .ToListAsync();
 
                 redirectTo = "dashboard/item-view/all";
-                message = "Updated successfully";
+                message = "Update successful";
                 Console.WriteLine(message);
                 Console.WriteLine("URL: {0}", redirectTo);
                 Console.WriteLine("User ID Claim: {0}", userId);
@@ -208,7 +208,7 @@ namespace InventorySystem.Controllers.api
             }
             catch (MySqlException sqlEx)
             {
-                message = "An error occurred while connecting to the MySQL database.";
+                message = "An error occurred while connecting to the database.";
 
                 #region --Console Logger--
                 Console.Clear();
@@ -235,9 +235,9 @@ namespace InventorySystem.Controllers.api
 
 
 #pragma warning disable ASP0018 // Unused route parameter
-        [HttpDelete("remove-confirm/{id?}")]
+        [HttpDelete("remove-confirm-multiple/{id?}")]
 #pragma warning restore ASP0018 // Unused route parameter
-        public async Task<IActionResult> RemoveConfirm([FromBody] int? id)
+        public async Task<IActionResult> MultipleRemoveConfirm([FromBody] int[]? ids)
         {
 
             int Status404 = StatusCodes.Status404NotFound;
@@ -245,36 +245,47 @@ namespace InventorySystem.Controllers.api
 
             try
             {
-                var item = await _context.Items.FindAsync(id);
-                if (item == null)
+                // Check if any IDs were provided
+                if (ids == null || ids.Length == 0)
                 {
-                    message = "Item doesn't exist";
+                    message = "No IDs provided for deletion.";
                     response = ApiResponseUtils.CustomResponse(false, message, null);
-                    Console.WriteLine(message);
                     return await Task.FromResult(StatusCode(Status404, response));
                 }
 
 
-                _context.Items.Remove(item);
+                foreach (var id in ids)
+                {
+                    var item = await _context.Items.FindAsync(id);
+                    if (item == null)
+                    {
+                        message = $"Item with ID {id} doesn't exist";
+                        Console.WriteLine(message);
+                        continue;
+                    }
+                    Console.WriteLine("Selected id: {0}", id);
+                    _context.Items.Remove(item);
+                }
+
                 await _context.SaveChangesAsync();
 
                 var items = await _context.Items
                         .Where(i => i.UserId == userId)
                         .ToListAsync();
 
-                redirectTo = "dashboard/item-view/all";
-                message = "Deleted successfully";
+                string redirectTo = "dashboard/item-view/all";
+                message = "Delete successful";
 
                 Console.WriteLine(message);
                 Console.WriteLine("URL: {0}", redirectTo);
-                Console.WriteLine("User ID recieved: {0}", userId);
+                Console.WriteLine("User ID received: {0}", userId);
 
                 response = ApiResponseUtils.SuccessResponse(null!, message, redirectTo);
                 return StatusCode(StatusCodes.Status200OK, response);
             }
             catch (MySqlException sqlEx)
             {
-                message = "An error occurred while connecting to the MySQL database.";
+                message = "An error occurred while connecting to the database.";
                 Console.Error.WriteLine($"\nMySQL Exception Caught: {sqlEx}\n");
 
                 response = ApiResponseUtils.CustomResponse(false, message, null);

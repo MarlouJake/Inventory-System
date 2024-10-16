@@ -108,7 +108,7 @@
                     `/add/${itemdata.id}`
                 );
 
-                // Log the result for debugging
+         
                 console.log("Request Error: ", JSON.stringify(result, null, 2));
                 ShowError(details);
  
@@ -124,7 +124,7 @@
         ShowError(ex);
     }
 
-    return false; // Prevent default form submission
+    return false; 
 };
 
 AddItem = (data, url) => {
@@ -176,11 +176,11 @@ AddItem = (data, url) => {
                 // Extract the status message
                 var statusMessage = jqXHR.statusText || 'Unknown Error';
 
-                // Construct the full error message
+      
                 var responsemessage = `Server responded with status code: ${jqXHR.status} ${textStatus}.`;
                 var details = responsemessage;
 
-                // Build the result object (assuming jsonResult is a function that handles this)
+  
                 let result = jsonResult(
                     type,
                     add,
@@ -195,7 +195,7 @@ AddItem = (data, url) => {
                     `/dashboard/${data.itemid}`
                 );
 
-                // Log the result for debugging
+                
                 console.log("Request Error: ", JSON.stringify(result, null, 2));
                 //ShowError(details);
 
@@ -240,49 +240,6 @@ AddItem = (data, url) => {
 };
 
 
-function ValidateInput(data) {
-    $('#itemCode-error').text('');
-    $('#itemName-error').text('');
-    $('#statusDropdown-error').text('');
-    $('#updateDropdown-error').text('');
-    $('.form-control').removeClass('input-error').addClass('input-success');
-
-    let isValid = true;
-
-    if (!data.itemcode || data.itemcode.trim() === '') {
-        $('#itemCode').addClass('input-error');
-        $('#itemCode-error').text('Item code is required');
-        isValid = false;
-    } else if(data.itemcode.length < 3){
-        $('#itemCode').addClass('input-error');
-        $('#itemCode-error').text('Item code is should be atleast 3 characters');
-        isValid = false;
-    } else if (data.itemcode.length > 20) {
-        $('#itemCode').addClass('input-error');
-        $('#itemCode-error').text('Item code should not exceed 20 characters');
-        isValid = false;
-    }
-
-    if (!data.itemname || data.itemname.trim() === '') {
-        $('#itemName').addClass('input-error');
-        $('#itemName-error').text('Item name is required');
-        isValid = false;
-    } else if (data.itemname.length < 3) {
-        $('#itemName').addClass('input-error');
-        $('#itemName-error').text('Item name is should be atleast 3 characters');
-        isValid = false;
-    } else if (data.itemname.length > 20) {
-        $('#itemName').addClass('input-error');
-        $('#itemName-error').text('Item name should not exceed characters');
-        isValid = false;
-    }
-
-    if (!isValid) {
-        console.log('Validation errors');
-    }
-
-    return isValid;
-}
 
 UpdateRequest = (form) => {
     const formData = new FormData(form);
@@ -374,7 +331,7 @@ ModifyItem = (data, url, dataid) => {
                     } else {
                         loadItemsByCategory(activeCategory, currentPage);
                     }
-
+                    
                 }
                 else {
                     console.error('An error occured while updating item:' + response.Message);
@@ -392,11 +349,9 @@ ModifyItem = (data, url, dataid) => {
                 // Extract the status message
                 var statusMessage = jqXHR.statusText || 'Unknown Error';
 
-                // Construct the full error message
                 var responsemessage = `Server responded with status code: ${jqXHR.status} ${textStatus}.`;
                 var details = responsemessage;
 
-                // Build the result object (assuming jsonResult is a function that handles this)
                 let result = jsonResult(
                     'PUT',
                     'update',
@@ -411,7 +366,6 @@ ModifyItem = (data, url, dataid) => {
                     `/modify/${dataid}`
                 );
 
-                // Log the result for debugging
                 console.log("Request Error: ", JSON.stringify(result, null, 2));
                 
 
@@ -435,6 +389,7 @@ ModifyItem = (data, url, dataid) => {
     return false;
 }
 
+/*
 DeleteRequest = (form) => {
     var deleteid = parseInt($('#delete-id').val(), 10);
    
@@ -517,7 +472,7 @@ RemoveItem = (url, id) => {
                     //loadPage(currentPage);
 
                     if ($('#searchbar').val() !== "") {
-                        loadItems($('#searchbar').val(), activeCategory, currentPage); // Load items based on search term
+                        loadItems($('#searchbar').val(), activeCategory, currentPage); 
                     } else {
                         loadItemsByCategory(activeCategory, currentPage);
                     }
@@ -545,4 +500,125 @@ RemoveItem = (url, id) => {
     }
     return false;
 };
+*/
 
+function DeleteRequest(itemIds) {
+    $.ajax({
+        url: '/api/u/validate/remove-multiple-item',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(itemIds), 
+        success: function (response) {
+
+            if (response.IsValid) {
+                if (response.RedirectUrl) {
+                    RemoveConfirm(response.RedirectUrl, itemIds);
+                }
+                else {
+                    var details = "Route sent by the server missing.";
+                    ShowError(details);
+                }
+            }
+            else {
+                console.log("Response Invalid: ", response);
+                ShowError("Response invalid");
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Error: ", jqXHR.status, textStatus, errorThrown);
+            ShowError(jqXHR.status);
+        },
+        fail: function (jqXHR) {
+            console.error("Error: ", jqXHR.status);
+            ShowError(jqXHR.status);
+        }
+
+    });
+}
+
+function RemoveConfirm(url, itemIds) {
+    let activeCategory = $('.ctg-selected').data('string');
+    $.ajax({
+        url: url,
+        type: 'DELETE',
+        contentType: 'application/json',
+        data: JSON.stringify(itemIds),
+        success: function (response, textStatus, jqXHR) {
+            var status = `Status Code: ${jqXHR.status}`;
+            var details = `Server responded with status code: ${jqXHR.status} ${textStatus}`;
+
+            if (response.IsValid) {
+
+                $("#dynamic-modal").modal('hide');
+
+                $("#message-success").text(response.Message).fadeIn().delay(500).fadeOut();
+
+                checkState('selectAllCheckBox');
+
+                if ($('#searchbar').val() !== "") {
+                    loadItems($('#searchbar').val(), activeCategory, currentPage); // Load items based on search term
+                } else {
+                    loadItemsByCategory(activeCategory, currentPage);
+                }
+              
+            }
+            else {
+                console.error('An error occured while removing item:' + response.Message);
+                var details = "Failed to remove item, try again";
+                ShowError(details);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Error: ", jqXHR.status, textStatus, errorThrown);
+            ShowError(jqXHR.status);
+        },
+        fail: function (jqXHR) {
+            console.error("Error: ", jqXHR.status);
+            ShowError(jqXHR.status);
+        }
+    });
+}
+
+function ValidateInput(data) {
+    $('#itemCode-error').text('');
+    $('#itemName-error').text('');
+    $('#statusDropdown-error').text('');
+    $('#updateDropdown-error').text('');
+    $('.form-control').removeClass('input-error').addClass('input-success');
+
+    let isValid = true;
+
+    if (!data.itemcode || data.itemcode.trim() === '') {
+        $('#itemCode').addClass('input-error');
+        $('#itemCode-error').text('Item code is required');
+        isValid = false;
+    } else if (data.itemcode.length < 3) {
+        $('#itemCode').addClass('input-error');
+        $('#itemCode-error').text('Item code is should be atleast 3 characters');
+        isValid = false;
+    } else if (data.itemcode.length > 20) {
+        $('#itemCode').addClass('input-error');
+        $('#itemCode-error').text('Item code should not exceed 20 characters');
+        isValid = false;
+    }
+
+    if (!data.itemname || data.itemname.trim() === '') {
+        $('#itemName').addClass('input-error');
+        $('#itemName-error').text('Item name is required');
+        isValid = false;
+    } else if (data.itemname.length < 3) {
+        $('#itemName').addClass('input-error');
+        $('#itemName-error').text('Item name is should be atleast 3 characters');
+        isValid = false;
+    } else if (data.itemname.length > 20) {
+        $('#itemName').addClass('input-error');
+        $('#itemName-error').text('Item name should not exceed characters');
+        isValid = false;
+    }
+
+    if (!isValid) {
+        console.log('Validation errors');
+    }
+
+    return isValid;
+}

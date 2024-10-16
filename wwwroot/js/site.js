@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //UserLogoutAction();
     DisplaySuccessAndError();
 
-  
+    
 });
 
 function getScreenSize() {
@@ -188,3 +188,19 @@ window.addEventListener('offline', checkInternetConnection);
 
 
 
+function toggleSidebar(){
+    console.log('Show Sidebar');
+}
+
+function updateCharCount(inputField, outputElement) {
+    const currentLength = inputField.value.length;
+    outputElement.textContent = currentLength;
+}
+
+function addBorderClass(outputElement) {
+    outputElement.classList.add('outline-orange');
+}
+
+function removeBorderClass(outputElement) {
+    outputElement.classList.remove('outline-orange');
+}

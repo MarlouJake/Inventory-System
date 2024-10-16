@@ -8,30 +8,76 @@
         display: block;
     }
 </style>
+
+
 <script>
+    var comp = `
+                    <i class="bi bi-filetype-csv fs-4 text-orange"></i>
+                    <span>
+                        <i class="fa fa-upload" aria-hidden="true"> </i>
+                        Choose file
+                    </span>
+    
+    `;
+
     $('#fileUpload').on('change', function () {
-        var fileName = this.files[0] ? this.files[0].name : "Choose file";
+
+        var fileName = this.files[0] ? this.files[0].name : comp;
+
+        
         $('#uploadLabel').html(fileName);
         $('#importButton').prop('disabled', false);
+
+        if (this.files[0]) {
+            $('#removeFile').show();
+        } else {
+            $('#removeFile').hide();
+        }
+
+    });
+
+    $('#removeFile').on('click', function () {
+        $('#fileUpload').val('');
+        $('#uploadLabel').html(comp);
+        $('#importButton').prop('disabled', true); 
+        $('#removeFile').hide();
     });
 
     $(document).ready(function(){
         $('#importButton').prop('disabled', true);
+        $('#removeFile').hide();
     });
  
 </script>
 
+<style>
+
+    #removeFile{
+        cursor: pointer;
+    }
+
+</style>
+
 <h5>Import CSV File</h5>
 
-<div class="input-group">
-    <div class="text-center text-orange input-file outline-orange p-4 w-100">
-        <div>  <i class="fa fa-upload" aria-hidden="true"> </i></div>
-        <input type="file" name="fileUpload" id="fileUpload" accept=".csv" hidden />
-        <label for="fileUpload" id="uploadLabel" class="text-center">Choose File</label>
+<div class="input-group d-flex border border-1 p-4 rounded">
+    <div class="text-center  input-file outline-orange rounded w-100 p-0">
+        <input type="file" name="fileUpload" id="fileUpload"accept=".csv" hidden />
+        <div id="uploadContent" class="d-flex align-items-center justify-content-center gap-1 h-100">
+            <label for="fileUpload" id="uploadLabel" class="text-center text-muted d-flex w-100 h-100 flex-column p-2">               
+                <i class="bi bi-filetype-csv fs-4 text-orange"></i>
+                <span>
+                    <i class="fa fa-upload" aria-hidden="true"> </i>
+                    Choose file
+                </span>
+            </label>
+            <i class="bi bi-backspace-fill text-danger me-2" id="removeFile" title="Remove"></i>
+         
+        </div>
     </div>
 </div>
 
-<div class="d-flex mt-2 gap-2">
+<div class="d-flex mt-3 gap-2">
     <button class="ms-auto btn btn-sm bgc-orange outline-orange" id="importButton">
         Import
     </button>

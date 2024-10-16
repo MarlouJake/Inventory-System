@@ -4,26 +4,26 @@
 
 @{
     ViewData["Title"] = "Items View";
-    //Layout = null;
-    int count = 0; // Initialize a counter to track the number of items rendered
+    Layout = null;
+    int count = 0; 
     var CurrentUsername = ViewBag.Username as string;
     var CurrentUserid = ViewBag.UserId as int?;
     var message = ViewBag.SuccessMessage as string;
-    var currentPage = Model.CurrentPage; // Store the current page number for use in JavaScript
-    var totalPages = Model.TotalPages; // Store total pages for use in JavaScript
+    var currentPage = Model.CurrentPage;
+    var totalPages = Model.TotalPages; 
     var pageSize = ViewBag.PageSize;
     var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
     var storedClaim = int.Parse(userIdClaim!);
 
     <!--Page Number Button -->
-    // Define range for the pagination buttons to display around the current page
-    int startPage = Math.Max(1, Model.CurrentPage - 2); // Start 2 pages before current page
-    int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2); // End 2 pages after current page
+
+    int startPage = Math.Max(1, Model.CurrentPage - 2); 
+    int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
 
     // Ensure 5 page buttons at most
     if (endPage - startPage + 1 < 3)
     {
-        // Adjust startPage or endPage to maintain 5 buttons, as long as we're within bounds
+     
         if (startPage > 1)
             startPage = Math.Max(1, endPage - 4);
         else if (endPage < Model.TotalPages)
@@ -32,21 +32,18 @@
 }
 
 <script>
-
-    var pagesize = '@Html.Raw(pageSize)';
     var currentPage = '@Html.Raw(currentPage)';
-    var totalPages = '@Html.Raw(totalPages)';  
     var pageItem = $('.pagination .page-item');
-
+    var checkboxStates = {};
     function handlePaginationUpdate() {
         // handles item overflow due to pagination
         // Reload the item list for the current page to include the new item
         $.ajax({
             type: 'GET',
-            url: '@Url.Action("ItemViewAll", "Users", new { username = ViewBag.Username, page = currentPage + 1 })', // Load the next page
+            url: '@Url.Action("ItemView", "Users", new { username = ViewBag.Username, page = @currentPage + 1 })', // Load the next page
             success: function (response) {
                 $('#view-all .card-container').html(response); // Update the current items with new data
-                currentPage += 1; // Increment the page number
+               
             }
         });
     }
@@ -61,81 +58,62 @@
     // lastButton
 
     $(document).ready(function(){
-       
+      
+        $('#firstButton, #previousButton, #jumpBackButton, #jumpForwardButton, #nextButton, #lastButton').on('click', function() {
+            let category = $('.ctg-selected').data('string');
+            let itemCode = $('#searchbar').val().trim();
+            let page;
+
+            switch (this.id) { 
+                case 'firstButton':
+                    page = 1;
+                    break;
+                case 'previousButton':
+                    page = @currentPage - 1; 
+                    break;
+                case 'jumpBackButton':
+                    page = @startPage - 1;
+                    break;
+                case 'jumpForwardButton':
+                    page = @endPage + 1;
+                    break;
+                case 'nextButton':
+                    page =  @currentPage + 1;
+                    break;
+                case 'lastButton':
+                    page = @totalPages;
+                    break;
+                default:
+                    return;
+            }
         
-        $('#firstButton').on('click', function(){
-            let category = $('.ctg-selected').data('string');
-            let itemCode = $('#searchbar').val().trim();
-            if(itemCode === ''){
-                loadItemsByCategory(category, 1);
-            } else{
-                loadItems(itemCode, category, 1);
-            }
-             
-        });
-
-        $('#previousButton').on('click', function () {
-            let category = $('.ctg-selected').data('string');
-            let itemCode = $('#searchbar').val().trim();
             if (itemCode === '') {
-                loadItemsByCategory(category, (currentPage - 1));
+                loadItemsByCategory(category, page);
             } else {
-                loadItems(itemCode, category, (currentPage - 1));
+                loadItems(itemCode, category, page);
             }
+          
         });
 
-        $('#jumpBackButton').on('click', function () {
-            let category = $('.ctg-selected').data('string');
-            let itemCode = $('#searchbar').val().trim();
-            if (itemCode === '') {
-                loadItemsByCategory(category, (@startPage - 1));
-            } else {
-                loadItems(itemCode, category, (@startPage - 1));
-            }
+
+        $('.page-link').on('click', function(){
+            $('#selectAllCheckBox').prop('checked', false);
+
+            $('#selectAllCheckBox').trigger('change');
+            removeChecks();
+        });
+        
+        $('#selectAllCheckBox').on('change', function () {
+            resetCheckState();
         });
 
-        $('#jumpForwardButton').on('click', function () {
-            let category = $('.ctg-selected').data('string');
-            let itemCode = $('#searchbar').val().trim();
-            if (itemCode === '') {
-                loadItemsByCategory(category, (@endPage + 1));
-            } else {
-                loadItems(itemCode, category, (@endPage + 1));
-            }
-        });
-
-        $('#nextButton').on('click', function () {
-            let category = $('.ctg-selected').data('string');
-            let itemCode = $('#searchbar').val().trim();
-            if (itemCode === '') {
-                loadItemsByCategory(category, (currentPage + 1));
-            } else {
-                loadItems(itemCode, category, (currentPage + 1));
-            }
-        });
-
-        $('#lastButton').on('click', function () {
-            let category = $('.ctg-selected').data('string');
-            let itemCode = $('#searchbar').val().trim();
-            if (itemCode === '') {
-                loadItemsByCategory(category, totalPages);
-            } else {
-                loadItems(itemCode, category, totalPages);
-            }
-        });
-
+        
+ 
     });
 
-    function loadPageByNumber(pageNumber) {
-        let category = $('.ctg-selected').data('string');
-        let itemCode = $('#searchbar').val().trim();
-        if (itemCode === '') {
-            loadItemsByCategory(category, pageNumber);
-        } else {
-            loadItems(itemCode, category, pageNumber);
-        }
-    }
-   
+    
+
+    
 </script>
 
 <style>
@@ -207,7 +185,7 @@
             @for (var i = startPage; i <= endPage; i++)
             {
                 <li class="page-item ms-2 @(i == Model.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="javascript:void(0);" id="pageNumberButton" onclick="loadPageByNumber(@i)">@i</a>
+                    <a class="page-link" href="javascript:void(0);" id="pageNumberButton" onclick="loadPageByNumber(@i, @currentPage)">@i</a>
                 </li>
             }
 
