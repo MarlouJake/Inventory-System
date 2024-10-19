@@ -40,7 +40,7 @@
         // Reload the item list for the current page to include the new item
         $.ajax({
             type: 'GET',
-            url: '@Url.Action("ItemView", "Users", new { username = ViewBag.Username, page = @currentPage + 1 })', // Load the next page
+            url: '@Url.Action("ItemsView", "Users", new { username = ViewBag.Username, page = @currentPage + 1 })', // Load the next page
             success: function (response) {
                 $('#view-all .card-container').html(response); // Update the current items with new data
                
@@ -58,7 +58,8 @@
     // lastButton
 
     $(document).ready(function(){
-      
+        var itemcode = $('#searchbar').val().trim();
+
         $('#firstButton, #previousButton, #jumpBackButton, #jumpForwardButton, #nextButton, #lastButton').on('click', function() {
             let category = $('.ctg-selected').data('string');
             let itemCode = $('#searchbar').val().trim();
@@ -87,11 +88,7 @@
                     return;
             }
         
-            if (itemCode === '') {
-                loadItemsByCategory(category, page);
-            } else {
-                loadItems(itemCode, category, page);
-            }
+            loadItemsByCategory(itemcode, category, page);
           
         });
 
@@ -130,13 +127,6 @@
 </style>
 
 <div class="card-container mb-4  w-auto container-fluid">
-    @if (Model.Items == null || !Model.Items.Any())
-    {
-
-        <div class="text-center text-muted ms-5 mt-5 ps-3" style="width: 100vw;">
-            <p class="">No items found</p>
-        </div>
-    }
     @foreach (var item in Model.Items!)
     {
         @if (count >= 24) break;

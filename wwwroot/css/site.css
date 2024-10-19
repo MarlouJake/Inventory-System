@@ -40,6 +40,19 @@ body {
     }
 }
 
+.w-10 {
+    width: 10%;
+}
+
+.w-13 {
+    width: 13%;
+}
+
+
+.w-15 {
+    width: 15%;
+}
+
 .w-60 {
     width: 60%;
 }
@@ -363,7 +376,7 @@ a.navbar-brand {
         grid-template-columns: repeat(7, 1fr); /* Adjust to 7 items per row on medium screens */
     }
 
-    #main-content {
+    #inventory-content {
         padding: 15px;
         overflow-y: auto;
     }
@@ -420,7 +433,7 @@ a.navbar-brand {
         display: block !important;
     }
 
-    #main-content {
+    #inventory-content {
         margin: 0;
         padding: 15px;
     }
@@ -438,7 +451,7 @@ a.navbar-brand {
 
 @media (max-width: 725px) {
 
-    #main-content {
+    #inventory-content {
         padding: 0;
     }
 
@@ -558,7 +571,6 @@ a.navbar-brand {
         font-size: 0.7rem;
     }
 
-/* Optional styling for category buttons */
 .category-button {
     margin-left: 10px;
 }
@@ -568,7 +580,7 @@ a.navbar-brand {
     margin-left: 0;
 }
 
-.checkAll-box {
+.inventory-checkbox {
     user-select: none;
     font-size: 0.84rem;
 }
@@ -576,32 +588,29 @@ a.navbar-brand {
 #uploadButton, #selectAllButton, #deleteCardButton {
     font-size: 0.8rem;
     background-color: white !important;
-    color: gray;
 }
+
 
 #deleteCardButton {
-    color: gray;
+    color: red !important;
 }
 
-.checkAll-box:hover, #uploadButton:hover, .deleteCardButtonHover:hover {
-    color: white !important;
-}
+    .inventory-checkbox:hover, #uploadButton:hover, #deleteCardButton:hover {
+        background-color: rgba(236, 236, 236, 1) !important;
+    }
 
-#uploadButton:hover, .checkAll-box:hover, #deleteCardButton:hover {
-    background-color: #fd7e14 !important;
-}
 
-#deleteCardButton:disabled {
-    background-color: white !important;
-    color: gray !important;
-    cursor: default !important;
-}
+    #deleteCardButton:disabled {
+        background-color: white !important;
+        color: gray !important;
+        cursor: default !important;
+    }
 
     #deleteCardButton:disabled:hover {
         background-color: white !important;
         pointer-events: none;
     }
 
-.checkAll-box label {
+.inventory-checkbox label {
     cursor: pointer;
 }

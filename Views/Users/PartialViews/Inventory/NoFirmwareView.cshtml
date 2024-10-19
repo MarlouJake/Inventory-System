@@ -1,6 +1,18 @@
 ﻿@using InventorySystem.Models.DataEntities
 @model Item
 
+
+@{
+    string categoryFromModel = ViewBag.Category;
+}
+
+<script>
+    $(document).ready(function () {
+        var categoryFetched = "@Html.Raw(categoryFromModel)";
+
+        changeBgBaseOnCategory(categoryFetched, '#item-status', '#item-status', '#item-category');
+    });
+</script>
 <div class="d-block mt-1">
 
     <dl class="d-flex mb-0">

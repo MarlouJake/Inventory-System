@@ -1,11 +1,38 @@
 ﻿@using InventorySystem.Models.DataEntities
-@model Item
+@model List<Item>
 
 @{
     ViewData["Title"] = "Delete Confirm";
-    string catergoryFromModel = ViewBag.Category;
     Layout = null;
 }
+<script>
+    $(document).ready(function(){
+        var totalItem = sessionStorage.getItem('deleteLenght');
+        var ids = sessionStorage.getItem('deleteIds');
+        $('#number').text(totalItem);
+        $('#changeWord').text(totalItem > 1 ? 'items' : 'item');
 
+        $('#remove-confirm').on('click', function () {
+            DeleteRequest(JSON.parse(ids));
+            $('#number, #changeWord').text('');
+            sessionStorage.removeItem('deleteIds');
+            sessionStorage.removeItem('deleteLenght');
+        });
+    });
+</script>
 
-Delete
+<h6><strong>Delete Confirmation</strong></h6>
+<hr class="mt-4" />
+
+<div id="delete-items" class="delete-items container-fluid text-center">
+    Delete <strong id="number"></strong> <span id="changeWord"></span>?
+    <br />
+    <p class="mt-2 text-muted" style="font-size: 0.7rem;">Please note that the items selected for deletion will be permanently removed and cannot be recovered. </p>
+</div>
+
+<hr class="mt-4" />
+
+<div class="form-group m-0 d-flex">
+    <input type="submit" id="remove-confirm" value="Confirm" class="ms-auto btn btn-sm btn-danger w-30" />
+    <input type="button" value="Cancel" class="btn btn-sm btn-outline-secondary ms-3 w-25" data-bs-dismiss="modal" />
+</div>

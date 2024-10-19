@@ -73,6 +73,9 @@ namespace InventorySystem.Migrations
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Username")
+                        .HasColumnType("longtext");
+
                     b.HasKey("HistoryId");
 
                     b.HasIndex("ItemId");

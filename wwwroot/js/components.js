@@ -6,14 +6,15 @@ let spinner = `
 
 let overlayDiv = ''
 
-let spinnerContainer = ` <div  class="text-center ms-5 mt-5 " style="width: 100vw;">
+let spinnerContainer = ` <div  class="text-center ms-5 mt-5 ">
                             <p class="ms-1">${spinner} Loading...</p>
                         </div>`;
 
 
-let noItemContainer = ` <div  class="text-center text-muted ms-5 mt-5 ps-3" style="width: 100vw;">
+let noItemContainer = ` <div  class="text-center text-muted ms-5 mt-5 ps-3">
                             <p>No items found</p>
                         </div>`;
+
 let noContent = `<div class="text-nowrap"> <p class="ms-1">No content found</p> </div>`;
 
 let newModal = `

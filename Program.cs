@@ -12,12 +12,12 @@ internal class Program
         // Access configuration from the builder
         var configuration = builder.Configuration;
 
-        // Configure Services
+        //  Services Configuration
         ConfigureServices(builder.Services, configuration);
 
         var app = builder.Build();
 
-        // Configure Middleware
+        // Middleware Configuration
         ConfigureMiddleware(app);
 
         app.Run();
@@ -25,10 +25,10 @@ internal class Program
 
     private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        // Add HTTP Client
+        // HTTP Client
         services.AddHttpClient();
         services.AddControllersWithViews();
-        // Add Controllers with JSON options
+        // Controllers with JSON options
         services.AddControllers()
             .AddJsonOptions(options =>
             {
@@ -37,11 +37,12 @@ internal class Program
             });
 
         services.AddScoped<GetClaims>();
+        services.AddScoped<SeedAddHistory>();
         services.AddScoped<ItemQuery>();
         services.AddScoped<CheckInputs>();
         services.AddScoped<ValidateArrayOfId>();
 
-        // Add CORS policy
+        // CORS policy
         services.AddCors(options =>
         {
             options.AddPolicy("AllowAll",
@@ -53,13 +54,13 @@ internal class Program
                 });
         });
 
-        // Add DbContext with MySQL
+        // DbContext 
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
         );
 
-        // Configure Authentication
+        // Authentication
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
@@ -67,10 +68,10 @@ internal class Program
                 options.AccessDeniedPath = "/access-denied";
             });
 
-        // Configure Authorization
+        // Authorization
         _ = services.AddAuthorization(options =>
         {
-            // Add policies if needed, e.g., for roles
+            //  Policies  e.g., for roles
             options.AddPolicy("RequireAdministratorRole", policy =>
                 policy.RequireRole("Administrator"));
             options.AddPolicy("RequireUserRole", policy =>
@@ -212,6 +213,8 @@ internal class Program
                .RequireAuthorization("RequireUserRole");
 
 
+
+
             //Services route
             _ = endpoints.MapControllerRoute(
               name: "update",
@@ -237,10 +240,9 @@ internal class Program
               defaults: new { controller = "Users", action = "Search" })
               .RequireAuthorization("RequireUserRole");
 
-
             //View routes
             _ = endpoints.MapControllerRoute(
-              name: "viewAll",
+              name: "items",
               pattern: "{roleName}/ims/{username}/inventory/items/uncategorized",
               defaults: new { controller = "Users", action = "ItemsView" })
               .RequireAuthorization("RequireUserRole");
@@ -253,6 +255,7 @@ internal class Program
               .RequireAuthorization("RequireUserRole");
 
 
+   
         });
 
         app.UseDeveloperExceptionPage();

@@ -23,6 +23,9 @@ namespace InventorySystem.Data
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
+            modelBuilder.Entity<User>()
+                .Property(u => u.Username)
+                .UseCollation("utf8mb4_bin");
 
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)

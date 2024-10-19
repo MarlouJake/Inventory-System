@@ -71,7 +71,7 @@ const DataType = [
 
 
 const ActionMessages = [
-    'Updated Successfully', //0
+    'Update Successful', //0
     'Failed To Update', //1
 ];
 

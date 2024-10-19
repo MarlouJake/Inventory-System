@@ -249,7 +249,7 @@ loadContent = function (url) {
     $.ajax({
         url: url,
         type: 'GET',
-        cache: true,
+        cache: false,
         timeout: 10000,
         success: function (response) {
             $('#content-handler').html(response);
@@ -283,10 +283,10 @@ function loadPage(category, pageNumber) {
         url: 'inventory/items/uncategorized',
         type: 'GET',
         timeout: 10000,
-        cache: true,
+        cache: false,
         data: { category: category, page: pageNumber },
         success: function (response) {
-            $('#view-all').html(response);        
+            $('#items-list').html(response);        
             updatePaginationControls(response);          
         },
         error: function (textStatus) {
@@ -304,27 +304,37 @@ function loadPage(category, pageNumber) {
 
 function loadItemsByCategory(category, pageNumber) {
     $('card-container').html(spinnerContainer);
+    var itemcode = $('#searchbar').val().trim();
     $.ajax({
         url: 'inventory/items/categorized',
         type: 'GET',
         timeout: 10000,
         cache: false,
-        data: { category: category, page: pageNumber },
+        data: { itemcode: itemcode, category: category, page: pageNumber },
         success: function (response) {
-            $('#view-all').html(response);
+
+
+
+            $('#items-list').html(response);
             $('#category-buttons .category-button').removeClass('disabled').find('.spinner').hide();
             $(`.category-button[data-string="${category}"]`).addClass('ctg-selected');
             updatePaginationControls(response);
+            checkForItems(200);
             resetCheckState();
         },
-        error: function (textStatus) {
-            $('.card-container').html(noItemContainer);           
-            $('.category-button').removeClass('disabled').find('.spinner').hide();
-
+        error: function (jqXHR, textStatus) {
+            let status = jqXHR.status;
+                   
             if (textStatus === 'timeout') {
                 console.log('The request timed out.');
+            } else if (status == 404) {
+                $('#category-buttons .category-button').removeClass('disabled').find('.spinner').hide();
+                $(`.category-button[data-string="${category}"]`).addClass('ctg-selected');
+                $('#items-list').html(noItemContainer);
+                checkForItems(status);
+                console.log(`Server responsed with status code: ${jqXHR.status}\nServer message: ${jqXHR.responseJSON.Message}`);
             } else {
-                console.log('An error occurred: ' + textStatus);
+                console.log('An error occurred: ' + JSON.stringify(jqXHR.responseJSON, null, 2));
             }
         }
     });
@@ -339,7 +349,7 @@ function loadItems(itemcode, category, pageNumber) {
         cache: false,
         data: { itemcode: itemcode, category: category, page: pageNumber },
         success: function (response) {
-            $('#view-all').html(response);
+            $('#items-list').html(response);
             resetCheckState();
             updatePaginationControls(response);
         },
@@ -357,13 +367,8 @@ function loadItems(itemcode, category, pageNumber) {
 
 function loadPageByNumber(pageNumber, currentPage) {
     let category = $('.ctg-selected').data('string');
-    let itemCode = $('#searchbar').val().trim();
     if (pageNumber != currentPage) {
-        if (itemCode === '') {
-            loadItemsByCategory(category, pageNumber);
-        } else {
-            loadItems(itemCode, category, pageNumber);
-        }
+        loadItemsByCategory(category, pageNumber);
     } else {
         $("html, body").animate({ scrollTop: 0 }, "smooth");
         return false;
@@ -372,9 +377,9 @@ function loadPageByNumber(pageNumber, currentPage) {
 }
 
 function deleteSelectedItem() {
-    let checkedBoxes = $('.delete-checkbox:checked');
+    let checkedBoxes = $('.item-checkbox:checked');
     let itemIds = [];
-
+  
     checkedBoxes.each(function () {
         const data = {
             itemId : $(this).closest('.card').data('item-id'),
@@ -383,14 +388,23 @@ function deleteSelectedItem() {
             itemCategory: $(this).closest('.card').data('item-category'),
             itemStatus: $(this).closest('.card').data('item-status')
         }
-        console.log('Selected item: ' + JSON.stringify(data, null, 2));
         itemIds.push(data.itemId);
     });
-    console.log('Total item(s): ', itemIds.length);
-    alert(`Total item(s): ${itemIds.length}`);
-    //DeleteRequest(itemIds);
+
+    sessionStorage.setItem('deleteLenght', itemIds.length);
+    sessionStorage.setItem('deleteIds', JSON.stringify(itemIds));
+
+    ModalShow('inventory/remove/');   
 }
 
+
+function checkForItems(status) {
+    if (status === 404) {
+        $('#showCheckbox-container, #deleteCardButton').addClass('d-none');
+    } else {
+        $('#showCheckbox-container, #deleteCardButton').removeClass('d-none');
+    }
+}
 //function toggleNavbar(uri) {
 //    let dashboardNav = $('#dashboard-nav');
 //    let inventoryNav = $('#summary-nav');

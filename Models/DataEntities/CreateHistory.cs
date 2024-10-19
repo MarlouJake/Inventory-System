@@ -19,8 +19,12 @@ namespace InventorySystem.Models.DataEntities
 
         [DisplayFormat(DataFormatString = "{0:MMM. dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
         public DateTime Timestamp { get; set; }
+
         [ForeignKey("UserId")]
         public int? UserId { get; set; }
+
+        [ForeignKey("Username")]
+        public string? Username { get; set; }
 
         public virtual Item? Items { get; set; }
         public virtual User? Users { get; set; }

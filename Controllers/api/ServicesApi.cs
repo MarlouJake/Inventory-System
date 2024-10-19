@@ -14,10 +14,11 @@ namespace InventorySystem.Controllers.api
 {
     [Route("api/u/services/")]
     [ApiController]
-    public class ServicesApi(ApplicationDbContext context, GetClaims getClaims) : ControllerBase
+    public class ServicesApi(ApplicationDbContext context, GetClaims getClaims, SeedAddHistory recentItem) : ControllerBase
     {
         private readonly ApplicationDbContext _context = context;
         private readonly GetClaims _getClaims = getClaims;
+        private readonly SeedAddHistory _recentItem = recentItem;
         private int? userId;
         private string? message;
         private ApiResponse? response;
@@ -65,7 +66,7 @@ namespace InventorySystem.Controllers.api
                     message = $"Data is {null}";
                     response = ApiResponseUtils.CustomResponse(false, message, model);
                     Console.Error.WriteLine(message);
-                    return StatusCode(StatusCodes.Status404NotFound, response);
+                    return StatusCode(StatusCodes.Status400BadRequest, response);
                 }
 
                 userId = _getClaims.GetIdClaim(User);
@@ -88,15 +89,27 @@ namespace InventorySystem.Controllers.api
                 }
 
 
-
+                
                 model.UserId = userId;
-
-                _context.Items.Add(model);
+                _context.Items.Add(model);              
                 await _context.SaveChangesAsync();
 
+                var item = new CreateHistory
+                {
+                    ItemId = model.ItemId,
+                    ItemCode = model.ItemCode,
+                    ItemName = model.ItemName,
+                    Category = model.Category,
+                    Timestamp = model.ItemDateAdded,
+                    UserId = _getClaims.GetIdClaim(User),
+                    Username = _getClaims.GetUsernameClaim(User)
+
+                };
+
+                await _recentItem.AddToCreateHistory(item);
 
                 redirectTo = "dashboard/item-view/all";
-                message = "Add successful";
+                message = $"Added 1 item";
 
                 Console.WriteLine($"Inserted data: {JsonConvert.SerializeObject(model)}");
                 Console.WriteLine(message);
@@ -235,7 +248,7 @@ namespace InventorySystem.Controllers.api
 
 
 #pragma warning disable ASP0018 // Unused route parameter
-        [HttpDelete("remove-confirm-multiple/{id?}")]
+        [HttpDelete("remove-confirm/{id?}")]
 #pragma warning restore ASP0018 // Unused route parameter
         public async Task<IActionResult> MultipleRemoveConfirm([FromBody] int[]? ids)
         {
@@ -274,7 +287,8 @@ namespace InventorySystem.Controllers.api
                         .ToListAsync();
 
                 string redirectTo = "dashboard/item-view/all";
-                message = "Delete successful";
+                string word = ids.Length > 1 ? "items" : "item";
+                message = $"Delete {ids.Length} {word}";
 
                 Console.WriteLine(message);
                 Console.WriteLine("URL: {0}", redirectTo);

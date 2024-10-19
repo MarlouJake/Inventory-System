@@ -26,10 +26,11 @@ namespace InventorySystem.Controllers.api
             string message;
             try
             {
-                // Retrieve user from database (you might want to fetch more details if needed)
+                // Retrieve user from database
                 var user = await _context.Users
-                    .FirstOrDefaultAsync(u => (u.Username == model.Username || u.Email == model.Username)
+                    .FirstOrDefaultAsync(u => (EF.Functions.Collate(u.Username, "utf8mb4_bin") == model.Username || u.Email == model.Username)
                                               && u.Password == HashHelper.HashString(model.Password!));
+
 
                 if (user == null)
                 {

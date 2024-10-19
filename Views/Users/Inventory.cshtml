@@ -19,13 +19,14 @@
     $(document).ready(function () {
         
         var searchBarGroup = document.getElementById('search-container');
-
+        $('#deleteCardButton').prop('disabled', true);
+        
         loadItemsByCategory(activeCategory, currentPage);
-
+        
         $('#searchbar').on('input', function () {
 
             let typeTimer;
-            var itemcode = $(this).val().trim(); 
+            //var itemcode = $(this).val().trim();
             let category = $('.ctg-selected').data('string');
 
             clearTimeout(typeTimer);
@@ -33,14 +34,7 @@
 
             $('.card-container').html(spinnerContainer);
 
-            typeTimer = setTimeout(() => {
-                if (itemcode === "") {
-                    loadItemsByCategory(category, 1);
-
-                } else {
-                    loadItems(itemcode, activeCategory, 1);
-                }
-            }, 700);
+            loadItemsByCategory(category, 1);
 
             removeChecks();
             
@@ -58,76 +52,60 @@
    
             let category = $(this).data('string');
             
-            let itemcode = $('#searchbar').val().trim();
-
+            //let itemcode = $('#searchbar').val().trim();
 
             if ($(this).hasClass('ctg-selected')) {
                 return; 
             }
 
-            $(this).html('');
-            $(this).html('<i class="fa fa-spinner fa-spin spinner m-0 pt-1" style="font-size: 0.8rem;">');
-
+            //$(this).html('');
+            //$(this).html('<i class="fa fa-spinner fa-spin spinner m-0 pt-1" style="font-size: 0.8rem;">');
             $('#category-buttons .category-button').addClass('disabled');
             $('.category-button').removeClass('ctg-selected');
-            $(this).addClass('ctg-selected'); // Add selected class to clicked one
-            if (itemcode === "") {
-                loadItemsByCategory(category, 1);
-                $(this).text('');
-                $(this).html(category);
-            } else {
+            $(this).addClass('ctg-selected'); 
 
-                loadItems(itemcode, activeCategory, 1);
-                $(this).text('');
-                $(this).html(category);
-
-            }
-
-            activeCategory = category;
-
-          
-           
-             
+            loadItemsByCategory(category, 1);
+            activeCategory = category;             
             removeChecks();
         });
 
         $('#deleteCardButton').on('click', function () {
-            let checkedBoxes = $('.delete-checkbox:checked');
-            if (checkedBoxes.length > 0) {
-                //ModalShow('dashboard/remove-confirm/');
-                deleteSelectedItem()
+            let checkedBoxes = $('.item-checkbox:checked');
+            if (checkedBoxes.length > 0) {             
+                deleteSelectedItem();
             } else {
                 $('#message-success').text('No item selected').fadeIn().delay(500).fadeOut();
             }
         });
 
-        $('#selectAllCheckBox, #selectAllItems, #showCheckboxes, #selectAllCheckboxes').on('click', function () {
-            checkState(this.id);
+        
+        $('#showCheckbox-All, #showCheckbox-container').on('click', function () {
+            checkState(this.id);         
         });
 
-        $('#selectAllItems').on('click', function (){
-            checkAll();
+        $('#showCheckbox-All').on('change', resetCheckState);
+
+        $('#checkbox-all, #checkbox-all-container').on('click', function () {
+            checkAllItems();
         });
 
         $('input[type="checkbox"]').on('click', function (event) {
             event.stopPropagation(); 
-        });
-
-        $('#selectAllItems').on('change', checkAll);
-
-        
+        });           
     });
+
+    
 
 </script>
 
 
 
-<!-- Main Content Area --> 
-<div id="main-content" class="d-flex flex-column w-100">
+<!-- Inventory Content Area --> 
+<div id="inventory-content" class="d-flex flex-column">
 
     <!-- Top Bar -->
     <nav class="">
-       <div class="bg-dark d-flex p-1 border-bottom border-secondary">
+        <div class="bg-dark d-flex p-1 border-bottom border-secondary container-fluid">
 
             <!-- Searchbar and Create Button Container -->
             <div class="d-flex justify-content-between align-items-center w-100" id="searchbarAndCreateButtonContainer">
@@ -153,9 +131,8 @@
 
        </div>
 
-        <div class="ps-3 pe-3" style="margin-top: 0.4rem;">
+        <div class="container-fluid" style="margin-top: 0.4rem;">
             
-            <!-- Category Container (now placed below) -->
             <div class="d-flex align-items-center" id="categoryListContainer">
                 <span class="me-1 text-muted category-label">Category:</span>
                 <ul class="list-group list-group-horizontal" id="category-buttons">
@@ -181,22 +158,22 @@
                     </li>
                 </ul>
 
-                <div class="ms-auto gap-1 d-flex">
-                    <div class="d-inline-flex checkAll-box p-1 ps-2 pe-2 gap-0 rounded text-muted d-none selectAllItems" id="selectAllCheckboxes">
-                        <input type="checkbox" class="text-orange " id="selectAllItems" />
-                        <label for="selectAllItems" class="ms-0">All</label>
+                <div class="ms-auto gap-1  d-inline-flex">
+                    <div class="d-inline-flex inventory-checkbox p-1 ps-2 pe-2 gap-0 rounded text-muted d-none" id="checkbox-all-container">
+                        <input type="checkbox" class="text-orange " id="checkbox-all" />
+                        <label for="checkbox-all" class="ms-0">All</label>
                     </div>
 
-                    <div class="d-inline-flex checkAll-box p-1 ps-2 pe-2 rounded text-muted" id="showCheckboxes">
-                        <input type="checkbox" class="text-orange " id="selectAllCheckBox" />
-                        <label for="selectAllCheckBox">Select</label>
+                    <div class="d-inline-flex inventory-checkbox p-1 ps-2 pe-2 rounded text-muted d-none" id="showCheckbox-container">
+                        <input type="checkbox" class="text-orange " id="showCheckbox-All" />
+                        <label for="showCheckbox-All">Select</label>
                     </div>
 
-                    <button class=" border-0 rounded ps-2 pe-2" disabled id="deleteCardButton" title="Delete Selection">
+                    <button class="border-0 rounded ps-2 pe-2 d-none" disabled id="deleteCardButton" title="Delete Selection">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
 
-                    <button class=" border-0 rounded text-orange ps-2 pe-2" id="uploadButton" title="Import CSV File" onclick="ModalShow('dashboard/import-file')">
+                    <button class="border-0 rounded text-orange ps-2 pe-2" id="uploadButton" title="Import CSV File" onclick="ModalShow('inventory/import-file')">
                         <i class="fa fa-upload" aria-hidden="true"></i>
                     </button>
 
@@ -213,7 +190,7 @@
    
 
     <!-- Content -->
-    <div id="view-all" class="border-top border-warning pt-3 bottom-0" style="margin-top: 0.6rem;">
+    <div id="items-list" class="border-top border-warning pt-3 bottom-0" style="margin-top: 0.6rem;">
 
     </div>
     

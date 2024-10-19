@@ -1,10 +1,67 @@
-﻿<div class="d-block">
+﻿
+
+@{
+    int[] itemsCount = ViewBag.ItemsCount;
+}
+
+<script>
+
+    $(document).ready(function(){
+
+        let itemsCount = JSON.parse('@Html.Raw(Json.Serialize(itemsCount))');
+
+        var elementIds = ['#robots-count', '#books-count', '#materials-count'];
+
+        elementIds.forEach((id, index) => {
+            $(id).text(itemsCount[index] !== undefined ? itemsCount[index] : '--');
+        });
+
+        let totalCount = itemsCount.reduce((sum, count) => sum + (count || 0), 0);
+        $('#inventoryCount').text(totalCount > 0 ? totalCount : '--');
+    });
+
+
+
+</script>
+
+
+<style>
+    .invnetory-count {
+        font-size: 0.8rem;
+    }
+</style>
+
+<div class="d-block mt-2 shadow pb-0 p-3 w-13  dashbaord-components rounded rounded-1 border border-1">
+
     <h6>
-        Inventory Items
+        <strong>Inventory Items</strong>
     </h6>
 
-    <span id="inventoryCount">
-        --
-    </span>
-
+    <ul class="list-unstyled  invnetory-count mt-0 border-0 border-top mt-1 border-warning">
+        <li class="mt-1">
+            <details>
+                <summary>Breakdown</summary>
+                <ul class="list-unstyled">
+                        <li class="d-flex justify-content-between ">
+                            <strong>Robots</strong>
+                            <span id="robots-count" class="ms-auto">--</span>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <strong>Books</strong>
+                            <span id="books-count" class="ms-auto">--</span>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <strong>Materials</strong>
+                            <span id="materials-count" class="ms-auto">--</span>
+                        </li>
+                    </ul>
+            </details>
+       </li>
+        <li class="d-flex justify-content-between border-0 border-top mt-1 pt-1 border-warning">
+            <strong>Total</strong>
+            <span id="inventoryCount" class="text-center ms-auto">
+                --
+            </span>
+        </li>
+    </ul>
 </div>

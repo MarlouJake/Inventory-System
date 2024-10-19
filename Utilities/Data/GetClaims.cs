@@ -15,5 +15,12 @@ namespace InventorySystem.Utilities.Data
 
             return null;
         }
+
+        public string? GetUsernameClaim(ClaimsPrincipal user)
+        {
+            var claim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+
+            return claim?.Value;
+        }
     }
 }

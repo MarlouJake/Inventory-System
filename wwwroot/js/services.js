@@ -131,7 +131,7 @@ AddItem = (data, url) => {
     let activeCategory = $('.ctg-selected').data('string');
     $('#itemCode-error').text('');
     $('.form-control').removeClass('input-error').addClass('input-success');
-
+   
     var type = 'POST';
     var add = validationMessages.Add;
     var addsuccess = validationMessages.AddingSuccess;
@@ -150,15 +150,11 @@ AddItem = (data, url) => {
                 if (response.IsValid) {
 
                     $("#dynamic-modal").modal('hide');
-                    $("#message-success").text(addsuccess).fadeIn().delay(500).fadeOut();
+                    $("#message-success").text(response.Message).css('background-color', '#7eca8f').fadeIn().delay(500).fadeOut();
                     
                     //loadPage(currentPage);
 
-                    if ($('#searchbar').val() !== "") {
-                        loadItems($('#searchbar').val(), activeCategory, currentPage); // Load items based on search term
-                    } else {
-                        loadItemsByCategory(activeCategory, currentPage);
-                    }
+                    loadItemsByCategory(activeCategory, currentPage);
                 }
                 else{
                     console.error('An error occured while adding item:'+ response.Message);
@@ -323,14 +319,10 @@ ModifyItem = (data, url, dataid) => {
  
                     $("#dynamic-modal").modal('hide');
 
-                    $("#message-success").text(response.Message).fadeIn().delay(500).fadeOut();
+                    $("#message-success").text(response.Message).css('background-color', '#7eca8f').fadeIn().delay(500).fadeOut();
                     //loadPage(currentPage);
 
-                    if ($('#searchbar').val() !== "") {
-                        loadItems($('#searchbar').val(), activeCategory, currentPage); // Load items based on search term
-                    } else {
-                        loadItemsByCategory(activeCategory, currentPage);
-                    }
+                    loadItemsByCategory(activeCategory, currentPage);
                     
                 }
                 else {
@@ -504,9 +496,10 @@ RemoveItem = (url, id) => {
 
 function DeleteRequest(itemIds) {
     $.ajax({
-        url: '/api/u/validate/remove-multiple-item',
+        url: '/api/u/validate/remove-item',
         type: 'POST',
         contentType: 'application/json',
+        cache: false,
         data: JSON.stringify(itemIds), 
         success: function (response) {
 
@@ -538,10 +531,12 @@ function DeleteRequest(itemIds) {
 
 function RemoveConfirm(url, itemIds) {
     let activeCategory = $('.ctg-selected').data('string');
+
     $.ajax({
         url: url,
         type: 'DELETE',
         contentType: 'application/json',
+        cache: false,
         data: JSON.stringify(itemIds),
         success: function (response, textStatus, jqXHR) {
             var status = `Status Code: ${jqXHR.status}`;
@@ -551,16 +546,11 @@ function RemoveConfirm(url, itemIds) {
 
                 $("#dynamic-modal").modal('hide');
 
-                $("#message-success").text(response.Message).fadeIn().delay(500).fadeOut();
-
-                checkState('selectAllCheckBox');
-
-                if ($('#searchbar').val() !== "") {
-                    loadItems($('#searchbar').val(), activeCategory, currentPage); // Load items based on search term
-                } else {
-                    loadItemsByCategory(activeCategory, currentPage);
-                }
-              
+                $("#message-success").text(response.Message).css('background-color', 'gray').fadeIn().delay(500).fadeOut();
+                loadItemsByCategory(activeCategory, currentPage);
+                removeChecks();
+                sessionStorage.removeItem('deleteIds');
+                sessionStorage.removeItem('deleteLength');       
             }
             else {
                 console.error('An error occured while removing item:' + response.Message);

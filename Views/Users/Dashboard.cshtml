@@ -14,6 +14,29 @@
     }
 </style>
 
+<script>
+
+    $(document).ready(function(){
+        loadPartialView('dashboard/partial_views/inventory-summary', 'inventory-summary');
+    });
+
+
+   async function loadPartialView(url, id){
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (response) {
+                $(`#${id}`).html(response);
+            },
+            error: function () {
+                let errorText = 'An error occurred while loading partial view';
+                $(`#${id}`).html(errorText);
+                console.error(errorText);
+            }
+        });
+   }
+
+</script>
 <!-- Top Bar -->
 <nav class="border-bottom border-secondary">
 
@@ -37,7 +60,10 @@
 </nav>
 
 <!-- Content -->
-<div id="dashboard-content" class="pt-3 mt-5 position-relative">
-     
-</div>
+<section id="dashboard-content" class="mt-2 position-relative container-fluid">
+     <div id="inventory-summary">
+     </div>
+     <div id="recent-add-details">
+     </div>
+</section>
 

@@ -21,7 +21,7 @@ namespace InventorySystem.Controllers.main
         private readonly ValidateArrayOfId _validateArrayOfId = validateArrayOfId;
         private ApiResponse response = null!;
         private string message = "";
-        private string? redirectUrl = "";
+        //private string? redirectUrl = "";
 
 
         // This method is called before every action method in the controller
@@ -71,8 +71,8 @@ namespace InventorySystem.Controllers.main
         public async Task<IActionResult> Inventory(string username, int page = 1, string category = "All")
         {
             int? id = userId;
-
-            var model = await _query.Pagination(id, page, category, "ItemView");
+            _query.SetPageSize(24);
+            var model = await _query.Pagination(id, page, category, "");
             var pageSize = _query.GetPageSize();
 
             ViewData["Layout"] = null;
@@ -101,10 +101,10 @@ namespace InventorySystem.Controllers.main
 
         [Route("inventory/items/uncategorized")]
         [HttpGet]
-        public async Task<IActionResult> ItemsView(string username, int page = 1, string category = "All")
+        public async Task<IActionResult> ItemsView(string username, string code, int page = 1, string category = "All")
         {
             int? id = userId;
-            var model = await _query.Pagination(id, page, category, "ItemView");
+            var model = await _query.Pagination(id, page, category, "");
 
             ViewData["Layout"] = null;
             ViewData["title"] = "Item View";
@@ -117,16 +117,23 @@ namespace InventorySystem.Controllers.main
 
         [Route("inventory/items/categorized")]
         [HttpGet]
-        public async Task<IActionResult> CategoryView(string username, string category, int page = 1)
+        public async Task<IActionResult> CategoryView(string username, string category, string itemcode, int page = 1)
         {
             int? id = userId;
-            var model = await _query.Pagination(id, page, category, "ItemView");
+            var model = await _query.Pagination(id, page, category, itemcode);
+            message = "No items found";
+            response = ApiResponseUtils.CustomResponse(false, message);
 
             ViewData["Layout"] = null;
             ViewData["title"] = "Item View";
 
             ViewBag.Username = username;
             ViewBag.Category = category;
+
+            if (!model.Items!.Any())
+            {
+                return StatusCode(StatusCodes.Status404NotFound, response);
+            }
 
             return PartialView("ItemsView", model);
         }
@@ -186,13 +193,12 @@ namespace InventorySystem.Controllers.main
                 Category = category
             };*/
             int? id = userId;
-            var model = await _query.Pagination(id, page, category, "ItemView", itemcode);
+            var model = await _query.Pagination(id, page, category, itemcode);
 
             if (!model.Items!.Any())
             {
-                redirectUrl = Url.Action("Search", "Users");
                 message = "No item(s) found";
-                response = ApiResponseUtils.SuccessResponse(model.Items!, message, redirectUrl!);
+                response = ApiResponseUtils.CustomResponse(false, message);
                 return StatusCode(StatusCodes.Status404NotFound, response);
             }
 
@@ -202,7 +208,7 @@ namespace InventorySystem.Controllers.main
             ViewData["Category"] = category;
 
 
-            return PartialView("CategoryView", model);
+            return PartialView("ItemsView", model);
         }
 
 
@@ -270,7 +276,7 @@ namespace InventorySystem.Controllers.main
             return PartialView(item);
         }
 
-
+        /*
         [HttpGet]
         [Route("inventory/remove/{id?}")]
         public async Task<IActionResult> Delete(int? id)
@@ -293,12 +299,12 @@ namespace InventorySystem.Controllers.main
             ViewBag.Claim = userId;
 
             return PartialView(item);
-        }
+        }*/
 
 
         [HttpGet]
-        [Route("inventory/remove-multiple/{ids?}")]
-        public async Task<IActionResult> DeleteMultiple(int[]? ids)
+        [Route("inventory/remove/{id?}")]
+        public async Task<IActionResult> DeleteMultiple(int[] ids)
         {
 
             var result = await _validateArrayOfId.ValidateAsync(ids, _context);
@@ -308,12 +314,17 @@ namespace InventorySystem.Controllers.main
                 NotFound();
             }
 
+            var items = await _query.FindItemsAsync(ids);
+
+            if (items == null)
+            {
+                return NotFound();
+            }
 
             ViewBag.Claim = userId;
-
+            
             return PartialView();
         }
-
 
 
 
@@ -331,29 +342,50 @@ namespace InventorySystem.Controllers.main
         //Partials Views for Dashboard
         //
         //
-        [Route("dashboard/partial_views/inventory-summary")]
+        [Route("dashboard/partial_views/inventory-summary", Name = "InventorySummary")]
         [HttpGet]
-        public IActionResult InventorySummary(int? id)
+        public async Task<IActionResult> InventorySummary(string? category = null)
         {
+            int? id = userId;
+                     
+            int robotsCount = await _query.CountTotalItems(id, "Robots");
+            int booksCount = await _query.CountTotalItems(id, "Books");
+            int materialsCount = await _query.CountTotalItems(id, "Materials");
+
+            var itemsCount = robotsCount + booksCount + materialsCount;
+
+            int[] items = [robotsCount, booksCount, materialsCount];
+
             ViewData["Layout"] = null;
-            var item = new Item();
-            return PartialView("~/Views/Users/PartialViews/Dashboard/InventorySummary.cshtml", item);
+
+            ViewBag.ItemsCount = items;
+            Console.WriteLine("Total Items: {0}", itemsCount);
+            return PartialView("~/Views/Users/PartialViews/Dashboard/InventorySummary.cshtml");
+        }
+
+        
+        [Route("dashboard/partial_views/recently-added", Name = "Recentlyadded")]
+        [HttpGet]
+        public IActionResult RecentlyAdded(int itemId)
+        {
+            int? id = userId;
+            
+            return PartialView("~/Views/Users/PartialViews/Dashboard/RecentlyAdded.cshtml");
         }
 
 
-        //
-        //
-        //Partials Views for Update, ViewDetails, Create
-        //
-        //
+            //
+            //
+            //Partials Views for Update, ViewDetails, Create
+            //
+            //
 
-        [Route("inventory/update/partial_views/with_firmwareUpdate")]
+            [Route("inventory/update/partial_views/with_firmwareUpdate")]
         [HttpGet]
         public IActionResult HasFirmwareUpdate()
         {
-            ViewData["Layout"] = null;
-            var item = new Item();
-            return PartialView("~/Views/Users/PartialViews/Inventory/HasFirmwareUpdate.cshtml", item);
+            ViewData["Layout"] = null;          
+            return PartialView("~/Views/Users/PartialViews/Inventory/HasFirmwareUpdate.cshtml");
         }
 
         [Route("inventory/update/partial_views/no_firmwareUpdate")]
@@ -371,6 +403,7 @@ namespace InventorySystem.Controllers.main
         {
             ViewData["Layout"] = null;
             var item = await _query.FindItemAsync(id);
+            ViewBag.Category = item!.Category;
             return PartialView("~/Views/Users/PartialViews/Inventory/HasFirmwareView.cshtml", item);
         }
 
@@ -379,7 +412,11 @@ namespace InventorySystem.Controllers.main
         public async Task<IActionResult> NoFirmwareView(int? id)
         {
             ViewData["Layout"] = null;
+            
             var item = await _query.FindItemAsync(id);
+
+            ViewBag.Category = item!.Category;
+
             return PartialView("~/Views/Users/PartialViews/Inventory/NoFirmwareView.cshtml", item);
         }
 

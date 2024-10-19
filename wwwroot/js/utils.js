@@ -199,31 +199,36 @@ async function resetCheckState() {
 
     isFired = true;
 
-    let deleteCard = $('#deleteCardButton');
-    let checkBoxes = $('.checkboxes-container, .selectAllItems');
+    let checkBoxes = $('.item-checkbox-container, #checkbox-all-container');
+    
 
-    if ($('#selectAllCheckBox').is(':checked')) {
-        deleteCard.prop('disabled', false);
-        deleteCard.addClass('deleteCardButtonHover text-orange');
+    if ($('#showCheckbox-All').is(':checked')) {       
         checkBoxes.removeClass('d-none');
-    } else {
-        deleteCard.prop('disabled', true);
-        deleteCard.css('color', 'gray');
-        deleteCard.removeClass('deleteCardButtonHover text-orange');
-        checkBoxes.addClass('d-none');
-        await removeChecks(); // Marked as await since it might involve async operations
-    }
 
+    } else {           
+        checkBoxes.addClass('d-none');
+        await removeChecks(); 
+    }
     isFired = false;
 }
 
-async function checkAll() {
-    let selectAll = $('#selectAllItems').is(':checked');
-    $('.delete-checkbox').each(function () {
+async function toggleDeleteButton(){
+    let deleteItemButton = $('#deleteCardButton');
+    if (deleteItemButton.prop('disabled', true)) {
+        deleteItemButton.prop('disabled', false);
+    } else{
+        deleteItemButton.prop('disabled', true);
+    }
+}
+
+
+async function checkAllItems() {
+    let selectAll = $('#checkbox-all').is(':checked');
+    $('.item-checkbox').each(function () {
         $(this).prop('checked', selectAll);
         $(this).trigger('change');
     });
-    await countCheck(); // Marked as await since it might involve async operations
+  
 }
 
 let isInit = false;
@@ -233,29 +238,53 @@ async function countCheck() {
 
     isInit = true;
 
-    let selectAll = $('#selectAllItems');
-    let checkBoxes = $('.delete-checkbox:checked');
-    let totalCheckBox = $('.delete-checkbox').length;
+    let selectAll = $('#checkbox-all');
+    let checkBoxes = $('.item-checkbox:checked');
+    let totalCheckBox = $('.item-checkbox').length;
 
     selectAll.prop('checked', checkBoxes.length < totalCheckBox);
-    selectAll.trigger('change');
+    selectAll.prop('indeterminate', true);
+  
 
     isInit = false;
 }
 
 async function removeChecks() {
-    $('.delete-checkbox').each(function () {
+    $('.item-checkbox').each(function () {
         $(this).prop('checked', false).trigger('change');
     });
 
-    $('#selectAllItems, #selectAllCheckBox').prop('checked', false).trigger('change');
+    let checkAllItems = '#checkbox-all';
+    let selector = `${checkAllItems}, #showCheckbox-All`;
+
+    $(selector).prop('checked', false).trigger('change');
+    $(checkAllItems).prop('indeterminate', false);
 }
+
 
 async function checkState(selector) {
     let checkBox = $(selector);
     checkBox.prop('checked', !checkBox.is(':checked'));
     checkBox.trigger('change');
 }
+
+
+async function checkItemsCheckbox() {
+    let checkedCount = $('.item-checkbox:checked').length;
+    let deleteCard = $('#deleteCardButton');
+
+    if (checkedCount < 1) {
+        deleteCard.prop('disabled', true);
+        deleteCard.css('color', 'gray');
+        deleteCard.removeClass('deleteCardButtonHover text-orange');
+    } else {      
+        deleteCard.prop('disabled', false);
+        deleteCard.addClass('deleteCardButtonHover text-orange');
+    }
+
+
+}
+
 
 // Example of async handling that might be added in future enhancements
 async function simulateAsyncOperation() {

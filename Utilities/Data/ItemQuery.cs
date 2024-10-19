@@ -18,9 +18,7 @@ namespace InventorySystem.Utilities.Data
     {
         private readonly ApplicationDbContext _context = context;
         private readonly CheckInputs _checkInputs = checkInputs;
-        private readonly int pageSize = 24; // Number of items per page
-
-
+        private int pageSize = 24;
 
         /// <summary>
         /// Gets the number of items per page.
@@ -31,12 +29,17 @@ namespace InventorySystem.Utilities.Data
             return pageSize; // Return the page size
         }
 
-
-
-        public async Task<ItemListViewModel> Pagination(int? id, int page, string category, string action, string code = null!)
+        public int SetPageSize(int size)
         {
+            pageSize = size;
+            return pageSize;
+        }
 
-            return await PaginateItems(id, page, category, code);
+
+
+        public async Task<ItemListViewModel> Pagination(int? id, int page, string category, string code, int? pagesize = null)
+        {
+            return await PaginateItems(id, page, pagesize, category, code!);
         }
 
 
@@ -46,38 +49,42 @@ namespace InventorySystem.Utilities.Data
             return await FindItemByIdAsync(id);
         }
 
-
-
-        private async Task<ItemListViewModel> PaginateItems(int? id, int page, string category, string code = null!)
+        public async Task<List<Item>> FindItemsAsync(int[] ids)
         {
+            return await FindItemByArrayofIdsAsync(ids);
+        }
+
+        public async Task<int> CountTotalItems(int? id, string? category = null)
+        {
+            return await CountTotalItemById(id, category);
+        }
+
+        private async Task<ItemListViewModel> PaginateItems(int? id, int page, int? pagesize, string category, string code)
+        {
+            _checkInputs.CheckPage(page);
+
             var fetchedItems = FilterByUserIdAsync(id);
-            var isSearch = code != null ? await SearchResult(id, page, category, code) : fetchedItems;
-            var items = CategoryBase(id, page, category, isSearch);
+            var searchResult = await SearchResult(id, code);
+            var isSearch = String.IsNullOrEmpty(code) ? fetchedItems : searchResult;
+            var items = CategoryBase(id, category, isSearch);
             var totalItems = await CountItems(await items);
             int totalPages = await CountTotalPages(totalItems);
-            var paginateItems = await PaginateItemsAsync(page, await items);
+            var paginateItems = await PaginateItemsAsync(page, pagesize, await items);
             var paginatedItems = await PaginatedItemsAsync(page, category, totalPages, paginateItems.AsQueryable());
             return paginatedItems;
         }
 
-        private async Task<IQueryable<Item>> SearchResult(int? id, int page, string category, string code)
+        private async Task<IQueryable<Item>> SearchResult(int? id, string code)
         {
             var fetchedItems = FilterByUserIdAsync(id);
             var filteredItem = await FilterByCodeAndUserId(id, code, fetchedItems);
-            /*var items = CategoryBase(id, page, category, filteredItem);
-            var totalItems = await CountItems(filteredItem);
-            var totalPages = await CountTotalPages(totalItems);
-            var paginateItems = await PaginateItemsAsync(page, filteredItem);
-            var paginatedItems = await PaginatedItemsAsync(page, category, totalPages, paginateItems.AsQueryable());
-            return paginatedItems;*/
-            //var paginateItems = await PaginateItems(id, page, category, code);
             return filteredItem;
         }
 
-        private async Task<IQueryable<Item>> CategoryBase(int? id, int page, string category, IQueryable<Item> items)
+        private async Task<IQueryable<Item>> CategoryBase(int? id, string category, IQueryable<Item> items)
         {
             _checkInputs.CheckId(id);
-            _checkInputs.CheckPage(page);
+
 
 
             if (category != "All")
@@ -85,17 +92,18 @@ namespace InventorySystem.Utilities.Data
                 items = items.Where(i => i.Category == category && i.UserId == id);
             }
 
-            return await Task.FromResult(items.AsQueryable());
+            return await Task.FromResult(items);
         }
 
 
 
-        private async Task<List<Item>> PaginateItemsAsync(int page, IQueryable<Item> model)
+        private async Task<List<Item>> PaginateItemsAsync(int page, int? pagesize, IQueryable<Item> model)
         {
+            int pageSizeResult = pagesize != null ? (int)pagesize : pageSize;
             var items = await model
                     .OrderBy(i => i.ItemName)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
+                    .Skip(((page - 1) * pageSizeResult))
+                    .Take(pageSizeResult)
                     .ToListAsync();
 
             return items;
@@ -115,6 +123,15 @@ namespace InventorySystem.Utilities.Data
             };
 
             return await Task.FromResult(model);
+        }
+
+        private async Task<int> CountTotalItemById(int? id, string? category = null)
+        {
+            var items =  FilterByUserIdAsync(id);
+            var countByCategory = await CategoryBase(id, category!, items);
+            var filteredItems = category != null ? countByCategory : items;         
+            var totalItem = await CountItems(filteredItems);
+            return totalItem;
         }
 
 
@@ -141,7 +158,6 @@ namespace InventorySystem.Utilities.Data
             {
                 filteredItem = items.Where(i => i.ItemCode!.StartsWith(code) && i.UserId == id);
             }
-
             return await Task.FromResult(filteredItem);
         }
 
@@ -161,6 +177,11 @@ namespace InventorySystem.Utilities.Data
         }
 
 
+
+        private async Task<List<Item>> FindItemByArrayofIdsAsync(int[] ids)
+        {
+            return await _context.Items.Where(i => ids.Contains(i.ItemId)).ToListAsync();
+        }
 
     }
 }

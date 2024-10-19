@@ -14,19 +14,15 @@
     var info = $('#layoutbody #message-success');
 
 
-    document.addEventListener('DOMContentLoaded', () => {
+
+
+
+    $(document).ready(function () {     
         $('#username-container').text(currentUsername);
         info.text(`Welcome ${currentUsername.toUpperCase()}!`).fadeIn().delay(1000).fadeOut();
-    });
-
-
-    $(document).ready(function () {
-
-       
-
         loadContent('dashboard');
 
-        $('#sidebar .nav-link').on('click', function (e) {
+        $('#sidebar .sidebar-link').on('click', function (e) {
             sidebarEvent(e, this);
         });
 

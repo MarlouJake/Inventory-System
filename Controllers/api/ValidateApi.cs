@@ -177,7 +177,7 @@ namespace InventorySystem.Controllers.api
             }
         }
 
-        [HttpPost("remove-multiple-item/{id?}")]
+        [HttpPost("remove-item/{id?}")]
         public async Task<IActionResult> DeleteMultipleItem([FromBody] int[]? ids)
         {
             string message = "";
