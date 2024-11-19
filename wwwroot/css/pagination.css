@@ -1,44 +1,42 @@
-﻿.pagination {
-    display: flex;
-    justify-content: center;
-    width: 100%; /* Make sure the container is full width */
+﻿.pagination-inventory {
     position: fixed;
     bottom: 0;
+    width: 90%;
     margin-bottom: 0;
-    padding-bottom: 0.8rem;
     z-index: 1000;
-    background-color: rgba(52, 58, 64, 0.7);
     backdrop-filter: blur(60%);
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-    height: 4rem;
+    height: 3.05rem;
 }
 
 
-    .pagination a {
-        display: block;
-        border: 1px solid #dee2e6;
+    .pagination-inventory li .page-link, .recent-table-pagination li {
         text-decoration: none;
-        color: lightslategray; /* Set font color for all buttons */
         transition: background-color 0.3s, color 0.3s; /* Smooth transition */
     }
-
-        .pagination a:hover {
-            background-color: lightslategray; /* Hover background effect */
+        .pagination-inventory a:focus, .recent-table-pagination a:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .pagination-inventory li:hover, .recent-table-pagination a:hover {
+            background-color: rgba(128, 128, 128, 0.2); /* Hover background effect */
             color: black; /* Hover text color */
         }
 
-    .pagination .page-item.active .page-link {
+    .pagination-inventory .page-item.active .page-link, .recent-table-pagination .page-item.active .page-link {
         background-color: #fd7e14 !important; /* Ensure the color change applies */
         border-color: #fd7e14 !important; /* Ensure the border color matches */
         color: white !important; /* Ensure the text color changes */
     }
 
-    .pagination a.disabled {
-        color: #6c757d;
+    .pagination-inventory a.disabled {
         cursor: not-allowed;
-        pointer-events: none;
-        background-color: #f8f9fa;
+        pointer-events: none;          
     }
 
 
-
+ul.recent-table-pagination li .page-link {
+    font-size: 0.6rem !important;
+    color: #fd7e14;
+    transition: background-color 0.3s, color 0.3s;
+}

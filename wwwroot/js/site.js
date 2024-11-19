@@ -83,11 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
     //Client-side input field validation
     UserLoginValidateField();
 
-    //UserLogoutAction();
     DisplaySuccessAndError();
-
-    
 });
+
+
 
 function getScreenSize() {
     var width = window.innerWidth;

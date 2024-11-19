@@ -30,6 +30,7 @@
             
         });
 
+        
 
     });
 
@@ -132,23 +133,11 @@
         </div>
 
         <div class="form-group mt-3">
-            <button type="submit" class="btn bgc-orange w-100 text-light" id="loginbutton"> </button>
+            <button class="btn bgc-orange w-100 text-light" id="loginbutton">Login</button>
             <a onclick="ModalShow('@Url.Action("SignUp", "Home")')" class="btn btn-success form-control mt-3">Sign Up</a>
         </div>
 
     </form>
-
-    <!--Error message container -->
-    <!--if (ViewData.ModelState.Values.Any(v => v.Errors.Any()))
-    {
-        <div id="error-message" class="alert alert-danger mt-3 text-break">
-            foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-            {
-                <p>error.ErrorMessage</p>
-            }
-        </div>
-    }-->
-
 </div>
 
 @section Scripts {

@@ -11,13 +11,14 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/popup-messages.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/pagination.css" asp-append-version="true" />
-
+    <link rel="stylesheet" href="~/css/custom-select.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
   
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.3/jquery.validate.min.js"></script>
-
+    
+    <script src="~/js/custom-select.js" asp-append-version="true" defer></script>
     <script src="~/js/messages.js" asp-append-version="true" defer></script>
     <script src="~/js/components.js" asp-append-version="true" defer></script>
     <script src="~/js/assets-modal.js" asp-append-version="true" defer></script>
@@ -29,25 +30,11 @@
     <script src="~/js/services.js" asp-append-version="true" defer></script>
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 
-    <style>
 
-        .ms-2-9 {
-            margin-left: 0.9rem;
-        }
-
-        .ms-2-7 {
-            margin-left: 0.7rem;
-        }
-
-        .ms-2-4 {
-            margin-left: 0.4rem;
-        }
-
-    </style>
 </head>
 
-<body id="dashboard-layout" class="bg-red">
-    <div class="container m-0 p-0 bg-red">
+<body id="dashboard-layout" style="user-select: none">
+    <div class="container m-0 p-0">
         <div id="message-success" class="alert alert-success" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px; background-color: #7eca8f; color: white; border-radius: 5px;">
             <!-- Success message content -->
         </div>
@@ -61,7 +48,7 @@
         <div role="main" id="dashboard-main" class="d-flex vw-100">
      
             <!-- Sidebar Navigation -->
-            <nav id="sidebar" class="bg-dark d-flex flex-column  p-0 border-end border-secondary">
+            <nav id="sidebar" class="bg-dark d-flex flex-column  p-0 border-end border-secondary" >
                 <div class="d-flex fs-5 gap-2 text-orange  shadow p-2  ps-3">
                     <i class="bi bi-box-seam-fill"></i>
                     <span class="">IMS</span>
@@ -78,7 +65,7 @@
                     </li>
 
                     <li class="nav-item tab m-0 p-0">
-                        <a class="nav-link sidebar-link" id="inventory-link" data-url="inventory">
+                        <a class="nav-link sidebar-link" id="inventory-link" data-url="inventory" data-string="All">
                             <i class="bi bi-boxes"></i>                            
                             <span class="ms-2-7">Inventory</span>
                          </a>     
@@ -94,7 +81,7 @@
                     <li class="nav-item m-0 p-0">
                         <a class="nav-link d-flex" id="user-logout">
                             <i class="bi bi-box-arrow-left text-danger"></i>
-                            <span class="ms-2-9"> Logout</span>
+                            <span class="ms-2-9">Logout</span>
                         </a>
                     </li>
                 </ul>
@@ -106,7 +93,7 @@
                 </footer>
             </nav>
           
-            <div class="w-100 " id="rendered-view">
+            <div class="w-100 m-0 p-0" id="rendered-view">
                 @RenderBody()
             </div>
         </div>

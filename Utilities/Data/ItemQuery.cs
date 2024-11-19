@@ -42,7 +42,15 @@ namespace InventorySystem.Utilities.Data
             return await PaginateItems(id, page, pagesize, category, code!);
         }
 
+        public async Task<List<Item>> GetItemListAsync(int? id)
+        {
+            return await FilterByUserIdAsync(id).ToListAsync();
+        }
 
+        public async Task<Item?> GetItemAsync(int id)
+        {
+            return await GetItemByItemIdAsync(id);
+        }
 
         public async Task<Item?> FindItemAsync(int? id)
         {
@@ -59,12 +67,12 @@ namespace InventorySystem.Utilities.Data
             return await CountTotalItemById(id, category);
         }
 
-        private async Task<ItemListViewModel> PaginateItems(int? id, int page, int? pagesize, string category, string code)
+        private async Task<ItemListViewModel> PaginateItems(int? id, int page, int? pagesize, string category, string code, bool deleted = false)
         {
             _checkInputs.CheckPage(page);
 
-            var fetchedItems = FilterByUserIdAsync(id);
-            var searchResult = await SearchResult(id, code);
+            var fetchedItems = FilterByUserIdAsync(id, deleted);
+            var searchResult = await SearchResult(fetchedItems, id, code);
             var isSearch = String.IsNullOrEmpty(code) ? fetchedItems : searchResult;
             var items = CategoryBase(id, category, isSearch);
             var totalItems = await CountItems(await items);
@@ -74,10 +82,10 @@ namespace InventorySystem.Utilities.Data
             return paginatedItems;
         }
 
-        private async Task<IQueryable<Item>> SearchResult(int? id, string code)
+        private static async Task<IQueryable<Item>> SearchResult(IQueryable<Item> items, int? id, string code)
         {
-            var fetchedItems = FilterByUserIdAsync(id);
-            var filteredItem = await FilterByCodeAndUserId(id, code, fetchedItems);
+            //var fetchedItems = FilterByUserIdAsync(id);
+            var filteredItem = await FilterByCodeAndUserId(id, code, items);
             return filteredItem;
         }
 
@@ -150,26 +158,34 @@ namespace InventorySystem.Utilities.Data
         }
 
 
-        private static async Task<IQueryable<Item>> FilterByCodeAndUserId(int? id, string code, IQueryable<Item> items)
+        private static async Task<IQueryable<Item>> FilterByCodeAndUserId(int? id, string code, IQueryable<Item> items, bool deleted = false)
         {
             IQueryable<Item> filteredItem = items;
 
             if (!string.IsNullOrEmpty(code))
             {
-                filteredItem = items.Where(i => i.ItemCode!.StartsWith(code) && i.UserId == id);
+                filteredItem = items.Where(i => i.ItemCode!.StartsWith(code) && i.UserId == id && i.IsDeleted == deleted);
             }
             return await Task.FromResult(filteredItem);
         }
 
 
 
-        private IQueryable<Item> FilterByUserIdAsync(int? id)
+        private IQueryable<Item> FilterByUserIdAsync(int? id, bool deleted = false)
         {
-            return _context.Items.Where(i => i.UserId == id);
+            return _context.Items.Where(i => i.UserId == id && i.IsDeleted == deleted);
         }
 
 
+        private async Task<Item?> GetItemByUserIdAsync(int? id, bool deleted = false)
+        {
+            return await _context.Items.FirstOrDefaultAsync(i => i.UserId == id && i.IsDeleted == deleted);
+        }
 
+        private async Task<Item?> GetItemByItemIdAsync(int? id, bool deleted = false)
+        {
+            return await _context.Items.FirstOrDefaultAsync(i => i.ItemId == id && i.IsDeleted == deleted);
+        }
 
         private async Task<Item?> FindItemByIdAsync(int? id)
         {
@@ -178,9 +194,9 @@ namespace InventorySystem.Utilities.Data
 
 
 
-        private async Task<List<Item>> FindItemByArrayofIdsAsync(int[] ids)
+        private async Task<List<Item>> FindItemByArrayofIdsAsync(int[] ids, bool deleted = false )
         {
-            return await _context.Items.Where(i => ids.Contains(i.ItemId)).ToListAsync();
+            return await _context.Items.Where(i => ids.Contains(i.ItemId) && i.IsDeleted == deleted).ToListAsync();
         }
 
     }

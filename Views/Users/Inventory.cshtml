@@ -8,8 +8,7 @@
 }
 
 <script>
-    var currentPage = '@Html.Raw(currentPage)';
-    
+       
     var info = $('#layoutbody #message-success');
 
     $(document).on('hidden.bs.modal', '.container #dynamic-modal', function (e) {
@@ -19,14 +18,17 @@
     $(document).ready(function () {
         
         var searchBarGroup = document.getElementById('search-container');
+        let InvnetoryCurrentPage = 1;
+
         $('#deleteCardButton').prop('disabled', true);
         
-        loadItemsByCategory(activeCategory, currentPage);
-        
+
+        loadItemsByCategory(activeCategory, InvnetoryCurrentPage);
+        renderTitle('inventory', 'inventory-nav');
+
         $('#searchbar').on('input', function () {
 
             let typeTimer;
-            //var itemcode = $(this).val().trim();
             let category = $('.ctg-selected').data('string');
 
             clearTimeout(typeTimer);
@@ -43,28 +45,30 @@
 
         $('#searchbar').on('focus', function () {
             addBorderClass(searchBarGroup);
+            $('.search-icon-container').addClass('text-orange').removeClass('text-muted');
+        }).on('blur', function () {          
+            removeBorderClass(searchBarGroup);
+            $('.search-icon-container').removeClass('text-orange').addClass('text-muted');
         });
 
 
 
-       
-        $('.category-button').on('click', function(){
-   
+        $('.category-button').on('click', function(e){
+            e.preventDefault();
             let category = $(this).data('string');
-            
+            let categorySpinner = `<i class="fa fa-spinner fa-spin text-orange"></i>`;
             //let itemcode = $('#searchbar').val().trim();
 
             if ($(this).hasClass('ctg-selected')) {
                 return; 
             }
-
-            //$(this).html('');
-            //$(this).html('<i class="fa fa-spinner fa-spin spinner m-0 pt-1" style="font-size: 0.8rem;">');
+            
+            $('.category-button').prop('disabled', true);
             $('#category-buttons .category-button').addClass('disabled');
-            $('.category-button').removeClass('ctg-selected');
-            $(this).addClass('ctg-selected'); 
-
+            $(this).text('').html(categorySpinner);
+            $('card-container').html(spinnerContainer);
             loadItemsByCategory(category, 1);
+                
             activeCategory = category;             
             removeChecks();
         });
@@ -94,107 +98,98 @@
         });           
     });
 
-    
-
 </script>
 
 
 
 <!-- Inventory Content Area --> 
-<div id="inventory-content" class="d-flex flex-column">
-
+<nav id="inventory-nav" class="m-0 p-0">
     <!-- Top Bar -->
-    <nav class="">
-        <div class="bg-dark d-flex p-1 border-bottom border-secondary container-fluid">
+    <div class="bg-dark text-light border-bottom border-secondary
+         d-flex align-content-center align-items-center" style="height:3rem;">
 
-            <!-- Searchbar and Create Button Container -->
-            <div class="d-flex justify-content-between align-items-center w-100" id="searchbarAndCreateButtonContainer">
-                <div class="d-flex p-2 text-light" style="font-size: 1rem;">
-                    <i class="bi bi-boxes"></i>
-                    <span class="ms-1">Inventory</span>
-                </div>
-
-                <!-- Searchbar -->
-                <div class="input-group search-container border-0" style="margin-left: 2.3rem;">
-                    <div class="input-group-prepend rounded border-0">
-                        <div class="input-group-text search-icon-container pt-0 pb-0 pe-0" title="Search" id="search-container">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search text-orange" viewBox="0 0 16 16">
-                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-                            </svg>
-                            <input type="search" id="searchbar" class="form-control border-0 ms-1" placeholder="Search by code" autocomplete="off">
-                        </div>
-                    </div>
-                </div>
-
-                
+        <div class="d-flex gap-5" id="searchbarAndCreateButtonContainer">
+            <div class="default-title-container">
             </div>
-
-       </div>
-
-        <div class="container-fluid" style="margin-top: 0.4rem;">
-            
-            <div class="d-flex align-items-center" id="categoryListContainer">
-                <span class="me-1 text-muted category-label">Category:</span>
-                <ul class="list-group list-group-horizontal" id="category-buttons">
-                    <li>
-                        <button class="ms-1 btn-sm outline-orange ctg-notselected category-button-radius category-button" data-string="All">
-                            All <i class="fa fa-spinner fa-spin spinner" style="display: none;"></i>
-                        </button>
-                    </li>
-                    <li>
-                        <button class="ms-1 btn-sm category-button-radius ctg-notselected category-button" data-string="Robots">
-                            Robots <i class="fa fa-spinner fa-spin spinner" style="display: none;"></i>
-                        </button>
-                    </li>
-                    <li>
-                        <button class="ms-1 btn-sm category-button-radius ctg-notselected category-button" data-string="Books">
-                            Books <i class="fa fa-spinner fa-spin spinner" style="display: none;"></i>
-                        </button>
-                    </li>
-                    <li>
-                        <button class="ms-1 btn-sm category-button-radius ctg-notselected category-button" data-string="Materials">
-                            Materials <i class="fa fa-spinner fa-spin spinner" style="display: none;"></i>
-                        </button>
-                    </li>
-                </ul>
-
-                <div class="ms-auto gap-1  d-inline-flex">
-                    <div class="d-inline-flex inventory-checkbox p-1 ps-2 pe-2 gap-0 rounded text-muted d-none" id="checkbox-all-container">
-                        <input type="checkbox" class="text-orange " id="checkbox-all" />
-                        <label for="checkbox-all" class="ms-0">All</label>
+           
+            <!-- Searchbar -->
+            <div class="input-group search-container border-0" style="margin-top: 0.65rem;">
+                <div class="input-group-prepend rounded border-0">
+                    <div class="input-group-text search-icon-container pt-0 pb-0 pe-0" title="Search" id="search-container">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                        </svg>
+                        <input type="search" id="searchbar" class="form-control border-0 ms-1" placeholder="Search by code" autocomplete="off">
                     </div>
-
-                    <div class="d-inline-flex inventory-checkbox p-1 ps-2 pe-2 rounded text-muted d-none" id="showCheckbox-container">
-                        <input type="checkbox" class="text-orange " id="showCheckbox-All" />
-                        <label for="showCheckbox-All">Select</label>
-                    </div>
-
-                    <button class="border-0 rounded ps-2 pe-2 d-none" disabled id="deleteCardButton" title="Delete Selection">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-
-                    <button class="border-0 rounded text-orange ps-2 pe-2" id="uploadButton" title="Import CSV File" onclick="ModalShow('inventory/import-file')">
-                        <i class="fa fa-upload" aria-hidden="true"></i>
-                    </button>
-
-                    <button type="button" class="btn bgc-orange p-1 ps-2 pe-2 d-flex gap-1" style="font-size: 0.8rem;" id="addItemButton" onclick="ModalShow(`inventory/add-item/`)">
-                        <i class="bi bi-plus-circle"></i>
-                        <span>Item</span>
-                    </button>
                 </div>
             </div>
 
-       </div>
-    </nav>
-
-   
-
-    <!-- Content -->
-    <div id="items-list" class="border-top border-warning pt-3 bottom-0" style="margin-top: 0.6rem;">
+        </div>
 
     </div>
-    
+
+    <div class="container-fluid" style="margin-top: 0.4rem;">
+
+        <div class="d-flex align-items-center" id="categoryListContainer">
+            <span class="me-1 text-muted category-label">Category:</span>
+            <ul class="list-group list-group-horizontal" id="category-buttons">
+                <li>
+                    <button class="ms-1 outline-orange ctg-notselected category-button-radius category-button"
+                            data-string="All" style="width: 2rem !important;">
+                        All
+                    </button>
+                </li>
+                <li>
+                    <button class="ms-1 outline-orange category-button-radius ctg-notselected category-button" data-string="Robots">
+                        Robots
+
+                    </button>
+                </li>
+                <li>
+                    <button class="ms-1 outline-orange category-button-radius ctg-notselected category-button" data-string="Books">
+                        Books
+                    </button>
+                </li>
+                <li>
+                    <button class="ms-1 outline-orange category-button-radius ctg-notselected category-button" data-string="Materials">
+                        Materials
+                    </button>
+                </li>
+            </ul>
+
+            <div class="ms-auto gap-1  d-inline-flex">
+                <div class="d-inline-flex inventory-checkbox p-1 ps-2 pe-2 gap-0 rounded text-muted d-none" id="checkbox-all-container">
+                    <input type="checkbox" class="text-orange " id="checkbox-all" />
+                    <label for="checkbox-all" class="ms-0">All</label>
+                </div>
+
+                <div class="d-inline-flex inventory-checkbox p-1 ps-2 pe-2 rounded text-muted d-none" id="showCheckbox-container">
+                    <input type="checkbox" class="text-orange " id="showCheckbox-All" />
+                    <label for="showCheckbox-All">Select</label>
+                </div>
+
+                <button class="border-0 rounded ps-2 pe-2 d-none" disabled id="deleteCardButton" title="Delete Selection">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+
+                <button class="border-0 rounded text-orange ps-2 pe-2" id="uploadButton" title="Import CSV File" onclick="ModalShow('inventory/import-file')">
+                    <i class="fa fa-upload" aria-hidden="true"></i>
+                </button>
+
+                <button type="button" class="btn bgc-orange p-1 ps-2 pe-2 d-flex gap-1" style="font-size: 0.8rem;" id="addItemButton" onclick="ModalShow(`inventory/add-item/`)">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>Item</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</nav>
+
+<!-- Content -->
+<div id="items-list" class="border-top border-warning pt-3 bottom-0" style="margin-top: 0.6rem;">
 </div>
+
 
 @section Scripts {
    

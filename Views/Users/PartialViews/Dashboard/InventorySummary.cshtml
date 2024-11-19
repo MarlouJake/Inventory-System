@@ -1,5 +1,4 @@
 ﻿
-
 @{
     int[] itemsCount = ViewBag.ItemsCount;
 }
@@ -17,51 +16,73 @@
         });
 
         let totalCount = itemsCount.reduce((sum, count) => sum + (count || 0), 0);
-        $('#inventoryCount').text(totalCount > 0 ? totalCount : '--');
+        $('#inventoryCount').text(totalCount !== null ? totalCount : '--');
+
+
+        $(".dashboard-category-list > li").on('click',function(){
+            let data = $(this).data('string');
+            jumpTo('inventory', data);
+        });
+
     });
 
-
-
+    function jumpTo(url, category){   
+        loadContent(url);
+        activeCategory = category;
+        $('.category-button').removeClass('ctg-selected');
+        loadItemsByCategory(category, 1);
+    }
 </script>
 
 
 <style>
-    .invnetory-count {
+    .inventory-count {
         font-size: 0.8rem;
+    }
+
+    .invnetory-count > li:nth-child(2), .dashboard-category-list > li {
+        color: #6c757d !important;
+    }
+
+    .dashboard-category-list > li {
+        width: 6rem;
+        height: 6rem;     
+        padding: 2rem 1rem 2rem;
+        font-size: 0.9rem;
+        overflow: hidden;
+        cursor: pointer;
     }
 </style>
 
-<div class="d-block mt-2 shadow pb-0 p-3 w-13  dashbaord-components rounded rounded-1 border border-1">
-
+<div class="d-block">
     <h6>
-        <strong>Inventory Items</strong>
+        <strong class="text-orange">Inventory Items</strong>
     </h6>
 
-    <ul class="list-unstyled  invnetory-count mt-0 border-0 border-top mt-1 border-warning">
-        <li class="mt-1">
-            <details>
-                <summary>Breakdown</summary>
-                <ul class="list-unstyled">
-                        <li class="d-flex justify-content-between ">
-                            <strong>Robots</strong>
-                            <span id="robots-count" class="ms-auto">--</span>
-                        </li>
-                        <li class="d-flex justify-content-between">
-                            <strong>Books</strong>
-                            <span id="books-count" class="ms-auto">--</span>
-                        </li>
-                        <li class="d-flex justify-content-between">
-                            <strong>Materials</strong>
-                            <span id="materials-count" class="ms-auto">--</span>
-                        </li>
-                    </ul>
-            </details>
+    <ul class="list-unstyled  invnetory-count mt-1 pt-2">
+        <li>
+            <ul class="list-unstyled d-flex justify-content-around text-center dashboard-category-list">
+                <li class="d-block shadow rounded rounded-circle" data-string="Robots">
+                    <h6 class="text-orange category-count-label m-0">Robots</h6>
+                    <span id="robots-count">--</span>
+                </li>
+                <li class="d-block - shadow rounded rounded-circle" data-string="Books">
+                    <h6 class="text-orange category-count-label m-0">Books</h6>
+                    <span id="books-count" >--</span>
+                </li>
+                <li class="d-block shadow rounded rounded-circle" data-string="Materials">
+                    <h6 class="text-orange category-count-label m-0">Materials</h6>
+                    <span id="materials-count">--</span>
+                </li>               
+            </ul>
        </li>
-        <li class="d-flex justify-content-between border-0 border-top mt-1 pt-1 border-warning">
-            <strong>Total</strong>
-            <span id="inventoryCount" class="text-center ms-auto">
+        <li class="d-flex flex-column justify-content-center align-items-center pt-4 text-center w-100 mb-0">
+            <h6 class="mb-0">
+                <strong class="text-orange mb-0">Total</strong>
+            </h6>
+            <div id="inventoryCount" class="mt-0 mb-0">
                 --
-            </span>
+            </div>
         </li>
     </ul>
 </div>

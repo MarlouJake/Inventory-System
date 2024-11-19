@@ -233,7 +233,67 @@ function changeBgBaseOnCategory(baseOnCategory, firmware, status, category) {
     }
 }
 
+async function requestEvent(isFininsheed, userEvent, data = null, element = null, clickedElement = null) {
+    if (isFininsheed) {
+        switch (userEvent) {
+            case 'sidebar':
+                element.remove();
+                $(clickedElement).addClass('active');
+                $('#sidebar .nav-link').removeClass('active bgc-orange');
+                
+                break;
+            case 'category':
+                $('.category-button').removeClass('ctg-selected').addClass('ctg-notselected').prop('disabled', false);
+                $('#category-buttons .category-button').removeClass('disabled');
+                $(`.category-button[data-string="${data}"]`).addClass('ctg-selected').removeClass('ctg-notselected').text(data);
+                break;
+            default:
+                console.error(`Event: ${userEvent} not found.`);
+                break;
+        };
+    } 
+}
 
+async function ajaxRequest(url, type = 'GET', data = {}, cache = false, timeout = 5000){
+    return  await $.ajax({
+        url: url,
+        type: type,
+        data: data,
+        cache: cache,
+        timeout: timeout,
+    });
+}
+
+async function ajaxFailure(requestType, error, status) {
+
+    if (error.textStatus === 'timeout') {
+        console.log('The request timed out.');
+    }
+
+    switch (requestType) {
+        case 'category':
+             if (status == 404) {
+                $('#items-list').html(noItemContainer);
+                checkForItems(status);
+                console.log(`Server responsed with status code: ${error.status}\n
+                             Server message: ${error.responseJSON.Message}`);
+            } else {
+                console.log(`An error occurred: ${JSON.stringify(error.responseJSON, null, 2)}`);
+            }
+            break;
+        case 'search':
+            $('.card-container').html(noItemContainer);
+            if (textStatus === 'timeout') {
+                console.log('The request timed out.');
+            } else {
+                console.log('An error occurred: ' + error.textStatus);
+            }
+            break;
+        default:
+            console.error(`Request Type: ${requestType} not found.`);
+            break;
+    }
+}
 
 /** 
  * Function to dynamically load page content in the dashboard.
@@ -243,42 +303,60 @@ function changeBgBaseOnCategory(baseOnCategory, firmware, status, category) {
  * @param {string} url - URI or URL of the API
  * @returns {string} Returns HTML content for the partial view.
  **/
-loadContent = function (url) {
-    $('.card-container').html(spinnerContainer);
+loadContent = async function (url, element) {
+    let done = false;
+   
+    try {
+        
+        const response = await ajaxRequest(url);
 
-    $.ajax({
-        url: url,
-        type: 'GET',
-        cache: false,
-        timeout: 10000,
-        success: function (response) {
-            $('#content-handler').html(response);
-            $('#sidebar .nav-link').removeClass('disabled').find('.spinner').hide();
-            $('#sidebar .nav-link').removeClass('active bgc-orange'); 
+        $('#content-handler').html(response);
+                  
+        setTimeout(async () => {
+            $('#sidebar .nav-link[data-url="' + url + '"]').addClass('active bgc-orange');
+        }, 1);
 
-            //$('.category-button').removeClass('ctg-selected');        
-            //$('.category-button[data-string="All"]').addClass('ctg-selected');
-
-            setTimeout(() => {
-                $('#sidebar .nav-link[data-url="' + url + '"]').addClass('active bgc-orange');
-            }, 20);
-            
-        },
-        error: function (textStatus) {
-            $('#sidebar .nav-link').removeClass('disabled').find('.spinner').hide();
-
-            if (textStatus === 'timeout') {
-                console.log('The request timed out.');
-            } else {
-                console.log("Error loading page: ", textStatus);
-            }
+        done = true;
+    }
+    catch (error) {
+        
+        if (erorr.textStatus === 'timeout') {
+            console.log('The request timed out.');
+        } else {
+            console.log("Error loading page: ", error.textStatus);
         }
-    });
+
+        done = true;
+    }
+
+    requestEvent(done, 'sidebar', null, $('#cover-element'), element);
 };
 
-function loadPage(category, pageNumber) {
-    //var itemcode = $('#searchbar').val().trim();
-    
+/*
+async function loadPage(url, category, pageNumber) {
+    try {
+        const data = {
+            category: category,
+            page: pageNumber
+        }
+        const response = await ajaxRequest(url, 'GET', data);
+        $('#items-list').html(response);
+        updatePaginationControls(response);
+    }
+    catch (error) {
+        $('#view-all').html(noContent);
+
+        if (textStatus === 'timeout') {
+            console.log('The request timed out.');
+        } else {
+            console.log("Error loading page: ", textStatus);
+        }
+    }
+
+}
+
+
+
     $.ajax({
         url: 'inventory/items/uncategorized',
         type: 'GET',
@@ -290,78 +368,59 @@ function loadPage(category, pageNumber) {
             updatePaginationControls(response);          
         },
         error: function (textStatus) {
-            $('#view-all').html(noContent);
             
-
-            if (textStatus === 'timeout') {
-                console.log('The request timed out.');
-            } else {
-                console.log("Error loading page: ", textStatus);
-            }
         }
     });
+}*/
+
+async function loadItemsByCategory(category, pageNumber) {
+  
+    let itemcode = $('#searchbar').val();
+    let done = false;
+   
+    try {
+        const url = 'inventory/items/categorized';
+        const data = {
+            itemcode: itemcode,
+            page: pageNumber,
+            category: category
+        };
+
+        const response = await ajaxRequest(url, 'GET', data);
+        $('#items-list').html(response);
+          
+        checkForItems(200);
+        resetCheckState();
+
+        done = true;
+    }
+    catch (error) {
+        let status = error.status;
+        await ajaxFailure('category', error, status);
+        done = true;
+    }
+
+    requestEvent(done, 'category', category);
 }
 
-function loadItemsByCategory(category, pageNumber) {
-    $('card-container').html(spinnerContainer);
-    var itemcode = $('#searchbar').val().trim();
-    $.ajax({
-        url: 'inventory/items/categorized',
-        type: 'GET',
-        timeout: 10000,
-        cache: false,
-        data: { itemcode: itemcode, category: category, page: pageNumber },
-        success: function (response) {
+async function loadItems(itemcode, category, pageNumber) {
+    try {
+        const url = 'inventory/search/';
+        const data = {
+            itemcode: itemcode,
+            category: category,
+            page: pageNumber
+        };
+        const response = await ajaxRequest(url, 'GET', data);
 
+        $('#items-list').html(response);
+        resetCheckState();
+        updatePaginationControls(response);
+    }
+    catch (error){
+        
+    }
 
-
-            $('#items-list').html(response);
-            $('#category-buttons .category-button').removeClass('disabled').find('.spinner').hide();
-            $(`.category-button[data-string="${category}"]`).addClass('ctg-selected');
-            updatePaginationControls(response);
-            checkForItems(200);
-            resetCheckState();
-        },
-        error: function (jqXHR, textStatus) {
-            let status = jqXHR.status;
-                   
-            if (textStatus === 'timeout') {
-                console.log('The request timed out.');
-            } else if (status == 404) {
-                $('#category-buttons .category-button').removeClass('disabled').find('.spinner').hide();
-                $(`.category-button[data-string="${category}"]`).addClass('ctg-selected');
-                $('#items-list').html(noItemContainer);
-                checkForItems(status);
-                console.log(`Server responsed with status code: ${jqXHR.status}\nServer message: ${jqXHR.responseJSON.Message}`);
-            } else {
-                console.log('An error occurred: ' + JSON.stringify(jqXHR.responseJSON, null, 2));
-            }
-        }
-    });
-}
-
-function loadItems(itemcode, category, pageNumber) {
-   $('card-container').html(spinnerContainer);
-    $.ajax({
-        url: 'inventory/search/', 
-        type: 'GET',
-        timeout: 10000,
-        cache: false,
-        data: { itemcode: itemcode, category: category, page: pageNumber },
-        success: function (response) {
-            $('#items-list').html(response);
-            resetCheckState();
-            updatePaginationControls(response);
-        },
-        error: function (textStatus) {
-            $('.card-container').html(noItemContainer);
-            if (textStatus === 'timeout') {
-                console.log('The request timed out.');
-            } else {
-                console.log('An error occurred: ' + textStatus);
-            }
-        }
-    });
 }
 
 
@@ -472,6 +531,7 @@ function checkForItems(status) {
 //    }
 //}
 
+/*
 function updatePaginationControls(response) {
     
     var totalPages = response.totalPages; // Get total pages from response
@@ -479,8 +539,10 @@ function updatePaginationControls(response) {
 
     // Update pagination controls
 }
+*/
 
-/**Enable or Disable & Add or Remove attr required  to the firmware status dropdown
+/**
+ * Enable or Disable & Add or Remove attr required  to the firmware status dropdown
  * @param {JQuery} input - ID of input dropdown
  * @param {JQuery} target - ID of target dropdown
  * 

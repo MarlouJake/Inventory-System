@@ -4,32 +4,33 @@
 @{
     ViewData["Title"] = "User Details";
     string categoryFromModel = ViewBag.Category;
-    int itemId = ViewBag.ItemId;
+    int? itemId = ViewBag.ItemId;
     Layout = null;
 }
 <script>
 
-    $(document).on('hidden.bs.modal', '.container #dynamic-modal', function (e) {
+    $(document).on('hidden.bs.modal', '.container #dynamic-modal', function () {
         $(this).remove();
     });
 
     $(document).ready(function () {
         var categoryFetched = "@Html.Raw(categoryFromModel)";
-
-        $('#deleteButtonView').on('click', DeleteItem);
-
-        getPartialView(categoryFetched);
+        var itemId = "@Html.Raw(itemId ?? null)";
+        $('#deleteButtonView').on('click', function(){
+            DeleteItem(itemId);
+        });
+        getPartialView(categoryFetched, itemId);
     });
 
-    function DeleteItem(){
-          let itemIds = []; 
-          itemIds.push(@Model.ItemId);
+    function DeleteItem(id){
+          let itemIds = [];;
+          itemIds.push(id);
           sessionStorage.setItem('deleteIds', JSON.stringify(itemIds));
           sessionStorage.setItem('deleteLenght', itemIds.length);
           ModalShow('inventory/remove/@Model.ItemId');
     }
 
-    function getPartialView(category){
+    async function getPartialView(category, id){
         let url;
         switch(category){
             case 'Robots':
@@ -44,21 +45,24 @@
                 break;
         }
 
-            fetch(`${url}?id=${@Html.Raw(itemId)}`, {
-               method: 'GET',
-               headers: {
-                   'Content-Type' : 'text/html'                   
-               }
-        }).then(response => {
-            if(!response.ok){
-               throw new Error('Network response was not ok');
+        try{
+            const response =  await fetch(`${url}?id=${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'text/html'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
-            return response.text();
-        }).then(data => {
-                   $('#ViewBaseOnCategory').html(data);
-        }).catch(error => {
-               connsole.error('There was a problem with the fetch operation:', error);
-        });
+
+            const data = await response.text();
+            $('#ViewBaseOnCategory').html(data);
+        }
+        catch(error){
+               console.error('There was a problem with the fetch operation:', error);
+        };
     }
 </script>
 
@@ -151,7 +155,8 @@
             </dt>
             @if (!String.IsNullOrEmpty(Model.ItemDescription))
             {
-                <dd class="col-sm-10  border p-2" style="font-size: 0.8rem;">
+                <dd class="col-sm-10  border p-2 w-auto" style="font-size: 0.8rem; word-break: break-all;
+                hyphens: auto; overflow-wrap: break-word;">
                     @Html.DisplayFor(model => model.ItemDescription)
                 </dd>
             }

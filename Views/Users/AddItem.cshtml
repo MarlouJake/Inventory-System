@@ -173,7 +173,7 @@
         <div class="w-50 col-sm-2">
             <label asp-for="ItemName" for="itemName" id="name-label" class="control-label"></label>
             <input asp-for="ItemName" id="itemName" class="form-control form-control-sm user-input" name="itemName"
-                   autocomplete="off"
+                   autocomplete="on"
                    required
                    placeholder="Item Name"
                    data-val="true"
@@ -188,7 +188,7 @@
         <div>
             <label asp-for="ItemDescription" for="itemDescription" class="control-label"></label>
             <textarea asp-for="ItemDescription" id="itemDescription" type="text" class="form-control form-control-sm user-input" name="itemDescription"
-                      autocomplete="off"
+                      autocomplete="on"
                       placeholder="Description" 
                       maxlength="5000">
             </textarea>

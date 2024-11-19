@@ -1,9 +1,13 @@
-﻿using InventorySystem.Data;
+﻿using Azure;
+using Google.Protobuf.WellKnownTypes;
+using InventorySystem.Data;
 using InventorySystem.Models.DataEntities;
 using InventorySystem.Models.Responses;
 using InventorySystem.Utilities.Api;
 using InventorySystem.Utilities.Data;
 using Microsoft.AspNetCore.Mvc;
+using Mysqlx;
+using System.Text.Json;
 
 namespace InventorySystem.Controllers.api
 {
@@ -12,41 +16,68 @@ namespace InventorySystem.Controllers.api
     public class RegisterApi(ApplicationDbContext context) : ControllerBase
     {
         private readonly ApplicationDbContext _context = context;
-        public ApiMessageListResponse? responseList;
 
-        [HttpPost("create/user")]
+        private ApiMessageListResponse? responseList;
+        private readonly List<string> serverLog = [];
+        private readonly ServerLog responseObject = new();
+        private User newUser = new();
+        private object userObj = new { };
+
+       [HttpPost("create/user")]
         public async Task<IActionResult> CreateNewAccount([FromBody] User model)
-        {
-            var newUser = new User
-            {
-                Username = model.Username,
-                Email = model.Email,
-                Password = HashHelper.HashString(model.Password!),
-            };
-
+        {          
             var seedrole = new SeedUserRole(_context);
-            var (isSuccess, seedMessage, statuscode) = await seedrole.AddUserWithRole(newUser, "User");
-            /*
-            var responseObject = new ApiMessageListResponse
-            {
-                IsValid = true,
-                Message = seedMessage,
-                Model = null,
-                RedirectUrl = null
-            };*/
+            string encryption = $"{HttpContext.Request.Scheme}://";
 
-            if (isSuccess)
+            newUser.Construct(model.Username, model.Email, HashHelper.HashString(model.Password!));
+        
+            var (isSuccess, seedMessage, statuscode) = await seedrole.AddUserWithRole(newUser, "User");
+
+            responseObject.Construct(isSuccess, ["ServerMessage"], model, 
+                string.Join("", encryption, HttpContext.Request.Host, HttpContext.Request.Path), 
+                "Create Account", string.Join(", ", seedMessage), statuscode); 
+            
+            UpdateServerResponse(isSuccess, seedMessage, responseObject);
+                   
+            return StatusCode(statuscode, responseList);
+        }
+
+      
+        private void UpdateServerResponse(bool isSuccess, List<string> messages, object obj)
+        {
+            string response = ToJsonFormatAsync(obj);
+            Console.WriteLine($"Server Log: {response}");
+
+            switch (isSuccess)
             {
-                responseList = ApiResponseList.MessageListResponse(true, seedMessage);
-                Console.WriteLine("Registration Successful");
-                return StatusCode(statuscode, responseList);
+                case true:
+                    responseList = ApiResponseList.MessageListResponse(true, messages);
+                    serverLog.Add("Registration Successsful");
+                    break;
+                case false:
+                    responseList = ApiResponseList.MessageListResponse(false, messages);
+                    serverLog.Add("Registration Unsuccessful");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(isSuccess),"Invalid argument value type.");
             }
-            else
+  
+        }
+
+
+        private static string ToJsonFormatAsync(object obj)
+        {
+            JsonSerializerOptions options = GetSerializerOptions();
+            return JsonSerializer.Serialize(obj, options);
+        }
+
+
+        private static JsonSerializerOptions GetSerializerOptions()
+        {
+            return new() 
             {
-                responseList = ApiResponseList.MessageListResponse(false, seedMessage);
-                Console.WriteLine("Registration Unsuccessful");
-                return StatusCode(statuscode, responseList);
-            }
+                WriteIndented = true 
+            };
         }
     }
 }

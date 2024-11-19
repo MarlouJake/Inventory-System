@@ -71,7 +71,8 @@ namespace InventorySystem.Controllers.api
 
                 // Redirect to the user dashboard
                 message = "Authenticated";
-                var redirectUrl = Url.Action("ContentHandler", "Users", new { roleName = roles.FirstOrDefault()!, username = user.Username });
+                //var redirectUrl = Url.Action("ContentHandler", "Users", new { roleName = roles.FirstOrDefault()!, username = user.Username });
+                var redirectUrl = Url.Action("ContentHandler", "Users", new { u = user.Username });
                 var response = ApiResponseUtils.SuccessResponse(true, message, redirectUrl!);
                 return StatusCode(StatusCodes.Status200OK, response);
             }

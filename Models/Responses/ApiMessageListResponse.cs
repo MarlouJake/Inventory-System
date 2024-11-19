@@ -6,5 +6,5 @@
         public List<string>? Message { get; set; }
         public object? Model { get; set; }
         public string? RedirectUrl { get; set; }
-    }
+    }   
 }

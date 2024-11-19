@@ -50,12 +50,10 @@ namespace InventorySystem.Data
                 .WithMany(r => r.UserRoles)
                 .HasForeignKey(ur => ur.RoleId);
 
-
             /*Create History Model Builder*/
             modelBuilder.Entity<CreateHistory>()
                 .HasKey(ch => ch.HistoryId);
-
-
+            
             /*Roles model builder*/
             modelBuilder.Entity<Role>()
                 .HasKey(r => r.RoleId);

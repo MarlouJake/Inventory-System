@@ -20,36 +20,32 @@
             <dt class="col-sm-2 status-header align-items-center">
                 @Html.DisplayNameFor(model => model.Category)
             </dt>
-            @if (!string.IsNullOrEmpty(Model.Category))
-            {
-                <dd id="item-category" class="col-sm-2 status-body mt-0 w-35">
+            <dd id="item-category" class="col-sm-2 status-body mt-0 w-35">
+                @if (!string.IsNullOrEmpty(Model.Category))
+                {
                     @Html.DisplayFor(model => model.Category)
-                </dd>
-            }
-            else
-            {
-                <dd id="item-category" class="col-sm-2 status-body mt-0 w-30">
-                    --
-                </dd>
-            }
+                }
+                else
+                {
+                    <span>--</span>
+                }
+            </dd>
         </div>
 
         <div class="d-block mt-0 mb-0 w-50">
             <dt class="col-sm-2 status-header align-items-center">
                 @Html.DisplayName("Status")
             </dt>
-            @if (!string.IsNullOrEmpty(Model.Status))
-            {
-                <dd id="item-status" class="col-sm-2 status-body mt-0 mb-0 w-40">
+            <dd id="item-status" class="col-sm-2 status-body mt-0 mb-0 w-40">
+                @if (!string.IsNullOrEmpty(Model.Status))
+                {
                     @Html.DisplayFor(model => model.Status)
-                </dd>
-            }
-            else
-            {
-                <dd id="item-status" class="col-sm-2 status-body mt-0 mb-0 w-40">
-                    --
-                </dd>
-            }
+                }
+                else
+                {
+                    <span>--</span>
+                }
+            </dd>        
         </div>
 
     </dl>
@@ -73,8 +69,16 @@
             </dt>
 
             <dd class="row-sm-2 text-break date-body">
-                @Html.DisplayFor(model => model.ItemDateUpdated)
+                @if (Model.ItemDateUpdated.ToString("yyyy-MM-dd HH:mm:ss.ffffff") == "0001-01-01 00:00:00.000000")
+                {
+                    <span>Not Modified</span>
+                }
+                else
+                {
+                    @Html.DisplayFor(model => model.ItemDateUpdated)
+                }               
             </dd>
+            
         </div>
     </dl>
 

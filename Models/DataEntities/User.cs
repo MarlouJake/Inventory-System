@@ -56,6 +56,13 @@ namespace InventorySystem.Models.DataEntities
             DateModified = DateTime.Now;
         }
 
+        public void Construct(string? username, string? email, string? password)
+        {
+            Username = username;
+            Email = email;
+            Password = password;
+        }
+
     }
 }
 

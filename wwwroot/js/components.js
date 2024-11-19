@@ -6,6 +6,10 @@ let spinner = `
 
 let overlayDiv = ''
 
+let spinnerOnly = ` <div class="text-center">
+                            ${spinner}
+                    </div>`;
+
 let spinnerContainer = ` <div  class="text-center ms-5 mt-5 ">
                             <p class="ms-1">${spinner} Loading...</p>
                         </div>`;
@@ -48,6 +52,56 @@ let DynamicModal = `
                            </div>
                         </div>
                 `;
+
+let defaultTitle = `
+                    <h6 id="default-header" class="d-flex gap-2 default-header" style="padding: 1rem 0.8rem; padding-bottom: 0.7rem;">
+                        <span class="default-icon"><i class="bi bi-box-seam-fill"></i></span>
+                        <span class="default-title">Title</span>
+                    </h6>
+        `;
+
+let navDropdown = `
+                <div class="custom-select">
+                    <button class="select-button">
+                        <span class="ms-1 view-title"></span>
+                        <span class="dropdown-icon ms-4.5">
+                            <i class="bi bi-caret-down-fill"></i>
+                        </span>
+                    </button>
+
+                    <ul class="dropdown-options nav tabs flex-grow-1 mt-0">
+                        <li class="nav-item m-0 p-0">
+                            <a class="nav-link sidebar-link" id="dashboardlink" data-url="dashboard">
+                                <i class="bi bi-speedometer2"></i>
+                                <span class="ms-2-7">Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item tab m-0 p-0">
+                            <a class="nav-link sidebar-link" id="inventory-link" data-url="inventory" data-string="All">
+                                <i class="bi bi-boxes"></i>
+                                <span class="ms-2-7">Inventory</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item m-0 p-0">
+                            <a class="nav-link sidebar-link" id="request-link" data-url="requests">
+                                <i class="fa-solid fa-user-group"></i>
+                                <span class="ms-2-4">Requests</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item m-0 p-0 ">
+                            <a class="nav-link d-fle w-100" id="user-logout">
+                                <i class="bi bi-box-arrow-left text-danger"></i>
+                                <span class="ms-2-9">Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+            </div> 
+        `;
+
+
 
 function ShowError(details) {
     var errormessage = "An Error Occurred";

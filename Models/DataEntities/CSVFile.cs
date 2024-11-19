@@ -4,7 +4,6 @@ namespace InventorySystem.Models.DataEntities
 {
     public class CSVFile
     {
-
         public string? ItemCode { get; set; }
         public string? ItemName { get; set; }
         public string? ItemDescription { get; set; }
@@ -15,12 +14,9 @@ namespace InventorySystem.Models.DataEntities
         public DateTime ItemDateAdded { get; set; }
         [DisplayFormat(DataFormatString = "{0:MMM. dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
         public DateTime ItemDateUpdated { get; set; }
+        public bool IsModified { get; set; }
+        public bool IsBorrowed { get; set; }
+        public bool IsReturned { get; set; }
         public int? UserId { get; set; }
-
-        public CSVFile()
-        {
-            ItemDateAdded = DateTime.Now;
-            ItemDateUpdated = DateTime.Now;
-        }
     }
 }

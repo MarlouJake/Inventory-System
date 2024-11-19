@@ -1,0 +1,152 @@
+﻿@using InventorySystem.Models.Pagination
+@model HistoryListModel
+
+@{
+    var timespan = ViewBag.TimeSpan;
+    
+    int currentPage = Model.CurrentPage;
+    int totalPages = Model.TotalPages;
+
+    int startPage = Math.Max(1, currentPage - 1);
+    int endPage = Math.Min(totalPages, currentPage + 1);
+   
+    if (endPage - startPage + 1 < 2)
+    {
+        if (startPage > 1)
+            startPage = Math.Max(1, endPage - 3);
+        else if (endPage < totalPages)
+            endPage = Math.Min(totalPages, startPage + 3);
+    }
+}
+
+<script>
+    
+    $(document).ready(function(){
+      
+        $('#jumpToFirst, #prev-history, #jumpBack, #jumpForward, #next-history, #jumpToLast').on('click', async function(event) {
+            event.preventDefault(); // Prevent default action
+        
+            switch (this.id) {
+                case 'jumpToFirst':
+                    page = 1;
+                    break;
+                case 'prev-history':
+                    page = @Math.Max(1, currentPage - 1); // Ensure page doesn't go below 1
+                    break;
+                case 'jumpBack':
+                    page = @Math.Max(1, startPage - 1); // Ensure page doesn't go below 1
+                    break;
+                case 'jumpForward':
+                    page = @Math.Min(totalPages, endPage + 1); // Ensure page doesn't exceed total pages
+                    break;
+                case 'next-history':
+                    page = @Math.Min(totalPages, currentPage + 1); // Ensure page doesn't exceed total pages
+                    break;
+                case 'jumpToLast':
+                    page = @totalPages;
+                    break;
+                default:
+                    return;
+            }
+            
+            await nextRecent(page, this);
+                       
+        });
+    });
+
+    async function callBack(element){
+        $(element).addClass('disabled').prop('disabled', true);
+        $('#recent-inventory-table').html(`
+                                                <div class="d-block w-100 h-100 mt-4 mb-4 justify-content-center align-items-center text-orange">
+                                                ${spinnerOnly}
+                                                    <div class="text-center"  style="font-size:0.7rem;">Fetching data</div>
+                                            </div>
+                                         `);
+    }
+
+    async function nextRecent(pageNumber, element) {
+        if (@currentPage === pageNumber) {
+            return false;
+        } else{
+            callBack(element);
+            await loadPartialView('dashboard/partial_views/recent-inventory', 'recent-inventory-table', pageNumber);
+            await loadPartialView('dashboard/partial_views/recent-inventory-pagination', 'recent-table-paginationButtons', pageNumber);
+            recentCurrentPage = pageNumber;
+        }
+    }
+
+   
+</script>
+
+
+
+<ul class="pagination pagination-sm recent-table-pagination d-flex justify-content-center align-content-center align-items-center  w-100">
+    @if (Model.History != null && totalPages > 0)
+    {
+        // Display "Page 1" if not in the visible set
+        if (Model.CurrentPage > 2)
+        {
+            <li class="page-item ms-2">
+                <a class="page-link" href="javascript:void(0);" onclick="nextRecent(1)">1</a>
+            </li>
+        }
+        <!-- Previous Page Button -->
+        if (Model.CurrentPage > 1  && Model.TotalPages != 1)
+        {
+
+            <li class="page-item page-button ms-2">
+                <a class="page-link" id="prev-history" href="
+                @Url.RouteUrl("recentPagination", new { username = ViewBag.Username, page = Math.Max(1, currentPage - 1) })">
+                    <i class="fa-solid fa-angle-left"></i>
+                </a>
+            </li>
+        }
+         
+
+        <!-- Previous Set of Pages Button -->
+        if (startPage > 1)
+        {
+            <li class="page-item ms-2">
+                <a class="page-link" href="javascript:void(0);" id="jumpBack">
+                    <i class="fa-solid fa-angles-left"></i>
+                </a>
+            </li>
+        }
+
+        for (var i = startPage; i <= endPage; i++)
+        {
+            <li class="page-item ms-2 @(i == Model.CurrentPage ? "active" : "")">
+                <a class="page-link" href="javascript:void(0);" id="pageButton" onclick="nextRecent(@i, this)">@i</a>
+            </li>
+        }
+
+        <!-- Next Set of Pages Button -->
+        if (endPage < Model.TotalPages)
+        {
+            <li class="page-item ms-2">
+                <a class="page-link" href="javascript:void(0);" id="jumpForward">
+                    <i class="fa-solid fa-angles-right"></i>
+                </a>
+            </li>
+        }
+
+        <!-- Next Page Button -->
+        if (Model.TotalPages > 1 && Model.CurrentPage != Model.TotalPages)
+        {
+            <li class="page-item page-button ms-2">
+                <a class="page-link" href="" id="next-history">
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+            </li>
+        }
+
+        <!-- Last Page Button -->
+        if (endPage < Model.TotalPages)
+        {
+            <li class="page-item page-button ms-2">
+                <a class="page-link" href="javascript:void(0);" id="jumpToLast">@Model.TotalPages</a>
+            </li>
+        }
+    }
+</ul>
+

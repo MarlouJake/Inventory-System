@@ -87,31 +87,21 @@ namespace InventorySystem.Controllers.api
                     Console.Error.WriteLine(message);
                     return StatusCode(StatusCodes.Status409Conflict, response);
                 }
-
-
-                
+            
                 model.UserId = userId;
+                model.IsModified = false;
+                model.IsBorrowed = false;
+                model.IsReturned = false;
+                model.IsDeleted = false;    
+
                 _context.Items.Add(model);              
                 await _context.SaveChangesAsync();
-
-                var item = new CreateHistory
-                {
-                    ItemId = model.ItemId,
-                    ItemCode = model.ItemCode,
-                    ItemName = model.ItemName,
-                    Category = model.Category,
-                    Timestamp = model.ItemDateAdded,
-                    UserId = _getClaims.GetIdClaim(User),
-                    Username = _getClaims.GetUsernameClaim(User)
-
-                };
-
-                await _recentItem.AddToCreateHistory(item);
+               
+                await _recentItem.AddToCreateHistory(model, User);
 
                 redirectTo = "dashboard/item-view/all";
                 message = $"Added 1 item";
 
-                Console.WriteLine($"Inserted data: {JsonConvert.SerializeObject(model)}");
                 Console.WriteLine(message);
                 Console.WriteLine("URL: {0}", redirectTo);
                 Console.WriteLine("User ID Claim in create: {0}", userId);
@@ -201,14 +191,15 @@ namespace InventorySystem.Controllers.api
                 }
 
                 model.UserId = userId;
+                model.ItemDateUpdated = DateTime.Now;
+                model.IsModified = true;
+
                 model.ItemDateAdded = existingItem.ItemDateAdded;
 
                 _context.Items.Update(model);
                 await _context.SaveChangesAsync();
 
-                var items = await _context.Items
-                    .Where(i => i.UserId == userId)
-                    .ToListAsync();
+                await _recentItem.UpdateCreateHistory(model, User, "update");
 
                 redirectTo = "dashboard/item-view/all";
                 message = "Update successful";
@@ -258,7 +249,6 @@ namespace InventorySystem.Controllers.api
 
             try
             {
-                // Check if any IDs were provided
                 if (ids == null || ids.Length == 0)
                 {
                     message = "No IDs provided for deletion.";
@@ -266,29 +256,52 @@ namespace InventorySystem.Controllers.api
                     return await Task.FromResult(StatusCode(Status404, response));
                 }
 
+                var checkItems = await _context.Items.Where(i => ids.Contains(i.ItemId)).ToListAsync();
+                var missingIds = ids.Where(id => !checkItems.Any(i => i.ItemId == id)).ToList();
+
+                if (missingIds.Count > 0)
+                {
+                    message = $"The following IDs do not exist: {string.Join(", ", missingIds)}";
+                    Console.WriteLine(message);
+                    return StatusCode(Status404, ApiResponseUtils.CustomResponse(false, message, null));
+                }
 
                 foreach (var id in ids)
                 {
                     var item = await _context.Items.FindAsync(id);
+                    
                     if (item == null)
                     {
-                        message = $"Item with ID {id} doesn't exist";
+                        message = $"Failed to remove item  with ID {id}";
                         Console.WriteLine(message);
                         continue;
                     }
-                    Console.WriteLine("Selected id: {0}", id);
-                    _context.Items.Remove(item);
-                }
 
+                    Console.WriteLine("Selected id: {0}", id);
+
+                    item.IsDeleted = true;
+
+                    var relatedHistories = _context.CreateHistories.Where(h => h.ItemId == id);            
+
+                    foreach(var history in relatedHistories)
+                    {
+                        history.IsRemoved = item.IsDeleted;
+                        history.Status = "Removed";
+                    }
+
+                    _context.CreateHistories.UpdateRange(relatedHistories);
+                    _context.Items.UpdateRange(item);
+                }
+                
                 await _context.SaveChangesAsync();
 
                 var items = await _context.Items
                         .Where(i => i.UserId == userId)
                         .ToListAsync();
 
-                string redirectTo = "dashboard/item-view/all";
+                string redirectTo = "inventory";
                 string word = ids.Length > 1 ? "items" : "item";
-                message = $"Delete {ids.Length} {word}";
+                message = $"Deleted {ids.Length} {word}";
 
                 Console.WriteLine(message);
                 Console.WriteLine("URL: {0}", redirectTo);

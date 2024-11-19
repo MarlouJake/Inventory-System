@@ -4,22 +4,22 @@
 <script>
     
     $(document).ready(function () {
-        
-        /*
-        $('.card').each(function () {
-            $(this).on('click', function () {
-                const itemId = $(this).data('item-id');
-                ModalShow('dashboard/details/'+itemId);
-                
-            });
-        });
-        */
         changeBackground(); 
-        changeDisplayName();
+        changeDisplayName(); 
         
-        
-        
+        $(".view-button").off('click').on('click', function (event) {
+            event.preventDefault;
+            const loading = `<i class="fa fa-spinner fa-spin text-light"></i>`;
+            let viewId = $(this).data('item-id');
+            $(this).html(loading);
+            setTimeout(async () => {
+                await ModalShow(`inventory/details/${viewId}`);
+                $(this).html("View");
+            }, 10);  
+        });
     });
+
+   
 
     function checkResponse(response){
         if (response.IsValid) {
@@ -103,13 +103,14 @@
                 'color': 'white',
                 'border-radius': '12px'
             });
+            
         });
     }
    
     $('.item-checkbox').on('click', countCheck);
 
     $('.item-checkbox').on('change', checkItemsCheckbox);
-
+    
 </script>
 
 <div class="card position-relative" data-item-id="@Model.ItemId" data-item-name="@Model.ItemName"
@@ -120,7 +121,7 @@
     </div>
     <div class="card-body mt-0">
         <div class="d-flex justify-content-between align-items-center">
-            <h6 class="card-title mb-1 fs-6"><strong>@Model.ItemName</strong></h6>
+            <h6 class="card-title mb-1 fs-6"><strong class="item-name">@Model.ItemName</strong></h6>
         </div>
         <p class="card-text mb-1">
             <span hidden class="d-none catergoryValue">@Model.Category</span>
@@ -132,8 +133,7 @@
             <span class="display-status ps-1 pe-1 mb-0"></span>
         </p>
 
-        <a onclick="ModalShow('inventory/details/@Model.ItemId')" 
-           class="btn btn-crud btn-sm mt-2 form-control text-light">
+        <a class="btn btn-crud btn-sm mt-2 form-control text-light view-button" data-item-id="@Model.ItemId">
            View
         </a>
     </div>

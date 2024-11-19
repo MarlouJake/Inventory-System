@@ -2,6 +2,7 @@ using InventorySystem.Data;
 using InventorySystem.Utilities.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 internal class Program
 {
@@ -30,15 +31,16 @@ internal class Program
         services.AddControllersWithViews();
         // Controllers with JSON options
         services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+         .AddJsonOptions(options =>
+         {
+             options.JsonSerializerOptions.PropertyNamingPolicy = null;
+         });
 
-            });
 
         services.AddScoped<GetClaims>();
         services.AddScoped<SeedAddHistory>();
         services.AddScoped<ItemQuery>();
+        services.AddScoped<HistoryQuery>();
         services.AddScoped<CheckInputs>();
         services.AddScoped<ValidateArrayOfId>();
 
@@ -154,7 +156,7 @@ internal class Program
                 return Task.CompletedTask;
             });
 
-            // API routes
+            // Service API routes
             _ = endpoints.MapControllerRoute(
                 name: "api-validate-userlogin",
                 pattern: "api/u/validate/login",
@@ -190,25 +192,25 @@ internal class Program
             // Standard dashboard route
             _ = endpoints.MapControllerRoute(
                 name: "standard-content",
-                pattern: "{roleName}/ims/{username}/content",
+                pattern: "ims/content/{username}",
                 defaults: new { controller = "Users", action = "ContentHandler" })
                 .RequireAuthorization("RequireUserRole");
 
             _ = endpoints.MapControllerRoute(
                   name: "standard-dashboard",
-                  pattern: "{roleName}/ims/{username}/dashboard",
+                  pattern: "ims/dashboard",
                   defaults: new { controller = "Users", action = "Dashboard" })
                   .RequireAuthorization("RequireUserRole");
 
             _ = endpoints.MapControllerRoute(
                 name: "standard-inventory",
-                pattern: "{roleName}/ims/{username}/inventory",
+                pattern: "ims/inventory",
                 defaults: new { controller = "Users", action = "Inventory" })
                 .RequireAuthorization("RequireUserRole");
 
             _ = endpoints.MapControllerRoute(
                name: "standard-requests",
-               pattern: "{roleName}/ims/{username}/requests",
+               pattern: "ims/requests",
                defaults: new { controller = "Users", action = "Requests" })
                .RequireAuthorization("RequireUserRole");
 
@@ -218,44 +220,52 @@ internal class Program
             //Services route
             _ = endpoints.MapControllerRoute(
               name: "update",
-              pattern: "{roleName}/ims/{username}/inventory/update/{id?}",
+              pattern: "ims/inventory/update/{id?}",
               defaults: new { controller = "Users", action = "Update" })
               .RequireAuthorization("RequireUserRole");
 
             _ = endpoints.MapControllerRoute(
             name: "delete",
-            pattern: "{roleName}/ims/{username}/inventory/remove/{id?}",
+            pattern: "ims/inventory/remove/{id?}",
             defaults: new { controller = "Users", action = "Delete" })
             .RequireAuthorization("RequireUserRole");
 
             _ = endpoints.MapControllerRoute(
             name: "viewdetails",
-            pattern: "{roleName}/ims/{username}/inventory/details/{id?}",
+            pattern: "ims/inventory/details/{id?}",
             defaults: new { controller = "Users", action = "ViewDetails" })
             .RequireAuthorization("RequireUserRole");
 
             _ = endpoints.MapControllerRoute(
               name: "searchView",
-              pattern: "{roleName}/ims/{username}/inventory/search/",
+              pattern: "ims/inventory/search/",
               defaults: new { controller = "Users", action = "Search" })
               .RequireAuthorization("RequireUserRole");
 
-            //View routes
+            //Inventory Partial View Routes
             _ = endpoints.MapControllerRoute(
               name: "items",
-              pattern: "{roleName}/ims/{username}/inventory/items/uncategorized",
+              pattern: "ims/inventory/items/uncategorized",
               defaults: new { controller = "Users", action = "ItemsView" })
               .RequireAuthorization("RequireUserRole");
 
 
             _ = endpoints.MapControllerRoute(
               name: "categoryView",
-              pattern: "{roleName}/ims/{username}/inventory/items/categorized",
+              pattern: "ims/inventory/items/categorized",
               defaults: new { controller = "Users", action = "CategoryView" })
               .RequireAuthorization("RequireUserRole");
 
 
-   
+            //Dashboard Partial View Routes
+            _ = endpoints.MapControllerRoute(
+            name: "recentPagination",
+            pattern: "ims/dashboard/partial_views/recent-inventory-pagination",
+            defaults: new { controller = "Users", action = "RecentInventoryPagination" })
+            .RequireAuthorization("RequireUserRole");
+
+
+
         });
 
         app.UseDeveloperExceptionPage();

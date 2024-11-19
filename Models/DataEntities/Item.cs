@@ -3,6 +3,7 @@ using InventorySystem.Utilities;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace InventorySystem.Models.DataEntities
 {
@@ -45,26 +46,29 @@ namespace InventorySystem.Models.DataEntities
         public string? Category { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:MMM. dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
-
         [DisplayName("Date Added")]
         [DataType(DataType.DateTime)]
         public DateTime ItemDateAdded { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:MMM. dd, yyyy hh:mm:ss tt}", ApplyFormatInEditMode = true)]
-
         [DisplayName("Last Modified")]
         [DataType(DataType.DateTime)]
         public DateTime ItemDateUpdated { get; set; }
+        public bool IsModified { get; set; }
+        public bool IsBorrowed { get; set; }
+        public bool IsReturned { get; set; }
+
+        public bool IsDeleted { get; set; }
 
         [DisplayName(DisplayNames.UserId)]
         [ForeignKey("UserId")]
         public int? UserId { get; set; }
-
+        public virtual ICollection<CreateHistory>? Histories { get; set; }
         public virtual User? User { get; set; }
+
         public Item()
         {
-            ItemDateAdded = DateTime.Now;
-            ItemDateUpdated = DateTime.Now;
+            ItemDateAdded = DateTime.Now;           
         }
 
     }

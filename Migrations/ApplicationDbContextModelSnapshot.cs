@@ -58,6 +58,30 @@ namespace InventorySystem.Migrations
                     b.Property<string>("Category")
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime>("DateAdded")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DateUpdated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("HistoryRemoved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsBorrowed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsModified")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsRemoved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsReturned")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("ItemCode")
                         .HasColumnType("longtext");
 
@@ -67,8 +91,11 @@ namespace InventorySystem.Migrations
                     b.Property<string>("ItemName")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime(6)");
+                    b.Property<string>("RelativeTimeStamp")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
@@ -98,6 +125,18 @@ namespace InventorySystem.Migrations
 
                     b.Property<string>("FirmwareUpdated")
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("IsBorrowed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsModified")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsReturned")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("ItemCode")
                         .HasColumnType("varchar(255)");
@@ -150,7 +189,8 @@ namespace InventorySystem.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Username")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(255)")
+                        .UseCollation("utf8mb4_bin");
 
                     b.HasKey("UserId");
 
@@ -283,17 +323,13 @@ namespace InventorySystem.Migrations
 
             modelBuilder.Entity("InventorySystem.Models.DataEntities.CreateHistory", b =>
                 {
-                    b.HasOne("InventorySystem.Models.DataEntities.Item", "Items")
-                        .WithMany()
+                    b.HasOne("InventorySystem.Models.DataEntities.Item", null)
+                        .WithMany("Histories")
                         .HasForeignKey("ItemId");
 
-                    b.HasOne("InventorySystem.Models.DataEntities.User", "Users")
+                    b.HasOne("InventorySystem.Models.DataEntities.User", null)
                         .WithMany("CreateHistories")
                         .HasForeignKey("UserId");
-
-                    b.Navigation("Items");
-
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("InventorySystem.Models.DataEntities.Item", b =>
@@ -341,6 +377,11 @@ namespace InventorySystem.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("InventorySystem.Models.DataEntities.Item", b =>
+                {
+                    b.Navigation("Histories");
                 });
 
             modelBuilder.Entity("InventorySystem.Models.DataEntities.User", b =>

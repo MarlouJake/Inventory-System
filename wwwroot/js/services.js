@@ -543,7 +543,7 @@ function RemoveConfirm(url, itemIds) {
             var details = `Server responded with status code: ${jqXHR.status} ${textStatus}`;
 
             if (response.IsValid) {
-
+                $("#dynamic-modal").html('');
                 $("#dynamic-modal").modal('hide');
 
                 $("#message-success").text(response.Message).css('background-color', 'gray').fadeIn().delay(500).fadeOut();

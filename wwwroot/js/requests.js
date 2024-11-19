@@ -138,7 +138,7 @@
                 break;
 
             case 'register':
-                this.CheckResponse(response) ? this.showSuccess(message) : this.showError(message);
+                this.CheckResponse(response) ? this.showSuccess(message) : this.showError(message);              
                 break;
 
             case 'logout':
@@ -158,21 +158,15 @@
 
     CheckResponse(response) {
         if (response.IsValid) {
-
-            return true;
-            
+            return true;          
         } else {
             return false;
         }
     }
 
-    CheckRoute(response, action = null) {
+    CheckRoute(response) {
         if (response.RedirectUrl) {
             window.location.href = response.RedirectUrl;
-
-            if (action === 'register') {
-
-            }
         } else {
             this.showError("Route is missing.");
         }
@@ -211,6 +205,8 @@
                 $("#error-message").text(message).fadeIn().delay(500).fadeOut();
             }
         });
+
+        $('#signup-button').html(`Register`);
     }
 
 

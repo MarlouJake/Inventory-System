@@ -1,69 +1,249 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@using InventorySystem.Models.Pagination
+@model HistoryListModel
 
-    Layout = null;
+@{
+    int totalPage = ViewBag.TotalPages;
 }
+
 <style>
-    .comming-soon > span{
-        margin-top: 5rem;
-        font-size: 3rem;
-        width: 5rem;
-        height: 5rem;
+    .dashboard-recent-table td:nth-child(4), .dashboard-recent-table td:nth-child(5) {
+        font-size: 0.6rem;
+    }
+
+    .dashboard-recent-table td{
+        color: #6c757d !important;
+    }
+    .dashboard-recent-table td, .dashboard-recent-table th {
+        overflow: hidden;
+        white-space: normal;
+        font-size: 0.7rem;
+    }
+
+    .dashboard-recent-table th.code-column {
+        font-size: 0.7rem;
+    }
+
+    #status-legend {
+        font-size: 0.6rem;
     }
 </style>
 
 <script>
-
+    var recentCurrentPage = 1; 
+  
     $(document).ready(function(){
+         
         loadPartialView('dashboard/partial_views/inventory-summary', 'inventory-summary');
+        loadPartialView('dashboard/partial_views/recent-inventory', 'recent-inventory-table', 1);
+        loadButtons(1);
+        awaitData();
+        renderTitle('dashboard', 'dashboard-nav');
+
+        $('li').each(function () {
+            let status = $(this).data('status');
+            changeStatusColor(status, this);
+        });
+
+        $('#refresh-recent-data').on('click', function () {
+            $('#recent-inventory-table').html(`
+                                               <div class="d-block w-100 h-100 mt-4 mb-4 justify-content-center align-items-center text-orange">
+                                                    ${spinnerOnly}
+                                                    <div class="text-center" style="font-size:0.7rem;">Fetching data</div>
+                                                </div>
+                                             `);
+
+            loadPartialView('dashboard/partial_views/recent-inventory', 'recent-inventory-table', recentCurrentPage);
+            //loadPartialView('dashboard/partial_views/recent-inventory-pagination', 'recent-table-paginationButtons', currentPage);
+            loadButtons(recentCurrentPage);
+        });
+      
+       
     });
 
+    function awaitData(){
+        const observer = new MutationObserver((mutations, observer) => {
+            const observedElement = document.getElementById('recent-add-details');
 
-   async function loadPartialView(url, id){
-        $.ajax({
-            url: url,
-            type: 'GET',
-            success: function (response) {
-                $(`#${id}`).html(response);
-            },
-            error: function () {
-                let errorText = 'An error occurred while loading partial view';
-                $(`#${id}`).html(errorText);
-                console.error(errorText);
+            if(observedElement){
+                removeRecentItemEvent();
+                observer.disconnect();
             }
+
         });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    function removeRecentItemEvent() {
+        $('.status-indicator[data-status="Removed"]').each(function () {
+            $(this).on('click', function () {
+                //console.log(`${$(this).data('code')} is clicked`);
+            });
+        });
+  
+    }
+ 
+   function changeStatusColor(status, element){
+        switch (status) {
+            case 'New':
+                $(element).css('color', 'green');
+                break;
+            case 'Removed':
+                $(element).css('color', 'red');
+                break;
+            case 'Modified':
+                $(element).css('color', 'orange');
+                break;
+            default:
+                $(element).css('color', 'black');
+                break;
+        }
    }
 
+   async function loadButtons(current = 1){
+       let total = '@Html.Raw(totalPage)';
+       if (total > 1) {
+            await loadPartialView('dashboard/partial_views/recent-inventory-pagination', 'recent-table-paginationButtons', current);
+       } 
+   }
+
+    async function loadPartialView(url, id, page) {
+        let requestFinished = false;
+        try {
+            const data = await $.ajax({
+                url: url,
+                type: 'GET',
+                data: { page: page },
+                timeout: 10000,
+                cache: false,
+            });
+
+            $(`#${id}`).html(data);
+            requestFinished = true;
+        }
+        catch (error) {
+            let errorText = 'An error occurred while loading data' || error;
+            $(`#${id}`).html(errorText);
+            console.error(errorText);
+            requestFinished = true;
+        }
+
+        if (requestFinished){
+            
+        }
+    }
+
+    async function getTimespan() {
+        $('.item-timestamp').each(function () {
+            let itemid = $(this).data('itemid');
+            let element = $(this);
+            loadPartialData('dashboard/partial_views/timestamp', element, itemid);
+        });
+    }
+
+    async function restoreRecentAdd() {
+        recentTimespanInterval = setInterval(async () => {
+            await getTimespan();
+        }, 5000);
+    }
+
+    async function loadPartialData(url, element, itemid) {
+        try {
+            const data = await $.ajax({
+                url: url,
+                type: 'GET',
+                data: { itemid: itemid },
+                timeout: 10000,
+                cache: false,
+            });
+
+            element.text(data);
+
+        }
+        catch (error) {
+            element.html(`<span class="text-danger">[error]</span>`);
+            console.error(error);
+        }
+    }
+
+    $(this).on('pagehide beforeunload', function () {
+        //Located in ContentHandler File
+        clearRecentTimespanInterval();
+    });
 </script>
-<!-- Top Bar -->
-<nav class="border-bottom border-secondary">
 
-    <div class="bg-dark d-flex p-1">
+<style>
+    .custom-select .arrow {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 6px solid white;
+        transition: transform ease-in-out 0.3s;        
+    }
+</style>
 
-        <!-- Searchbar and Create Button Container -->
-        <div class="d-flex justify-content-between align-items-center w-100 " id="searchbarAndCreateButtonContainer">
-            <div class="bg-dark p-2 d-flex text-light">
-                <i class="bi bi-speedometer2"></i>
-                <span class="ms-1">Dashboard</span>
-            </div>
-
-            <div>
-                <h6 href="#" class="text-decoration-none text-light text-start text-uppercase" id="username-container"></h6>
-            </div>
-        </div>
-
+<nav id="dashboard-nav">
+    <!-- Top Bar -->
+    <div class="default-title-container bg-dark text-light border-bottom border-secondary
+         d-flex align-content-center align-items-center" style="height:3rem;">        
     </div>
-    
-
 </nav>
 
 <!-- Content -->
-<section id="dashboard-content" class="mt-2 position-relative container-fluid">
-     <div id="inventory-summary">
-     </div>
-     <div id="recent-add-details">
-     </div>
+<section id="dashboard-content" class="position-relative dashbaord-components p-2 pe-3 overflow-hidden">
+    <div class="gap-2 d-sm-block d-md-flex d-lg-flex d-sm-block">
+
+        <div id="inventory-summary" class="col-12 col-md-6 shadow pb-0 p-3 dashbaord-components rounded border">
+        </div>
+
+        <div class="shadow dashbaord-components rounded border col-12 col-md-6">
+            <div class=" d-flex align-items-center ps-2 pe-2 pt-2">
+                <h6 class="text-orange">
+                    <strong>
+                        Recent
+                    </strong>
+                </h6>
+                
+                <ul id="status-legend" class="list-unstyled d-flex mt-2 ms-auto gap-2 m-0 p-0 overflow-hidden">
+                    <li data-status="New">
+                        <i class="bi bi-circle-fill text-center me-1"></i>New
+                    </li>
+                    <li data-status="Removed">
+                        <i class="bi bi-circle-fill text-center me-1"></i>Removed
+                    </li>
+                    <li data-status="Modified">
+                        <i class="bi bi-circle-fill text-center me-1"></i>Modified
+                    </li>
+                </ul>
+
+                <button id="refresh-recent-data" class="btn btn-success btn-sm ms-auto" title="Refresh Data">
+                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <table class="dashboard-recent-table mt-2 bgc-orange w-100">
+                <thead>
+                    <tr class="text-start row row-cols-auto 
+                        justify-content-center align-content-center align-items-center 
+                        ps-2 pe-sm-2 pe-md-0 pe-lg-0">
+                        <th class="col-2" style="padding-left:1.8rem;">Code</th>
+                        <th class="col-3" style="padding-left:1.8rem;">Name</th>
+                        <th class="col-3">Category</th>
+                        <th class="col-2">Added</th>
+                        <th class="col-2 text-center">Status</th>
+                    </tr>
+                </thead>
+            </table>
+
+            <div id="recent-inventory-table" class="pt-1">
+               
+            </div>
+
+           
+            <!-- Pagination controls -->
+            <nav id="recent-table-paginationButtons" class="w-100 mt-3 d-flex" data-page="currentPage">
+
+            </nav>
+         
+        </div>
+    </div>
 </section>
 

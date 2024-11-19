@@ -1,4 +1,4 @@
-﻿function ModalShow(url) {
+﻿async function ModalShow(url) {
     var dashboard = $('#dashboard-layout');
     var home = $('#layoutbody');
     $('.modal').each(function () {
@@ -6,31 +6,32 @@
     });
     $('#dynamic-modal').remove();
 
-    setTimeout(() => {
+    setTimeout(async () => {
         if (dashboard) {
             dashboard.append(DynamicModal);
         }
         if (home) {
             home.append(DynamicModal);
         }       
-        GetData(url);
-    },100);
+        await GetData(url);
+    },10);
 };
 
-function GetData(url) {
-    $.ajax({
-        type: 'GET',
-        url: url,
-        success: function (fallback) {
-            $('#dynamic-modal .modal-body').html(fallback);
-            $('#dynamic-modal').modal('show');
-        },
-        error: function (jqXHR, status) {
-            $('#dynamic-modal').modal('hide');
-            console.error("Error details: ", jqXHR.responseText);
-            alert("An error occurred while loading the form: " + jqXHR.status + " " + status);
-        }
-    });
+async function GetData(url) {
+    try {
+        const response = await $.ajax({
+            type: 'GET',
+            url: url,  
+            cache: true
+        });
+        $('#dynamic-modal .modal-body').html(response);
+        $('#dynamic-modal').modal('show');
+    }
+    catch (error) {
+        $('#dynamic-modal').modal('hide');
+        console.error("Error details: ", error.responseText);
+        alert("An error occurred while loading the form: " + error.status + " " + error.statusText);
+    }
 }
 
 function checkSession() {

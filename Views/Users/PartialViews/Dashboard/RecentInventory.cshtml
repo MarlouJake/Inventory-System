@@ -1,0 +1,145 @@
+﻿@using InventorySystem.Models.Pagination
+@model HistoryListModel
+
+@{
+    var timespan = ViewBag.TimeSpan;
+
+    int currentPage = Model.CurrentPage;
+    int totalPages = Model.TotalPages;
+
+    int startPage = Math.Max(1, Model.CurrentPage - 2);
+    int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+
+    if (endPage - startPage + 1 < 3)
+    {
+
+        if (startPage > 1)
+            startPage = Math.Max(1, endPage - 4);
+        else if (endPage < Model.TotalPages)
+            endPage = Math.Min(Model.TotalPages, startPage + 4);
+    }
+}
+
+<script>
+
+    var recentTimespanInterval;
+
+
+    $(document).ready(function () {
+        let normalIcon = `
+                    <i class="bi bi-circle-fill text-center normal-icon"></i>
+            `;
+
+        let removeIcon = `
+                    <i class="fa-solid fa-trash-can remove-icon"></i>
+            `;
+        $('.status-indicator').each(function () {
+            let itemStatus = $(this).data('status');
+            $(this).html(normalIcon);
+            changeStatusColor(itemStatus, this);
+        });
+     
+        
+        $('.normal-icon').on('click', function () {
+            let parent = $(this).parent();
+            let status = parent.data('status');
+            if (status !== "Removed") {
+
+                return;
+            }
+
+            parent.html(removeIcon);
+
+        });
+
+        
+
+        FormatItems();
+        getTimespan();
+        clearRecentTimespanInterval();
+        restoreRecentAdd();
+
+    });
+
+    async function FormatItems(){
+        let viewWidth = window.innerWidth;
+        let maxLength = viewWidth <= 820 ? 4 : 11;
+
+        // Format item code and name
+        $('.item-code, .item-name').each(function () {
+            let value = $(this).data('code') ? 'code' : 'name';
+            FormatString(this, value, maxLength);
+        });
+    }
+
+    async function FormatString(element, value, maxLength) {
+        let content = $(element).data(value);
+        let formatString;
+        if (content.length > maxLength) {
+            formatString = content.substring(0, maxLength) + '...';
+            $(element).html(formatString);
+            $(element).prop('title', content);
+        } else {
+            $(element).html(content);
+        }
+    }
+
+       
+
+</script>
+
+
+<div id="recent-add-details" style="user-select: none;">
+    @if (Model.History!.Any())
+    {
+        <table class="dashboard-recent-table w-100 h-auto">
+            <tbody>
+                @foreach (var item in Model.History!)
+                {
+                    <tr class="row row-cols-auto 
+                        justify-content-center align-content-center align-items-center
+                        ps-2 pe-sm-2 pe-md-0 pe-lg-0 recent-data">
+                        <td class="col-2 text-nowrap">
+                            <span class="item-code ms-3" data-code="@item.ItemCode">
+                                @item.ItemCode
+                            </span>
+                        </td>
+                        <td class="col-3 text-nowrap">
+                            <span class="item-name ms-3" data-name="@item.ItemName">
+                                @item.ItemName
+                            </span>
+                        </td>
+                        <td class="col-3">
+                            @Html.DisplayFor(model => item.Category)
+                        </td>
+                        <td class="col-2">
+                            <span class="item-timestamp" id="item-timestamp"
+                            data-timestamp="@item.RelativeTimeStamp" data-itemid="@item.ItemId">
+                                --
+                            </span>
+                        </td>
+                        <td class="col-2">
+                            @{
+                                var status = item.Status == "Removed" ? true : false;
+                            }
+                            <span class="d-flex status-indicator justify-content-center 
+                                  align-content-center align-items-center overflow-hidden" 
+                                  data-status="@item.Status" data-code="@item.ItemCode"
+                                  style="cursor: @(status ? "pointer" : "default");">
+                            </span>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>     
+    }
+    else
+    {
+        <div class="text-center text-muted mt-5">
+            No Data Retrieved
+        </div>
+    }
+</div>
+
+ 

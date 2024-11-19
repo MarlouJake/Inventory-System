@@ -5,16 +5,23 @@
 }
 
 <script>
+    $(document).ready(function () {
+        $('.comming-soon div').html('<div class="info-container"></div>');
+        $('.info-container')
+            .append('<i class="bi bi-cone-striped fs-3"></i>')
+            .append(`<br/><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>`)
+            .append('This page is currently underconstruction')
+            .append(`<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>`)
+            .append('<br/><span class="spinner-container"></span>')
+            .addClass('border p-4 rounded shadow');
+
+        for (let element = 0; element <= 2; element++) {
+            $('.spinner-container').append('<span class="spinner-grow" role="status"></span>');
+        }
+     
+    });
 
 </script>
-<style>
-    .comming-soon > span{
-        margin-top: 5rem;
-        font-size: 3rem;
-        width: 5rem;
-        height: 5rem;
-    }
-</style>
 
 <nav class="">
     <div class="bg-dark d-flex p-1 border-bottom border-secondary">
@@ -23,23 +30,16 @@
             <div class="d-inline-flex p-2 text-light" style="font-size: 1rem;">
                 <i class="fa-solid fa-user-group mt-1"></i>
                 <span class="ms-1">Requests</span>
-            </div>
-
-          
-
-
+            </div>        
         </div>
 
     </div>
 
 </nav>
 
-<div class="text-center mt-3 ps-3 text-orange comming-soon">
-    <h6> 
-        Comming Soon
-    </h6>
-    
-    <span class="spinner-border" role="status" aria-hidden="true">
-    </span>
-
+<div class="text-center p-2 text-orange comming-soon">      
+    <div class="d-grid justify-content-center align-items-center align-content-center align-items-center
+         text-orange fs-5"
+         aria-hidden="true" style="height: 80vh;">     
+    </div>
 </div>

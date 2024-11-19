@@ -7,22 +7,29 @@
 
 }
 
+
+
 <script>
 
-    var activeCategory = "All";
-    var currentUsername = '@Html.Raw(CurrentUsername)';
+    var activeCategory;
+    var recentTimespanInterval;
+
     var info = $('#layoutbody #message-success');
 
 
 
-
-
     $(document).ready(function () {     
-        $('#username-container').text(currentUsername);
-        info.text(`Welcome ${currentUsername.toUpperCase()}!`).fadeIn().delay(1000).fadeOut();
-        loadContent('dashboard');
 
-        $('#sidebar .sidebar-link').on('click', function (e) {
+        const defaultContent = $('#sidebar ul li:first-child .sidebar-link').data('url');
+        loadContent(defaultContent);   
+        renderTitle(defaultContent);
+        
+        $('#sidebar .sidebar-link').on('click', function (e) {  
+
+            if ($(this).data('url') === 'inventory') {
+                activeCategory = $(this).data('string');
+            }
+            
             sidebarEvent(e, this);
         });
 
@@ -33,11 +40,10 @@
 
     });
 
-
-    function sidebarEvent(e, element) {
+   
+    async function sidebarEvent(e, element) {
         e.preventDefault();
-
-        
+ 
         clickedElementId = $(e.target).attr('id');
 
         if ($(element).hasClass('active')) {
@@ -45,27 +51,129 @@
         }
         
         $('#searchbar').val('');
+        let title = $(element).data('url');
 
-        $(element).addClass('active');
+        $('body').append(`<div id="cover-element" class="text-orange
+        text-center justify-content-center align-content-center">${spinner} Loading</div>`);
+        $('#cover-element').css({
+            "position": "fixed",
+            "top": 0,
+            "left": 0,
+            "width": "100%",
+            "height": "100%",
+            "background-color": "rgba(255, 255, 255, 0.2)",
+            "z-index": 9999
+        });
 
-        renderContent(element);
-        
+
+        await renderContent(element);
+        await changeTitle(title);
+        await renderTitle(title);
+        clearRecentTimespanInterval()
         removeChecks();
     }
 
-
-    function renderContent(element) {
+    async function renderContent(element) {
         let url = $(element).data('url');
-        loadContent(url);
+        let loading = `
+             <div class="d-block justify-content-center align-items-center align-content-center 
+              text-center text-orange" style="height: 100vh;"
+             aria-hidden="true">
+                <h6>Loading</h6>
+                <div class="d-inline-flex" style="width: 8rem; height: 5rem; font-size: 3rem;">
+                    <span class="spinner-grow" role="status">
+                    </span>
+                    <span class="spinner-grow" role="status">
+                    </span>
+                    <span class="spinner-grow" role="status"t>
+                    </span>
+                </div>
+            </div>
+            `;
+    
+        loadContent(url, element);
     }
 
+    async function clearRecentTimespanInterval() {
+        if (recentTimespanInterval) {
+            clearInterval(recentTimespanInterval);
+            recentTimespanInterval = null;
+        }
+    }
+
+    async function changeTitle(title){   
+        try{
+            const response = await $.ajax({
+                url: `partial_views/nav-dropdown`,
+                type: 'GET',
+                cache: true,
+                timeout: 10000
+            });
+
+            $('.custom-select').html(response);
+            $('.custom-select .view-title').html(title);
+        } 
+        catch (error){
+            if (erorr.textStatus === 'timeout') {
+                console.log('The request timed out.');
+            } else {
+                console.log("Error loading page: ", error.textStatus);
+            }
+        }
+    }
+
+    async function awaitElement(elementId) {
+        const observer = new MutationObserver((mutations, observer) => {
+            const observedElement = document.getElementById(elementId);
+
+            if (observedElement) {
+                console.log(observedElement);
+                
+                observer.disconnect();
+            }
+            console.log('Not found');
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
 
     
+    async function renderTitle(activeTab, navId){
+        let title, icon;        
+        $(`#${navId} .default-title-container`).html(defaultTitle).append(navDropdown);
 
-
+        switch(activeTab){
+            case 'dashboard':    
+                title = 'Dashboard';
+                icon = `<i class="bi bi-speedometer2"></i>`;
+                $('.default-icon').html(icon);
+                $('.default-title').text(title);
+                $('.custom-select .view-title').text(title);
+                $('.input-group search-container').addClass('d-none'); 
+                break;
+            case 'inventory':
+                title = 'Inventory';
+                icon = `<i class="bi bi-boxes"></i>`;
+                $('.default-icon').html(icon);
+                $('.default-title').text(title);
+                $('.custom-select .view-title').text(title);
+                $('.input-group search-container').removeClass('d-none');
+                break;
+            case 'requests':
+                title = 'Request';
+                icon = `<i class="fa-solid fa-user-group"></i>`;
+                $('.default-icon').html(icon);
+                $('.default-title').text(title);
+                $('.custom-select .view-title').text(title);
+                break;
+            default:
+                return console.erorr('Tab not found!');
+                break;
+        };
+    }
 </script>
 
-<div id="content-container" class=" m-0 p-0 w-100">
-    <div id="content-handler" class="">
+
+<div id="content-container" class="m-0 p-0 w-100">
+    <div id="content-handler" class="m-0 p-0">
     </div>
 </div>
