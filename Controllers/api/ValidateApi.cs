@@ -178,7 +178,7 @@ namespace InventorySystem.Controllers.api
         }
 
         [HttpPost("remove-item/{id?}")]
-        public async Task<IActionResult> DeleteMultipleItem([FromBody] int[]? ids)
+        public async Task<IActionResult> DeleteMultipleItem([FromBody] string[]? ids)
         {
             string message = "";
             //int Status404 = StatusCodes.Status404NotFound;
@@ -194,12 +194,12 @@ namespace InventorySystem.Controllers.api
                     return await Task.FromResult(StatusCode(StatusCodes.Status400BadRequest, response));
                 }
 
-                // Here you would typically handle the deletion of items with the provided IDs
+                // Handles the deletion of items with the provided IDs
                 foreach (var id in ids)
                 {
-                    // Call your deletion logic here for each id
+
                     Console.WriteLine($"Deleting item with ID: {id}");
-                    // Example: await _yourService.DeleteItemAsync(id);
+                    // Example: await service.DeleteItemAsync(id);
                 }
 
                 var redirectUrl = Url.Action("MultipleRemoveConfirm", "ServicesApi", new { ids }, Request.Scheme);
