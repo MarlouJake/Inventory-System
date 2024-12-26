@@ -87,16 +87,16 @@ namespace InventorySystem.Controllers.api
                     Console.Error.WriteLine(message);
                     return StatusCode(StatusCodes.Status409Conflict, response);
                 }
-            
+
                 model.UserId = userId;
                 model.IsModified = false;
                 model.IsBorrowed = false;
                 model.IsReturned = false;
-                model.IsDeleted = false;    
+                model.IsDeleted = false;
 
-                _context.Items.Add(model);              
+                _context.Items.Add(model);
                 await _context.SaveChangesAsync();
-               
+
                 await _recentItem.AddToCreateHistory(model, User);
 
                 redirectTo = "dashboard/item-view/all";
@@ -241,7 +241,7 @@ namespace InventorySystem.Controllers.api
 #pragma warning disable ASP0018 // Unused route parameter
         [HttpDelete("remove-confirm/{id?}")]
 #pragma warning restore ASP0018 // Unused route parameter
-        public async Task<IActionResult> MultipleRemoveConfirm([FromBody] int[]? ids)
+        public async Task<IActionResult> MultipleRemoveConfirm([FromBody] string[]? ids)
         {
 
             int Status404 = StatusCodes.Status404NotFound;
@@ -256,8 +256,17 @@ namespace InventorySystem.Controllers.api
                     return await Task.FromResult(StatusCode(Status404, response));
                 }
 
-                var checkItems = await _context.Items.Where(i => ids.Contains(i.ItemId)).ToListAsync();
-                var missingIds = ids.Where(id => !checkItems.Any(i => i.ItemId == id)).ToList();
+                List<Guid> uniqueIds = ids.Where(id => Guid.TryParse(id, out _))
+                    .Select(Guid.Parse).ToList();
+
+                var itemList = await _context.Items.Where(i => uniqueIds.Contains(i.UniqueId)).ToListAsync();
+
+                List<string> missingIds = ids
+                    .Where(id => !itemList
+                    .Any(item => Guid.TryParse(id, out var parsedId) && parsedId == item.UniqueId))
+                    .ToList();
+
+                //var missingIds = ids.Where(id => !items.Any(i => i.UniqueId == id)).ToList();
 
                 if (missingIds.Count > 0)
                 {
@@ -268,8 +277,10 @@ namespace InventorySystem.Controllers.api
 
                 foreach (var id in ids)
                 {
-                    var item = await _context.Items.FindAsync(id);
-                    
+                    Guid.TryParse(id, out var parsedId);
+                    var locator = await _context.Items.Where(i => i.UniqueId == parsedId).FirstOrDefaultAsync();
+                    var item = await _context.Items.FindAsync(locator?.ItemId);
+
                     if (item == null)
                     {
                         message = $"Failed to remove item  with ID {id}";
@@ -279,20 +290,22 @@ namespace InventorySystem.Controllers.api
 
                     Console.WriteLine("Selected id: {0}", id);
 
-                    item.IsDeleted = true;
+                    //item.IsDeleted = true;
 
-                    var relatedHistories = _context.CreateHistories.Where(h => h.ItemId == id);            
+                    var relatedHistories = _context.CreateHistories.Where(history => history.UniqueID == parsedId);
 
-                    foreach(var history in relatedHistories)
+                    foreach (var history in relatedHistories)
                     {
                         history.IsRemoved = item.IsDeleted;
                         history.Status = "Removed";
+                        history.IsRemoved = true;
                     }
 
                     _context.CreateHistories.UpdateRange(relatedHistories);
-                    _context.Items.UpdateRange(item);
+                    _context.Items.RemoveRange(item);
+
                 }
-                
+
                 await _context.SaveChangesAsync();
 
                 var items = await _context.Items
