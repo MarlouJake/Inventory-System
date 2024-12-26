@@ -5,8 +5,10 @@ namespace InventorySystem.Controllers.api
 {
     [Route("api/values/")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class ValuesController(IConfiguration configuration): ControllerBase
     {
+        private readonly IConfiguration _configuration = configuration;
+
         [Route("get-statuses")]
         [HttpGet]
         public JsonResult GetStatuses()
@@ -72,6 +74,15 @@ namespace InventorySystem.Controllers.api
             };
 
             return new JsonResult(options);
+        }
+
+
+
+        [HttpGet("configs")]
+        public IActionResult GetCredentials()
+        {
+            var appsettings = _configuration.GetSection("TestCredentials").GetChildren();
+            return Ok(appsettings);
         }
     }
 }
