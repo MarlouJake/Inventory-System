@@ -19,5 +19,6 @@ namespace InventorySystem.Controllers.api
             await _context.SaveChangesAsync();
             return StatusCode(StatusCodes.Status201Created);
         }
+
     }
 }
