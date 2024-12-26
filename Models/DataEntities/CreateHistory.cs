@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-
+using System;
 namespace InventorySystem.Models.DataEntities
 {
     public class CreateHistory
@@ -10,8 +10,6 @@ namespace InventorySystem.Models.DataEntities
         [Key]
         [DisplayName("#")]
         public int? HistoryId { get; set; }
-        [ForeignKey("ItemId")]
-        public int? ItemId { get; set; }
         [DisplayName("Code")]
         public string? ItemCode { get; set; }
         [DisplayName("Name")]
@@ -28,12 +26,13 @@ namespace InventorySystem.Models.DataEntities
         public bool IsReturned { get; set; }
         public bool IsRemoved { get; set; }
         public bool HistoryRemoved { get; set; }
-
+        public int? Id { get; set; }
+        public Guid UniqueID { get; set; }
         [DisplayName("Added")]
         public string? RelativeTimeStamp { get; set; }
 
         [DisplayName]
-        public string? Status { get; set; } 
+        public string? Status { get; set; }
         public int? UserId { get; set; }
         public string? Username { get; set; }
     }

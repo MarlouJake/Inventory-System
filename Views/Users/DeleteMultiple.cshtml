@@ -14,7 +14,7 @@
 
         $('#remove-confirm').on('click', function () {
             DeleteRequest(JSON.parse(ids));
-            $('#number, #changeWord').text('');
+            //$('#number, #changeWord').text('');
             sessionStorage.removeItem('deleteIds');
             sessionStorage.removeItem('deleteLenght');
         });

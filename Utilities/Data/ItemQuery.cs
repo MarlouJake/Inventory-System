@@ -57,7 +57,12 @@ namespace InventorySystem.Utilities.Data
             return await FindItemByIdAsync(id);
         }
 
-        public async Task<List<Item>> FindItemsAsync(int[] ids)
+        public async Task<Item?> FindItemUUIDAsync(Guid id)
+        {
+            return await FindItemByUUIDAsync(id);
+        }
+
+        public async Task<List<Item>> FindItemsAsync(string[] ids)
         {
             return await FindItemByArrayofIdsAsync(ids);
         }
@@ -135,9 +140,9 @@ namespace InventorySystem.Utilities.Data
 
         private async Task<int> CountTotalItemById(int? id, string? category = null)
         {
-            var items =  FilterByUserIdAsync(id);
+            var items = FilterByUserIdAsync(id);
             var countByCategory = await CategoryBase(id, category!, items);
-            var filteredItems = category != null ? countByCategory : items;         
+            var filteredItems = category != null ? countByCategory : items;
             var totalItem = await CountItems(filteredItems);
             return totalItem;
         }
@@ -192,11 +197,17 @@ namespace InventorySystem.Utilities.Data
             return await _context.Items.FindAsync(id);
         }
 
-
-
-        private async Task<List<Item>> FindItemByArrayofIdsAsync(int[] ids, bool deleted = false )
+        private async Task<Item?> FindItemByUUIDAsync(Guid id)
         {
-            return await _context.Items.Where(i => ids.Contains(i.ItemId) && i.IsDeleted == deleted).ToListAsync();
+            return await _context.Items.FirstOrDefaultAsync(i => i.UniqueId == id);
+        }
+
+        private async Task<List<Item>> FindItemByArrayofIdsAsync(string[] ids, bool deleted = false)
+        {
+            List<Guid> uniqueIds = ids.Where(id => Guid.TryParse(id, out _))
+                .Select(Guid.Parse).ToList();
+
+            return await _context.Items.Where(i => uniqueIds.Contains(i.UniqueId) && i.IsDeleted == deleted).ToListAsync();
         }
 
     }

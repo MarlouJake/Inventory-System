@@ -111,6 +111,7 @@
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
+            cache: "reload"
         };
 
         const response = await fetch(url, options);
@@ -202,7 +203,9 @@
                 $('#email-group').addClass('input-error');
             } else {
                 // If the message is not a known error, display it in a general error area
-                $("#error-message").text(message).fadeIn().delay(500).fadeOut();
+                setTimeout(() => {
+                    $("#error-message").text(message).fadeIn().delay(500).fadeOut();
+                }, 800);
             }
         });
 

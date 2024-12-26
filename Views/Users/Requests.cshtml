@@ -6,21 +6,34 @@
 
 <script>
     $(document).ready(function () {
-        $('.comming-soon div').html('<div class="info-container"></div>');
-        $('.info-container')
+       getView();
+    });
+
+    async function getView(){
+       try{
+           const response = await $.ajax({
+            url:'/not_implemented'
+           });
+
+           $('.comming-soon').html(response);
+           $('.comming-soon a').addClass('d-none');
+       } catch (err){
+           console.error(err);
+           $('.comming-soon div').html('<div class="info-container"></div>');
+            $('.info-container')
+            .append(`<h1>Feature not yet implemented</h1>`)
             .append('<i class="bi bi-cone-striped fs-3"></i>')
             .append(`<br/><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>`)
-            .append('This page is currently underconstruction')
+            .append('This feature is currently underconstruction')
             .append(`<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>`)
             .append('<br/><span class="spinner-container"></span>')
             .addClass('border p-4 rounded shadow');
 
-        for (let element = 0; element <= 2; element++) {
-            $('.spinner-container').append('<span class="spinner-grow" role="status"></span>');
-        }
-     
-    });
-
+            for (let element = 0; element <= 2; element++) {
+                $('.spinner-container').append('<span class="spinner-grow" role="status"></span>');
+            }
+       }
+    }
 </script>
 
 <nav class="">
@@ -37,9 +50,6 @@
 
 </nav>
 
-<div class="text-center p-2 text-orange comming-soon">      
-    <div class="d-grid justify-content-center align-items-center align-content-center align-items-center
-         text-orange fs-5"
-         aria-hidden="true" style="height: 80vh;">     
-    </div>
+<div class="text-center p-5 m-5 text-orange comming-soon">      
+
 </div>

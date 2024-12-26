@@ -1,6 +1,5 @@
 ﻿using InventorySystem.Data;
 using InventorySystem.Models.DataEntities;
-using InventorySystem.Models.Identities;
 using InventorySystem.Models.Pagination;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,10 +41,16 @@ namespace InventorySystem.Utilities.Data
             return await PaginateHistory(id, page);
         }
 
-        public async Task<string?> GetTimeStampByItemId(int id)
+        public async Task<string?> GetTimeStampByItemId(int? id)
         {
             return await Task.FromResult(FilterTimeSpanByItemId(id));
         }
+
+        public async Task<string?> GetTimeStampByByUUID(Guid uuid)
+        {
+            return await Task.FromResult(FilterTimeSpanByUUID(uuid));
+        }
+
 
 
 
@@ -73,10 +78,10 @@ namespace InventorySystem.Utilities.Data
             return _context.CreateHistories.Where(i => i.UserId == id && i.HistoryRemoved == false);
         }
 
-        private string? FilterTimeSpanByItemId(int id)
+        private string? FilterTimeSpanByItemId(int? id)
         {
             var item = _context.CreateHistories
-                .Where(i => i.ItemId == id).FirstOrDefault()!;
+                .Where(i => i.Id == id).FirstOrDefault()!;
             string? timestamp = null;
 
             if (item.DateAdded.ToString() != null)
@@ -85,12 +90,33 @@ namespace InventorySystem.Utilities.Data
             }
             else
             {
-                Console.WriteLine("DateAdded is null for item ID: " + item.ItemId);
+                Console.WriteLine("DateAdded is null for item ID: " + item.Id);
             }
 
             timestamp = item.RelativeTimeStamp;
 
             Console.WriteLine($"Timestamp from query: {id} = " + timestamp);
+            return timestamp;
+        }
+
+        private string? FilterTimeSpanByUUID(Guid uuid)
+        {
+            var item = _context.CreateHistories
+                .Where(i => i.UniqueID == uuid).FirstOrDefault()!;
+            string? timestamp = null;
+
+            if (item.DateAdded.ToString() != null)
+            {
+                item.RelativeTimeStamp = item.DateAdded.GetRelativeTime();
+            }
+            else
+            {
+                Console.WriteLine("DateAdded is null for item ID: " + item.UniqueID);
+            }
+
+            timestamp = item.RelativeTimeStamp;
+
+            Console.WriteLine($"Timestamp from query: {uuid} = " + timestamp);
             return timestamp;
         }
 
@@ -123,7 +149,7 @@ namespace InventorySystem.Utilities.Data
                 }
                 else
                 {
-                    Console.WriteLine("DateAdded is null for item ID: " + item.ItemId);
+                    Console.WriteLine("DateAdded is null for item ID: " + item.Id);
                 }
             }
         }

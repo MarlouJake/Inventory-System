@@ -98,6 +98,7 @@ body {
     color: #fd7e14 !important;
 }
 
+
 .bgc-lsg {
     background-color: lightslategray !important;
     color: white !important;
@@ -148,6 +149,10 @@ a.navbar-brand {
 
 .outline-orange {
     border: 1px solid #fd7e14 !important;
+}
+
+.border-orange-start {
+    border-left-color: #fd7e14 !important;
 }
 
 .bgc-orange:hover {
@@ -222,13 +227,13 @@ a.navbar-brand {
 
 
 
-.tabs .nav-link {
+.tabs .nav-link, .nav-button-container {
     border-radius: 8px;
     cursor: pointer;
 }
 
-    .tabs .nav-link:hover {
-        background-color:  rgb(128, 128, 128, 0.3);
+    .tabs .nav-link:hover, .nav-button-container:hover {
+        background-color: rgb(128, 128, 128, 0.3);
     }
 
     .tabs .nav-link .active:hover {

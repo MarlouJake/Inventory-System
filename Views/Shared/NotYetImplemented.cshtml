@@ -1,0 +1,36 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<script>
+    $(document).ready(function () {
+        $('.comming-soon div').html('<div class="info-container"></div>');
+        $('.info-container')
+            .append(`<h1>Feature not yet implemented</h1>`)
+            .append('<i class="bi bi-cone-striped fs-3"></i>')
+            .append(`<br/><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>`)
+            .append('This feature is currently underconstruction')
+            .append(`<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>`)
+            .append('<br/><span class="spinner-container"></span>')
+            .addClass('border p-4 rounded shadow');
+
+        for (let element = 0; element <= 2; element++) {
+            $('.spinner-container').append('<span class="spinner-grow" role="status"></span>');
+        }
+
+    });
+</script>
+
+
+
+
+<div class="text-center p-2 text-orange comming-soon">
+      <div class="d-grid justify-content-center align-items-center align-content-center align-items-center
+         text-orange fs-5"
+         aria-hidden="true" style="height: 65vh;">
+    </div>
+
+    <a href="javascript:history.back()">Return to Previous Page</a>
+</div>
+

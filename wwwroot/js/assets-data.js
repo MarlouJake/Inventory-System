@@ -240,7 +240,14 @@ async function requestEvent(isFininsheed, userEvent, data = null, element = null
                 element.remove();
                 $(clickedElement).addClass('active');
                 $('#sidebar .nav-link').removeClass('active bgc-orange');
-                
+                let id = $(clickedElement).attr('id');
+                if (id === 'inventory-link' || id === 'parts-inventory') {
+                    $('#inventory-list-button').addClass('outline-orange');   
+                    $('#inventory-list').css('background-color', 'rgba(236, 240, 241, 0.1)');
+                } else {
+                    $('#inventory-list-button').removeClass('outline-orange');
+                }
+
                 break;
             case 'category':
                 $('.category-button').removeClass('ctg-selected').addClass('ctg-notselected').prop('disabled', false);
@@ -320,7 +327,7 @@ loadContent = async function (url, element) {
     }
     catch (error) {
         
-        if (erorr.textStatus === 'timeout') {
+        if (error.textStatus === 'timeout') {
             console.log('The request timed out.');
         } else {
             console.log("Error loading page: ", error.textStatus);
@@ -329,6 +336,19 @@ loadContent = async function (url, element) {
         done = true;
     }
 
+    if (done === false) {
+        $('body').append(`<div id="cover-element" class="text-orange
+        text-center justify-content-center align-content-center">${spinner} Loading</div>`);
+        $('#cover-element').css({
+            "position": "fixed",
+            "top": 0,
+            "left": 0,
+            "width": "100%",
+            "height": "100%",
+            "background-color": "rgba(255, 255, 255, 0.2)",
+            "z-index": 9999
+        });
+    }
     requestEvent(done, 'sidebar', null, $('#cover-element'), element);
 };
 
@@ -441,13 +461,9 @@ function deleteSelectedItem() {
   
     checkedBoxes.each(function () {
         const data = {
-            itemId : $(this).closest('.card').data('item-id'),
-            itemName : $(this).closest('.card').data('item-name'),
-            itemCode: $(this).closest('.card').data('item-code'),
-            itemCategory: $(this).closest('.card').data('item-category'),
-            itemStatus: $(this).closest('.card').data('item-status')
+            itemUID: $(this).closest('.card').data('uid'),
         }
-        itemIds.push(data.itemId);
+        itemIds.push(data.itemUID);
     });
 
     sessionStorage.setItem('deleteLenght', itemIds.length);

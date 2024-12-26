@@ -3,13 +3,14 @@ using InventorySystem.Utilities;
 using InventorySystem.Utilities.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Net.Http;
 
 namespace InventorySystem.Controllers.main
 {
 
-    public class HomeController() : Controller
+    public class HomeController(HttpClient httpClient) : Controller
     {
-
+        private readonly HttpClient _httpClient = httpClient;
 
         [Route("/home/login")]
         public IActionResult Index()
@@ -35,10 +36,9 @@ namespace InventorySystem.Controllers.main
         {
             var url = Url.Action("SignUp", "Home");
             Messages.PrintUrl(url);
-            var demouser = "demo1 || demo1@user.com";
-            var demouserpass = "@demo2024";
-            var demoUserPass = HashHelper.HashString(demouserpass);
-            Console.WriteLine("Temp Demo Username: {0}\nTemp Demo Password: {1}", demouser, demoUserPass);
+            var hash = "@Academy2024";
+            var hashed = HashHelper.HashString(hash);
+            Console.WriteLine("Pass: {0}", hashed);
             return PartialView();
         }
 
@@ -68,6 +68,21 @@ namespace InventorySystem.Controllers.main
             Messages.PrintUrl(url);
             ViewData["Title"] = "Access Denied";
             return View();
+        }
+
+        [Route("/not-implemented")]
+        public IActionResult NotYetImplemented()
+        {
+            var url = Url.Action("NotYetImplemented", "Home");
+            Messages.PrintUrl(url);
+            ViewData["Title"] = "Not Yet Implemented";
+            return View();
+        }
+
+        [Route("/not_implemented")]
+        public IActionResult NotImplemented()
+        {
+            return PartialView("NotYetImplemented");
         }
 
 

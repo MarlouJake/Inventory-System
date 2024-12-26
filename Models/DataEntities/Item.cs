@@ -59,6 +59,7 @@ namespace InventorySystem.Models.DataEntities
         public bool IsReturned { get; set; }
 
         public bool IsDeleted { get; set; }
+        public Guid UniqueId { get; set; } = Guid.NewGuid();
 
         [DisplayName(DisplayNames.UserId)]
         [ForeignKey("UserId")]

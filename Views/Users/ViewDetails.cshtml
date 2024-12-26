@@ -27,7 +27,7 @@
           itemIds.push(id);
           sessionStorage.setItem('deleteIds', JSON.stringify(itemIds));
           sessionStorage.setItem('deleteLenght', itemIds.length);
-          ModalShow('inventory/remove/@Model.ItemId');
+          ModalShow('inventory/remove/@Model.UniqueId');
     }
 
     async function getPartialView(category, id){

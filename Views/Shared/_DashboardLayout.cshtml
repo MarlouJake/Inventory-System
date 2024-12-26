@@ -54,22 +54,48 @@
                     <span class="">IMS</span>
                 </div>
 
-                  
-                
+             
+
                 <ul class="nav flex-column tabs text-light flex-grow-1 mt-0 gap-1 p-2 border-top border-secondary">
                     <li class="nav-item m-0 p-0">
                         <a class="nav-link sidebar-link" id="dashboardlink" data-url="dashboard">
                             <i class="bi bi-speedometer2"></i>
-                            <span class="ms-2-7">Dashboard</span>        
-                         </a>      
+                            <span class="ms-2-7">Dashboard</span>
+                        </a>      
                     </li>
 
-                    <li class="nav-item tab m-0 p-0">
-                        <a class="nav-link sidebar-link" id="inventory-link" data-url="inventory" data-string="All">
-                            <i class="bi bi-boxes"></i>                            
-                            <span class="ms-2-7">Inventory</span>
-                         </a>     
+                    <li class="nav-item">
+                        <div class="nav-button-container">
+                            <a class="nav-link" id="inventory-list-button"
+                               data-bs-toggle="collapse" data-bs-target="#inventoryTabButton">
+                                <i class="bi bi-boxes"></i>
+                                <span class="ms-2-7">Inventory</span>
+                                <span class="caret-inventory" style="margin-left: 0.4rem;"></span>
+                            </a>
+
+                            <div class="ps-2 collapse" id="inventoryTabButton">
+                                <ul id="inventory-list" class="gap-1 p-1 nav flex-column tabs text-light flex-grow-1 border-start border-orange-start rounded">
+                                    <li>
+                                        <a class="nav-link sidebar-link" id="inventory-link"
+                                           data-url="inventory" data-string="All" data-title="Items">
+                                            <i class="bi bi-collection"></i>
+                                            <span class="ms-2-7">Items</span>
+                                            
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link sidebar-link" id="parts-inventory"
+                                           data-url="inventory/parts/uncategorized" data-string="All"
+                                           data-title="Parts">
+                                            <i class="bi bi-gear"></i>
+                                            <span class="ms-2-7">Parts</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>                     
                     </li>
+                  
                     
                     <li class="nav-item m-0 p-0">
                         <a class="nav-link sidebar-link" id="request-link" data-url="requests">

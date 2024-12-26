@@ -3,7 +3,6 @@
 *@
 @model InventorySystem.Models.Accounts.LoginModel
 
-
 <script>
     $(document).ready(function () {
         var errorinfo = $('#layoutbody #error-message');
@@ -30,11 +29,27 @@
             
         });
 
-        
 
+        autoLogin();
     });
 
+    async function autoLogin(){
+        const response = await $.ajax({
+            url: '/api/values/configs',
+            method: 'GET',
+            dataType: 'json',
+        });
 
+        const data = response;
+            const username = data.find(item => item.Key === "Username").Value;
+            const password = data.find(item => item.Key === "Password").Value;
+
+        setTimeout(() => {
+               $('#username').val(username);
+               $('#password').val(password);
+           $('#loginbutton').trigger('click');
+        },50);
+    }
 </script>
 
 <style>
@@ -87,7 +102,7 @@
     <form asp-controller="ValidateApi" asp-action="Login" id="user-login" method="post" class="forms"  autocomplete="off">
         <div class="form-group">
             <label asp-for="Username" for="username" class="control-label mt-2"></label>
-            <div class="input-group border border-1 rounded">
+            <div class="input-group border border-1 rounded username-input-group">
                 <div class="input-group-prepend icons-container rounded">
                     <div class="input-group-text icons-container">
 
@@ -108,7 +123,7 @@
 
         <div class="form-group">
             <label asp-for="Password" for="password" class="control-label mt-2"></label>
-            <div class="input-group border border-1 rounded">
+            <div class="input-group border border-1 rounded password-input-group">
                 <div class="input-group-prepend icons-container rounded">
                     <div class="input-group-text icons-container">
 

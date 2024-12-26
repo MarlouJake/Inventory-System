@@ -6,7 +6,6 @@ using InventorySystem.Utilities.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using ZstdSharp.Unsafe;
 
 
 namespace InventorySystem.Controllers.main
@@ -20,6 +19,7 @@ namespace InventorySystem.Controllers.main
         private readonly ItemQuery _query = query;
         private readonly HistoryQuery _getHistory = getHistory;
         private int? userId;
+        private string? username;
         private readonly ValidateArrayOfId _validateArrayOfId = validateArrayOfId;
         private ApiResponse response = null!;
         private string message = "";
@@ -31,7 +31,7 @@ namespace InventorySystem.Controllers.main
         {
             // Set userId from claims
             userId = _getClaims.GetIdClaim(User);
-
+            username = _getClaims.GetUsernameClaim(User);
             if (userId == null)
             {
                 actionContext.Result = RedirectToAction("AccessDenied", "Home");
@@ -47,18 +47,25 @@ namespace InventorySystem.Controllers.main
         //
         //
 
-        
+
         [HttpGet("content")]
-        public IActionResult ContentHandler(string username)
+        public IActionResult ContentHandler(string u)
         {
             ViewData["title"] = "IMS";
-            ViewBag.Username = username;
+
+            // Check if the claim exists and matches the parameter 'u'
+            if (username == null || username != u)
+            {
+                // Redirect to Access Denied page if the claim does not match
+                return RedirectToAction("AccessDenied", "Home");
+            }
+
             return View();
         }
 
 
 
-       
+
         [HttpGet("dashboard")]
         public async Task<IActionResult> DashboardAsync(string username)
         {
@@ -88,6 +95,12 @@ namespace InventorySystem.Controllers.main
             ViewBag.PageSize = pageSize;
 
             return PartialView(model);
+        }
+
+        [HttpGet("inventory/parts/uncategorized")]
+        public IActionResult PartsInventoryView()
+        {
+            return PartialView();
         }
 
         [HttpGet("requests")]
@@ -132,7 +145,7 @@ namespace InventorySystem.Controllers.main
 
         [Route("inventory/items/categorized")]
         [HttpGet]
-        public async Task<IActionResult> CategoryView(string username, string itemcode , int page = 1, string category = "All")
+        public async Task<IActionResult> CategoryView(string username, string itemcode, int page = 1, string category = "All")
         {
             int? id = userId;
             var model = await _query.Pagination(id, page, category, itemcode);
@@ -141,15 +154,15 @@ namespace InventorySystem.Controllers.main
 
             ViewBag.Username = username;
             ViewBag.Category = category;
-                
+
             if (!model.Items!.Any())
             {
                 StatusCode(StatusCodes.Status404NotFound, ApiResponseUtils.CustomResponse(false, "No items found"));
             }
 
             return PartialView("ItemsView", model);
-          
-                      
+
+
         }
 
 
@@ -218,17 +231,14 @@ namespace InventorySystem.Controllers.main
         }
 
 
-        [Route("inventory/details/{id?}")]
+        [Route("inventory/details")]
         [HttpGet]
-        public async Task<IActionResult> ViewDetails(int? id, string username, string roleName)
+        public async Task<IActionResult> ViewDetails(Guid id, string username, string roleName)
         {
 
-            if (id == null)
-            {
-                return NotFound();
-            }
+            //var item = await _query.FindItemAsync(id); //should take int? id
 
-            var item = await _query.FindItemAsync(id);
+            var item = await _query.FindItemUUIDAsync(id);
 
             if (item == null)
             {
@@ -246,7 +256,7 @@ namespace InventorySystem.Controllers.main
 
         [HttpGet]
         [Route("inventory/remove/{id?}")]
-        public async Task<IActionResult> DeleteMultiple(int[] ids)
+        public async Task<IActionResult> DeleteMultiple(string[] ids)
         {
 
             var result = await _validateArrayOfId.ValidateAsync(ids, _context);
@@ -264,7 +274,7 @@ namespace InventorySystem.Controllers.main
             }
 
             ViewBag.Claim = userId;
-            
+
             return PartialView();
         }
 
@@ -281,7 +291,7 @@ namespace InventorySystem.Controllers.main
         [HttpGet]
         public async Task<IActionResult> NavDropdown()
         {
-             return await Task.FromResult(PartialView("~/Views/Users/PartialViews/NavDropdown.cshtml"));
+            return await Task.FromResult(PartialView("~/Views/Users/PartialViews/NavDropdown.cshtml"));
         }
 
         [HttpGet]
@@ -305,7 +315,7 @@ namespace InventorySystem.Controllers.main
         public async Task<IActionResult> InventorySummary(string? category = null)
         {
             int? id = userId;
-                     
+
             int robotsCount = await _query.CountTotalItems(id, "Robots");
             int booksCount = await _query.CountTotalItems(id, "Books");
             int materialsCount = await _query.CountTotalItems(id, "Materials");
@@ -319,7 +329,7 @@ namespace InventorySystem.Controllers.main
             return PartialView("~/Views/Users/PartialViews/Dashboard/InventorySummary.cshtml");
         }
 
-        
+
         [Route("dashboard/partial_views/recent-inventory", Name = "RecentInventory")]
         [HttpGet]
         public async Task<IActionResult> RecentInventory(int page)
@@ -335,10 +345,16 @@ namespace InventorySystem.Controllers.main
 
         [Route("dashboard/partial_views/timestamp", Name = "TimeStamp")]
         [HttpGet]
-        public async Task<IActionResult> TimeStamp(int itemid)
+        public async Task<IActionResult> TimeStamp(Guid cid)
         {
-            var timestamp = await _getHistory.GetTimeStampByItemId(itemid);
-     
+            //var timestamp = await _getHistory.GetTimeStampByItemId(cid); //should be int?
+            var timestamp = await _getHistory.GetTimeStampByByUUID(cid);
+
+            if (timestamp == null)
+            {
+                return NotFound(); // 404 Not Found if timestamp is not found for the given id
+            }
+
             return Ok(timestamp);
         }
 
@@ -361,12 +377,12 @@ namespace InventorySystem.Controllers.main
         //Partials Views for Inventory Update, ViewDetails, Create
         //
         //
-        
+
 
         [Route("inventory/update/partial_views/with_firmwareUpdate")]
         [HttpGet]
         public IActionResult HasFirmwareUpdate()
-        {       
+        {
             return PartialView("~/Views/Users/PartialViews/Inventory/HasFirmwareUpdate.cshtml");
         }
 
@@ -391,7 +407,7 @@ namespace InventorySystem.Controllers.main
         [HttpGet]
         public async Task<IActionResult> NoFirmwareView(int? id)
         {
-            
+
             var item = await _query.FindItemAsync(id);
 
             ViewBag.Category = item!.Category;
@@ -410,7 +426,7 @@ namespace InventorySystem.Controllers.main
         [Route("inventory/delete/partial_views/no_firmwaredelete")]
         [HttpGet]
         public IActionResult NoFirmwareDelete()
-        {         
+        {
             var item = new Item();
             return PartialView("~/Views/Users/PartialViews/Inventory/NoFirmwareDelete.cshtml", item);
         }

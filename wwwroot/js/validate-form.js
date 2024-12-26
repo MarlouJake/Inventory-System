@@ -386,14 +386,14 @@ function ValidateForm(data) {
 
     // Manual validation for username
     if (!data.username || data.username.trim() === '') {
-        $('#username').addClass('input-error');
+        $('.username-input-group').addClass('input-error');
         $('#username-error').text(validationMessages.UsernameEmpty);
         isValid = false;
     }
 
     // Manual validation for password
     if (!data.password || data.password.trim() === '') {
-        $('#password').addClass('input-error');
+        $('.password-input-group').addClass('input-error');
         $('#password-error').text(validationMessages.PasswordEmpty);
         isValid = false;
     }

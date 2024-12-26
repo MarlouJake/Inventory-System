@@ -36,7 +36,7 @@
         loadPartialView('dashboard/partial_views/inventory-summary', 'inventory-summary');
         loadPartialView('dashboard/partial_views/recent-inventory', 'recent-inventory-table', 1);
         loadButtons(1);
-        awaitData();
+        //awaitData();
         renderTitle('dashboard', 'dashboard-nav');
 
         $('li').each(function () {
@@ -59,7 +59,7 @@
       
        
     });
-
+    /*
     function awaitData(){
         const observer = new MutationObserver((mutations, observer) => {
             const observedElement = document.getElementById('recent-add-details');
@@ -80,7 +80,7 @@
             });
         });
   
-    }
+    }*/
  
    function changeStatusColor(status, element){
         switch (status) {
@@ -134,9 +134,9 @@
 
     async function getTimespan() {
         $('.item-timestamp').each(function () {
-            let itemid = $(this).data('itemid');
+            let cid = $(this).data('id');
             let element = $(this);
-            loadPartialData('dashboard/partial_views/timestamp', element, itemid);
+            loadPartialData('dashboard/partial_views/timestamp', element, cid);
         });
     }
 
@@ -146,12 +146,12 @@
         }, 5000);
     }
 
-    async function loadPartialData(url, element, itemid) {
+    async function loadPartialData(url, element, cid) {
         try {
             const data = await $.ajax({
                 url: url,
                 type: 'GET',
-                data: { itemid: itemid },
+                data: { cid: cid },
                 timeout: 10000,
                 cache: false,
             });

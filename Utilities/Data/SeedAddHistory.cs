@@ -45,7 +45,6 @@ namespace InventorySystem.Utilities.Data
 
                 var item = new CreateHistory
                 {
-                    ItemId = recentItem.ItemId,
                     ItemCode = recentItem.ItemCode,
                     ItemName = recentItem.ItemName,
                     Category = recentItem.Category,
@@ -58,6 +57,8 @@ namespace InventorySystem.Utilities.Data
                     IsRemoved = false,
                     HistoryRemoved = false,
                     Status = "New",
+                    Id = recentItem.ItemId,
+                    UniqueID = recentItem.UniqueId,
                     UserId = _getClaims.GetIdClaim(claim),
                     Username = _getClaims.GetUsernameClaim(claim)
                 };
@@ -111,7 +112,7 @@ namespace InventorySystem.Utilities.Data
 
                 if (existingItem!.Status != modifiedItem.Status)
                 {
-                    var existingStatus = await _context.CreateHistories.AnyAsync(i => i.Status == modifiedItem.Status && i.ItemId == modifiedItem.ItemId);
+                    var existingStatus = await _context.CreateHistories.AnyAsync(i => i.Status == modifiedItem.Status && i.HistoryId == modifiedItem.ItemId);
 
                     if (existingStatus)
                     {
@@ -131,7 +132,7 @@ namespace InventorySystem.Utilities.Data
 
                 Console.WriteLine("Status {0}", status);
                 var existingHistory = await _context.CreateHistories
-                        .FirstOrDefaultAsync(h => h.ItemId == modifiedItem.ItemId);
+                        .FirstOrDefaultAsync(h => h.HistoryId == modifiedItem.ItemId);
 
                 existingHistory!.ItemCode = modifiedItem.ItemCode;
                 existingHistory.ItemName = modifiedItem.ItemName;
@@ -146,6 +147,7 @@ namespace InventorySystem.Utilities.Data
                 existingHistory.IsReturned = returned || modifiedItem.IsReturned;
                 existingHistory.IsRemoved = isRemoved;
                 existingHistory.Status = status;
+                existingHistory.Id = modifiedItem.ItemId;
               
                 await _context.SaveChangesAsync();
 
@@ -198,7 +200,7 @@ namespace InventorySystem.Utilities.Data
             try
             {
                 var existingHistory = await _context.CreateHistories
-                        .FirstOrDefaultAsync(h => h.ItemId == itemid);
+                        .FirstOrDefaultAsync(h => h.Id == itemid);
 
                 if (existingHistory == null) {
                     message = "Item not found";

@@ -18,12 +18,16 @@
 
 
 
-    $(document).ready(function () {     
-
+    $(document).ready(function () {
+        const carretDown = `<i class="bi bi-caret-down"></i>`;
+        const carretUp = `<i class="bi bi-caret-up"></i>`;      
         const defaultContent = $('#sidebar ul li:first-child .sidebar-link').data('url');
+
         loadContent(defaultContent);   
         renderTitle(defaultContent);
-        
+        updateIcon(carretUp, carretDown);
+
+
         $('#sidebar .sidebar-link').on('click', function (e) {  
 
             if ($(this).data('url') === 'inventory') {
@@ -38,9 +42,21 @@
             apiService.logoutRequest('@Url.Action("Logout", "ValidateApi", new { username = CurrentUsername })');
         });
 
+        $('#inventoryTabButton').on('shown.bs.collapse', function () {
+            updateIcon(carretUp, carretDown);
+        }).on('hidden.bs.collapse', function () {
+            updateIcon(carretUp, carretDown);
+        });
     });
 
-   
+
+    function updateIcon(upIcon, downIcon) {
+        let update = $('#inventoryTabButton').hasClass('show') ? upIcon : downIcon;
+        setTimeout( () => {
+            $('.caret-inventory').html(update).fadeIn();
+        }, 10);
+    }
+
     async function sidebarEvent(e, element) {
         e.preventDefault();
  
@@ -51,45 +67,41 @@
         }
         
         $('#searchbar').val('');
-        let title = $(element).data('url');
-
-        $('body').append(`<div id="cover-element" class="text-orange
-        text-center justify-content-center align-content-center">${spinner} Loading</div>`);
-        $('#cover-element').css({
-            "position": "fixed",
-            "top": 0,
-            "left": 0,
-            "width": "100%",
-            "height": "100%",
-            "background-color": "rgba(255, 255, 255, 0.2)",
-            "z-index": 9999
-        });
+        let url = $(element).data('url');
 
 
         await renderContent(element);
-        await changeTitle(title);
-        await renderTitle(title);
+        await changeTitle(url);
+        await renderTitle(url, element);
+        await collapsebuttonList(element);
+      
         clearRecentTimespanInterval()
         removeChecks();
     }
 
+    async function collapsebuttonList(element) {
+
+        let collapsible = $('#inventoryTabButton');
+
+        switch (element.id) {
+            case 'dashboardlink':
+            case 'request-link':
+                if (collapsible.hasClass('show')){
+                    collapsible.removeClass('show');        
+                    $('.caret-inventory').html('<i class="bi bi-caret-down"></i>');
+                }            
+                break;
+            case 'inventory-list-button':
+                if (!collapsible.hasClass('show')) {
+                    collapsible.addClass('show');                   
+                }
+            default:              
+                break;
+        }    
+    }
+
     async function renderContent(element) {
         let url = $(element).data('url');
-        let loading = `
-             <div class="d-block justify-content-center align-items-center align-content-center 
-              text-center text-orange" style="height: 100vh;"
-             aria-hidden="true">
-                <h6>Loading</h6>
-                <div class="d-inline-flex" style="width: 8rem; height: 5rem; font-size: 3rem;">
-                    <span class="spinner-grow" role="status">
-                    </span>
-                    <span class="spinner-grow" role="status">
-                    </span>
-                    <span class="spinner-grow" role="status"t>
-                    </span>
-                </div>
-            </div>
-            `;
     
         loadContent(url, element);
     }
@@ -122,24 +134,9 @@
         }
     }
 
-    async function awaitElement(elementId) {
-        const observer = new MutationObserver((mutations, observer) => {
-            const observedElement = document.getElementById(elementId);
-
-            if (observedElement) {
-                console.log(observedElement);
-                
-                observer.disconnect();
-            }
-            console.log('Not found');
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-    }
-
-    
-    async function renderTitle(activeTab, navId){
+    async function renderTitle(activeTab, element){
         let title, icon;        
-        $(`#${navId} .default-title-container`).html(defaultTitle).append(navDropdown);
+        $(`.default-title-container`).html(defaultTitle).append(navDropdown);
 
         switch(activeTab){
             case 'dashboard':    
@@ -151,7 +148,14 @@
                 $('.input-group search-container').addClass('d-none'); 
                 break;
             case 'inventory':
-                title = 'Inventory';
+            case 'inventory/parts/uncategorized':
+
+                if (activeTab == 'inventory') {
+                    title = "Items";
+                } else {
+                    title = $(element).data('title');
+                }
+                
                 icon = `<i class="bi bi-boxes"></i>`;
                 $('.default-icon').html(icon);
                 $('.default-title').text(title);
@@ -166,7 +170,7 @@
                 $('.custom-select .view-title').text(title);
                 break;
             default:
-                return console.erorr('Tab not found!');
+                return console.error('Tab not found!');
                 break;
         };
     }

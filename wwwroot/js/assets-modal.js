@@ -1,4 +1,4 @@
-﻿async function ModalShow(url) {
+﻿async function ModalShow(url, id) {
     var dashboard = $('#dashboard-layout');
     var home = $('#layoutbody');
     $('.modal').each(function () {
@@ -13,15 +13,18 @@
         if (home) {
             home.append(DynamicModal);
         }       
-        await GetData(url);
+        console.log(id);
+        await GetData(url, id);
+
     },10);
 };
 
-async function GetData(url) {
+async function GetData(url, id) {
     try {
         const response = await $.ajax({
             type: 'GET',
             url: url,  
+            data: {id : id},
             cache: true
         });
         $('#dynamic-modal .modal-body').html(response);

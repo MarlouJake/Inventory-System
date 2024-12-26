@@ -46,25 +46,5 @@ namespace InventorySystem.Utilities.Data
             return Convert.ToBase64String(BitConverter.GetBytes(id.Value));
         }
 
-        /// <summary>
-        /// Converts a Base64 encoded string back to an integer ID.
-        /// </summary>
-        /// <param name="hashedId">The Base64 encoded string to unhash.</param>
-        /// <returns>The integer ID represented by the Base64 encoded string.</returns>
-        /// <exception cref="FormatException">Thrown when the Base64 string is not valid.</exception>
-        public static int Unhash(string hashedId)
-        {
-            if (string.IsNullOrEmpty(hashedId))
-            {
-                throw new ArgumentNullException(nameof(hashedId), "Hashed ID cannot be null or empty");
-            }
-
-            var bytes = Convert.FromBase64String(hashedId);
-            if (bytes.Length != 4)
-            {
-                throw new FormatException("The hashed ID is not in the correct format.");
-            }
-            return BitConverter.ToInt32(bytes, 0);
-        }
     }
 }

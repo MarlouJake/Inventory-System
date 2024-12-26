@@ -7,7 +7,7 @@ namespace InventorySystem.Utilities.Data
 {
     public class ValidateArrayOfId
     {
-        public async Task<ApiResponse> ValidateAsync(int[]? ids, ApplicationDbContext _context)
+        public async Task<ApiResponse> ValidateAsync(string[] ids, ApplicationDbContext _context)
         {
             string message;
 
@@ -17,15 +17,16 @@ namespace InventorySystem.Utilities.Data
                 return await Task.FromResult(ApiResponseUtils.CustomResponse(false, message, null));
             }
 
-            List<int> invalidIds = new List<int>();
+            List<Guid> invalidIds = new List<Guid>();
 
             foreach (var id in ids)
             {
-                var item = await _context.Items.FirstOrDefaultAsync(m => m.ItemId == id);
+                Guid.TryParse(id, out var parsedId);
+                var item = await _context.Items.FirstOrDefaultAsync(model => model.UniqueId == parsedId);
 
                 if (item == null)
                 {
-                    invalidIds.Add(id);
+                    invalidIds.Add(parsedId);
                     Console.WriteLine($"Item with ID {id} doesn't exist");
                     continue;
                 }
